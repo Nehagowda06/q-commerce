@@ -7,9 +7,11 @@ import { useState, useEffect } from "react";
 const placeholders = [
   'Search "milk"',
   'Search "bread"',
-  'Search "vegetables"',
-  'Search "organic eggs"',
-  'Search "fresh fruits"',
+  'Search "biryani"',
+  'Search "detergent"',
+  'Search "alphonso mangoes"',
+  'Search "atta"',
+  'Search "chips"',
 ];
 
 export default function Navbar() {
