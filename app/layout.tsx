@@ -19,10 +19,13 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body className={`${inter.className} bg-gray-100 min-h-screen`}>
-        <div className="app-container shadow-2xl overflow-x-hidden pb-24">
+      <body className={`${inter.className} bg-gray-100 m-0 min-h-dvh`}>
+        <div
+          className="app-container overflow-x-hidden shadow-2xl"
+          style={{ paddingBottom: "calc(5.5rem + env(safe-area-inset-bottom))" }}
+        >
           <Navbar />
-          <main className="min-h-screen">
+          <main className="flex-1">
             {children}
           </main>
           <CartBar />

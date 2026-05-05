@@ -16,8 +16,11 @@ export default function BottomNav() {
   const pathname = usePathname();
 
   return (
-    <nav className="fixed bottom-0 left-0 right-0 z-50 flex justify-center pointer-events-none">
-      <div className="app-container w-full bg-white/80 backdrop-blur-md border-t border-gray-100 flex items-center justify-around px-2 py-2 pointer-events-auto">
+    <nav
+      className="fixed inset-x-0 bottom-0 z-50 flex justify-center px-4 pointer-events-none"
+      style={{ paddingBottom: "env(safe-area-inset-bottom)" }}
+    >
+      <div className="w-full max-w-[420px] bg-white/95 backdrop-blur-md border border-gray-100 border-b-0 rounded-t-3xl shadow-[0_-10px_30px_rgba(0,0,0,0.08)] flex items-center justify-around px-2 py-2 pointer-events-auto">
         {navItems.map((item) => {
           const isActive = pathname === item.href;
           const Icon = item.icon;
@@ -58,7 +61,7 @@ export default function BottomNav() {
               {isActive && (
                 <motion.div 
                   layoutId="activeDot"
-                  className="absolute bottom-0 w-1 h-1 bg-brand-primary rounded-full"
+                  className="absolute bottom-0.5 w-1 h-1 bg-brand-primary rounded-full"
                 />
               )}
             </Link>

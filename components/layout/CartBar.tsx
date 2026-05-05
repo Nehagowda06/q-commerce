@@ -14,8 +14,11 @@ export default function CartBar() {
   if (totalItems === 0) return null;
 
   return (
-    <div className="fixed bottom-20 left-0 right-0 z-40 flex justify-center pointer-events-none px-4">
-      <div className="app-container w-full pointer-events-none flex justify-center">
+    <div
+      className="fixed left-0 right-0 z-40 flex justify-center pointer-events-none px-4"
+      style={{ bottom: "calc(5.5rem + env(safe-area-inset-bottom))" }}
+    >
+      <div className="w-full max-w-[420px] pointer-events-none flex justify-center">
         <AnimatePresence>
           <motion.div
             initial={{ y: 100, opacity: 0 }}
@@ -38,14 +41,14 @@ export default function CartBar() {
               </div>
             </div>
 
-            <Link href="/cart">
-              <motion.button
-                whileTap={{ scale: 0.95 }}
-                className="bg-brand-primary text-white h-11 px-6 rounded-xl text-xs font-black uppercase tracking-widest flex items-center gap-2 shadow-soft"
-              >
+            <Link
+              href="/cart"
+              className="bg-brand-primary text-white h-11 px-6 rounded-xl text-xs font-black uppercase tracking-widest flex items-center gap-2 shadow-soft"
+            >
+              <motion.span whileTap={{ scale: 0.95 }} className="flex items-center gap-2">
                 View Cart
                 <ChevronRight size={16} strokeWidth={3} />
-              </motion.button>
+              </motion.span>
             </Link>
           </motion.div>
         </AnimatePresence>
