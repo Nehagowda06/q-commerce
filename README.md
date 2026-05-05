@@ -1,41 +1,45 @@
-<<<<<<< HEAD
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Q-Commerce App
+
+A fast and responsive Quick Commerce application built with Next.js, TypeScript, and Tailwind CSS.
+
+## Features
+
+- **Dynamic Product Browsing**: Explore categories and products with a smooth UI.
+- **Cart Management**: Add items to your cart and manage them seamlessly (powered by Zustand).
+- **Responsive Design**: Optimized for both mobile and desktop experiences.
+- **Quick Navigation**: Bottom navigation for easy access to categories, cart, and profile.
+- **Modern Tech Stack**: Built with Next.js 15+, React 19, and Framer Motion for animations.
+
+## Tech Stack
+
+- **Framework**: [Next.js](https://nextjs.org/)
+- **State Management**: [Zustand](https://zustand-demo.pmnd.rs/)
+- **Styling**: [Tailwind CSS](https://tailwindcss.com/)
+- **Animations**: [Framer Motion](https://www.framer.com/motion/)
+- **Icons**: [Lucide React](https://lucide.dev/)
 
 ## Getting Started
 
-First, run the development server:
+First, install dependencies:
+
+```bash
+npm install
+```
+
+Then, run the development server:
 
 ```bash
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
 Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## Deployment
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+This project is optimized for deployment on the [Vercel Platform](https://vercel.com/new).
 
-## Learn More
+The easiest way to deploy is to connect your GitHub repository to Vercel. It will automatically detect Next.js and handle the build process.
 
-To learn more about Next.js, take a look at the following resources:
+## License
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
-=======
-# q-commerce
-...
->>>>>>> efba2dea97b5d1f1e9f98daa6069c73b2b7d2eef
+MIT

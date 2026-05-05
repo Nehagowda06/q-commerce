@@ -12,7 +12,7 @@ const shimmer = {
       ease: "linear" 
     }
   }
-};
+} as const;
 
 const ShimmerEffect = () => (
   <motion.div 
