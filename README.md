@@ -40,6 +40,3 @@ This project is optimized for deployment on the [Vercel Platform](https://vercel
 
 The easiest way to deploy is to connect your GitHub repository to Vercel. It will automatically detect Next.js and handle the build process.
 
-## License
-
-MIT
