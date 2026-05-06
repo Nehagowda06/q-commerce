@@ -1,10 +1,17 @@
 "use client";
 
+<<<<<<< HEAD
 import { AnimatePresence, motion } from "framer-motion";
 import { ChevronDown, MapPin, Search, User } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
+=======
+import { motion, AnimatePresence } from "framer-motion";
+import { Search, MapPin, ChevronDown, User } from "lucide-react";
+import { useState, useEffect } from "react";
+import Link from "next/link";
+>>>>>>> 63d8498fee391372fe81c736efc013a7056ac583
 
 const placeholders = [
   'Search "milk"',
@@ -52,12 +59,20 @@ export default function Navbar() {
               </div>
             </div>
           </div>
+<<<<<<< HEAD
 
           <Link href="/profile">
             <motion.div
               whileTap={{ scale: 0.9 }}
               className="w-10 h-10 rounded-full bg-gray-100 flex items-center justify-center text-gray-600 cursor-pointer"
               aria-label="Profile"
+=======
+          
+          <Link href="/profile">
+            <motion.div 
+              whileTap={{ scale: 0.9 }}
+              className="w-10 h-10 rounded-full bg-gray-100 flex items-center justify-center text-gray-600 cursor-pointer"
+>>>>>>> 63d8498fee391372fe81c736efc013a7056ac583
             >
               <User size={20} />
             </motion.div>

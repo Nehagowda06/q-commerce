@@ -1,5 +1,17 @@
+import {
+  Bell,
+  ChevronRight,
+  CreditCard,
+  HelpCircle,
+  LogOut,
+  MapPin,
+  Settings,
+} from "lucide-react";
 import PageWrapper from "@/components/layout/PageWrapper";
+<<<<<<< HEAD
 import { Bell, ChevronRight, CreditCard, HelpCircle, LogOut, MapPin, Settings } from "lucide-react";
+=======
+>>>>>>> 63d8498fee391372fe81c736efc013a7056ac583
 
 const menuItems = [
   { icon: CreditCard, label: "Payments & Refunds" },
@@ -14,31 +26,35 @@ export default function ProfilePage() {
   return (
     <PageWrapper>
       <div className="p-4">
-        {/* Profile Header */}
-        <div className="flex items-center gap-4 mb-8">
-          <div className="w-20 h-20 rounded-full bg-brand-primary/10 flex items-center justify-center text-brand-primary text-3xl font-black">
+        <div className="mb-8 flex items-center gap-4">
+          <div className="flex h-20 w-20 items-center justify-center rounded-full bg-brand-primary/10 text-3xl font-black text-brand-primary">
             JD
           </div>
           <div>
-            <h1 className="text-2xl font-black text-brand-text leading-tight">John Doe</h1>
+            <h1 className="text-2xl font-black leading-tight text-brand-text">John Doe</h1>
             <p className="text-sm text-brand-text-muted">+91 98765 43210</p>
           </div>
         </div>
 
-        {/* Menu Items */}
-        <div className="bg-white rounded-3xl shadow-soft border border-gray-100 overflow-hidden">
-          {menuItems.map((item, i) => (
-            <div 
-              key={i} 
-              className={`flex items-center justify-between p-4 cursor-pointer hover:bg-gray-50 transition-colors ${
-                i !== menuItems.length - 1 ? "border-b border-gray-50" : ""
+        <div className="overflow-hidden rounded-3xl border border-gray-100 bg-white shadow-soft">
+          {menuItems.map((item, index) => (
+            <div
+              key={item.label}
+              className={`flex cursor-pointer items-center justify-between p-4 transition-colors hover:bg-gray-50 ${
+                index !== menuItems.length - 1 ? "border-b border-gray-50" : ""
               }`}
             >
               <div className="flex items-center gap-4">
-                <div className={`w-10 h-10 rounded-xl bg-gray-50 flex items-center justify-center ${item.color || "text-gray-600"}`}>
+                <div
+                  className={`flex h-10 w-10 items-center justify-center rounded-xl bg-gray-50 ${
+                    item.color || "text-gray-600"
+                  }`}
+                >
                   <item.icon size={20} />
                 </div>
-                <span className={`font-bold text-sm ${item.color || "text-brand-text"}`}>{item.label}</span>
+                <span className={`text-sm font-bold ${item.color || "text-brand-text"}`}>
+                  {item.label}
+                </span>
               </div>
               <div className="text-gray-300">
                 <ChevronRight size={16} />
@@ -46,9 +62,15 @@ export default function ProfilePage() {
             </div>
           ))}
         </div>
+<<<<<<< HEAD
         
         <p className="text-center text-[10px] text-gray-400 font-bold mt-8 uppercase tracking-widest">
           Savega Version 1.0.42
+=======
+
+        <p className="mt-8 text-center text-[10px] font-bold uppercase tracking-widest text-gray-400">
+          Version 1.0.42
+>>>>>>> 63d8498fee391372fe81c736efc013a7056ac583
         </p>
       </div>
     </PageWrapper>
