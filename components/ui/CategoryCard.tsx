@@ -22,37 +22,21 @@ export default function CategoryCard({
   const Icon = icons[icon as keyof typeof icons] || Leaf;
 
   return (
-    <motion.button
-      type="button"
+    <motion.div
       onClick={onClick}
       whileTap={{ scale: 0.92 }}
       transition={{ type: "spring", stiffness: 600, damping: 15 }}
-      className="flex flex-col items-center flex-shrink-0 cursor-pointer group select-none"
+      className="w-[64px] flex flex-col items-center flex-shrink-0 cursor-pointer group select-none"
     >
-      <div
-        className={`
-          relative flex h-14 w-14 items-center justify-center rounded-full text-xl shadow-sm transition-all duration-200
-          ${isActive ? "bg-brand-primary text-white ring-2 ring-brand-primary/20 scale-105" : `${color} text-brand-text`}
-        `}
-      >
-        <span className={isActive ? "brightness-200" : ""}>
-          {icon}
-        </span>
-
+      <div className="relative">
         <motion.div
-<<<<<<< HEAD
           animate={{
             backgroundColor: isActive ? "var(--color-brand-primary)" : "transparent",
             scale: isActive ? 1.05 : 1,
           }}
-          className={`
-            w-14 h-14 ${isActive ? "" : color} rounded-2xl flex items-center justify-center text-xl
-            transition-colors duration-200 shadow-sm relative overflow-hidden
-          `}
+          className={`w-11 h-11 ${isActive ? "" : color} rounded-xl flex items-center justify-center transition-colors duration-200 shadow-sm relative overflow-hidden`}
         >
-          <Icon size={24} className={isActive ? "text-white" : "text-brand-primary"} strokeWidth={2.5} />
-
-          {/* Ripple/Flash Effect on Tap */}
+          <Icon size={19} className={isActive ? "text-white" : "text-brand-primary"} strokeWidth={2.4} />
           <motion.div
             initial={false}
             whileTap={{ opacity: [0, 0.4, 0], scale: [0.8, 1.5] }}
@@ -61,30 +45,25 @@ export default function CategoryCard({
           />
         </motion.div>
 
-        {/* Active Ring */}
         {isActive && (
           <motion.div
             layoutId="category-active-ring"
-            className="absolute -inset-1 border-2 border-brand-primary rounded-[20px]"
+            className="absolute -inset-0.5 border-2 border-brand-primary rounded-[14px]"
             transition={{ type: "spring", stiffness: 400, damping: 25 }}
           />
         )}
-=======
-          initial={false}
-          whileTap={{ opacity: [0, 0.4, 0], scale: [0.8, 1.5] }}
-          transition={{ duration: 0.4 }}
-          className="absolute inset-0 bg-white rounded-full pointer-events-none opacity-0"
-        />
->>>>>>> 63d8498fee391372fe81c736efc013a7056ac583
       </div>
 
-      <span
-        className={`mt-2 text-center text-[10px] font-bold leading-tight transition-colors ${
-          isActive ? "text-brand-primary" : "text-brand-text"
-        }`}
+      <motion.span
+        animate={{
+          color: isActive ? "var(--color-brand-primary)" : "var(--color-brand-text)",
+          fontWeight: isActive ? 800 : 700,
+        }}
+        className="block w-full truncate text-[9px] mt-1.5 text-center leading-tight transition-all"
+        title={name}
       >
         {name}
-      </span>
-    </motion.button>
+      </motion.span>
+    </motion.div>
   );
 }

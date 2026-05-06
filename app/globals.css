@@ -4,10 +4,10 @@
   --color-brand-primary: #5f259f;
   --color-brand-primary-light: #8a3ffc;
   --color-brand-accent: #00b761;
-  --color-brand-bg: #f9fafb; /* gray-50 */
-  --color-brand-text: #111827; /* gray-900 */
-  --color-brand-text-muted: #6b7280; /* gray-500 */
-  
+  --color-brand-bg: #f9fafb;
+  --color-brand-text: #111827;
+  --color-brand-text-muted: #6b7280;
+
   --radius-xl: 12px;
   --radius-2xl: 16px;
   --radius-3xl: 24px;
@@ -29,33 +29,63 @@ body {
   background: var(--background);
   color: var(--foreground);
   -webkit-tap-highlight-color: transparent;
-<<<<<<< HEAD
-  overscroll-behavior-y: contain;
-=======
+  font-family: Arial, Helvetica, sans-serif;
   margin: 0;
-  min-height: 100dvh;
-  display: flex;
-  justify-content: center;
->>>>>>> 63d8498fee391372fe81c736efc013a7056ac583
+  overscroll-behavior-y: contain;
+  font-size: 12px;
+  letter-spacing: 0;
 }
 
-/* App Shell container */
 .app-container {
-  width: min(100%, 420px);
-  min-height: 100dvh;
+  max-width: 420px;
+  margin: 0 auto;
+  min-height: 100vh;
   background: white;
   position: relative;
-  display: flex;
-  flex-direction: column;
-  box-shadow: 0 0 50px rgba(0,0,0,0.05);
-  scroll-padding-bottom: 160px;
+  box-shadow: 0 0 50px rgba(0, 0, 0, 0.05);
+  scroll-padding-bottom: 96px;
   padding-bottom: env(safe-area-inset-bottom);
 }
 
-/* Hide scrollbar for horizontal scroll sections */
+button,
+input {
+  font: inherit;
+}
+
+.app-container .font-black {
+  font-weight: 700;
+}
+
+.app-container .font-extrabold {
+  font-weight: 700;
+}
+
+.app-container .font-bold {
+  font-weight: 600;
+}
+
+.app-container .font-semibold {
+  font-weight: 600;
+}
+
+.app-container .uppercase {
+  text-transform: none;
+}
+
+.app-container h1,
+.app-container h2,
+.app-container h3 {
+  letter-spacing: 0;
+}
+
+.app-container [class*="tracking-"] {
+  letter-spacing: 0;
+}
+
 .no-scrollbar::-webkit-scrollbar {
   display: none;
 }
+
 .no-scrollbar {
   -ms-overflow-style: none;
   scrollbar-width: none;

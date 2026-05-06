@@ -1,17 +1,10 @@
 "use client";
 
-<<<<<<< HEAD
 import { AnimatePresence, motion } from "framer-motion";
 import { ChevronDown, MapPin, Search, User } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
-=======
-import { motion, AnimatePresence } from "framer-motion";
-import { Search, MapPin, ChevronDown, User } from "lucide-react";
-import { useState, useEffect } from "react";
-import Link from "next/link";
->>>>>>> 63d8498fee391372fe81c736efc013a7056ac583
 
 const placeholders = [
   'Search "milk"',
@@ -39,42 +32,34 @@ export default function Navbar() {
 
   return (
     <header className="sticky top-0 z-50 bg-white shadow-soft">
-      <div className="px-4 py-3">
-        <div className="flex items-center justify-between mb-3">
+      <div className="px-3.5 py-2.5">
+        <div className="flex items-center justify-between mb-2.5">
           <div className="flex items-center gap-2 min-w-0">
-            <div className="w-9 h-9 rounded-2xl bg-brand-primary text-white flex items-center justify-center font-black text-lg">
+            <div className="w-8 h-8 rounded-xl bg-brand-primary text-white flex items-center justify-center font-extrabold text-base">
               S
             </div>
             <div className="min-w-0">
               <div className="flex items-center gap-1">
-                <span className="text-[10px] font-black text-brand-primary uppercase tracking-widest leading-none">
+                <span className="text-[9px] font-extrabold text-brand-primary uppercase leading-none">
                   savega
                 </span>
-                <span className="text-[10px] font-bold text-brand-text-muted leading-none">in 10 mins</span>
+                <span className="text-[9px] font-bold text-brand-text-muted leading-none">in 10 mins</span>
               </div>
               <div className="flex items-center gap-1 mt-1 min-w-0">
-                <MapPin size={13} className="text-brand-primary flex-shrink-0" strokeWidth={3} />
-                <span className="text-sm font-extrabold text-brand-text leading-none truncate">Home - Bangalore</span>
-                <ChevronDown size={14} className="text-brand-primary flex-shrink-0" strokeWidth={3} />
+                <MapPin size={12} className="text-brand-primary flex-shrink-0" strokeWidth={3} />
+                <span className="text-[12px] font-bold text-brand-text leading-none truncate">Home - Bangalore</span>
+                <ChevronDown size={13} className="text-brand-primary flex-shrink-0" strokeWidth={3} />
               </div>
             </div>
           </div>
-<<<<<<< HEAD
 
           <Link href="/profile">
             <motion.div
               whileTap={{ scale: 0.9 }}
-              className="w-10 h-10 rounded-full bg-gray-100 flex items-center justify-center text-gray-600 cursor-pointer"
+              className="w-9 h-9 rounded-full bg-gray-100 flex items-center justify-center text-gray-600 cursor-pointer"
               aria-label="Profile"
-=======
-          
-          <Link href="/profile">
-            <motion.div 
-              whileTap={{ scale: 0.9 }}
-              className="w-10 h-10 rounded-full bg-gray-100 flex items-center justify-center text-gray-600 cursor-pointer"
->>>>>>> 63d8498fee391372fe81c736efc013a7056ac583
             >
-              <User size={20} />
+              <User size={18} />
             </motion.div>
           </Link>
         </div>
@@ -82,27 +67,27 @@ export default function Navbar() {
         {showSearch && (
           <div className="relative group">
             <div className="absolute inset-y-0 left-3 flex items-center pointer-events-none text-gray-400 group-focus-within:text-brand-primary transition-colors z-10">
-              <Search size={18} strokeWidth={2.5} />
+              <Search size={16} strokeWidth={2.5} />
             </div>
 
-            <div className="relative w-full h-11 bg-gray-50 border border-gray-100 rounded-2xl flex items-center shadow-inner overflow-hidden">
+            <div className="relative w-full h-10 bg-gray-50 border border-gray-100 rounded-xl flex items-center shadow-inner overflow-hidden">
               <input
                 type="text"
                 value={query}
                 onChange={(event) => setQuery(event.target.value)}
-                className="w-full h-full pl-10 pr-20 bg-transparent text-sm font-medium focus:outline-none z-10 text-brand-text"
+                className="w-full h-full pl-9 pr-16 bg-transparent text-[12px] font-medium focus:outline-none z-10 text-brand-text"
                 aria-label="Search Savega"
               />
 
               {!query && (
-                <div className="absolute left-10 inset-y-0 flex items-center pointer-events-none">
+                <div className="absolute left-9 inset-y-0 flex items-center pointer-events-none">
                   <AnimatePresence mode="wait">
                     <motion.span
                       key={placeholderIdx}
                       initial={{ y: 10, opacity: 0 }}
                       animate={{ y: 0, opacity: 1 }}
                       exit={{ y: -10, opacity: 0 }}
-                      className="text-gray-400 text-sm font-medium"
+                      className="text-gray-400 text-[12px] font-medium"
                     >
                       {placeholders[placeholderIdx]}
                     </motion.span>
@@ -112,8 +97,8 @@ export default function Navbar() {
             </div>
 
             <div className="absolute right-3 inset-y-0 flex items-center z-10 pointer-events-none">
-              <div className="w-px h-5 bg-gray-200 mx-2" />
-              <span className="text-xs font-bold text-brand-primary">Search</span>
+              <div className="w-px h-4 bg-gray-200 mx-2" />
+              <span className="text-[11px] font-bold text-brand-primary">Search</span>
             </div>
           </div>
         )}
