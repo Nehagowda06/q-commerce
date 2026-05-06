@@ -1,16 +1,13 @@
 "use client";
 
 import { useState } from "react";
-import { Baby, ChevronRight, Cookie, CupSoda, Heart, Leaf, Milk, Sparkles, Wheat } from "lucide-react";
+import { ChevronRight } from "lucide-react";
 import PageWrapper from "@/components/layout/PageWrapper";
 import { groceryAisles } from "@/data/mockData";
-
-const icons = { Baby, Cookie, CupSoda, Heart, Leaf, Milk, Sparkles, Wheat };
 
 export default function CategoriesPage() {
   const [activeAisle, setActiveAisle] = useState(groceryAisles[0].name);
   const active = groceryAisles.find((aisle) => aisle.name === activeAisle) || groceryAisles[0];
-  const ActiveIcon = icons[active.icon as keyof typeof icons] || Leaf;
 
   return (
     <PageWrapper>
@@ -23,7 +20,6 @@ export default function CategoriesPage() {
         <div className="grid grid-cols-[82px_1fr] min-h-[calc(100vh-150px)]">
           <aside className="bg-gray-50 border-r border-gray-100 py-1.5">
             {groceryAisles.map((aisle) => {
-              const Icon = icons[aisle.icon as keyof typeof icons] || Leaf;
               const isActive = aisle.name === activeAisle;
 
               return (
@@ -36,8 +32,9 @@ export default function CategoriesPage() {
                       : "border-transparent text-gray-500"
                   }`}
                 >
-                  <div className={`w-9 h-9 rounded-xl flex items-center justify-center ${isActive ? "bg-brand-primary text-white" : aisle.color}`}>
-                    <Icon size={17} strokeWidth={2.4} />
+                  <div className={`w-11 h-11 rounded-xl flex items-center justify-center ${aisle.color} shadow-soft`}>
+                    {/* eslint-disable-next-line @next/next/no-img-element */}
+                    <img src={aisle.image} alt={aisle.name} width={32} height={32} className="w-8 h-8 object-contain drop-shadow-sm" loading="lazy" />
                   </div>
                   <span className="w-full truncate text-[8.5px] font-bold leading-tight">{aisle.name}</span>
                 </button>
@@ -46,9 +43,10 @@ export default function CategoriesPage() {
           </aside>
 
           <main className="p-3">
-            <div className="rounded-xl bg-brand-primary text-white p-2.5 mb-2.5 flex items-center gap-2">
-              <div className="w-9 h-9 rounded-lg bg-white/15 flex items-center justify-center">
-                <ActiveIcon size={19} />
+            <div className="rounded-xl bg-brand-primary text-white p-2.5 mb-2.5 flex items-center gap-2.5">
+              <div className="w-11 h-11 rounded-lg bg-white flex items-center justify-center shadow-soft">
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img src={active.image} alt={active.name} width={32} height={32} className="w-8 h-8 object-contain" />
               </div>
               <div>
                 <h2 className="text-[13px] font-extrabold leading-tight">{active.name}</h2>
@@ -62,8 +60,9 @@ export default function CategoriesPage() {
                   key={subcategory}
                   className="min-h-20 rounded-xl border border-gray-100 bg-white shadow-soft p-2 text-left flex flex-col justify-between"
                 >
-                  <div className={`w-8 h-8 rounded-lg ${active.color} flex items-center justify-center text-brand-primary`}>
-                    <ActiveIcon size={16} strokeWidth={2.4} />
+                  <div className={`w-10 h-10 rounded-lg ${active.color} flex items-center justify-center`}>
+                    {/* eslint-disable-next-line @next/next/no-img-element */}
+                    <img src={active.image} alt={active.name} width={28} height={28} className="w-7 h-7 object-contain drop-shadow-sm" />
                   </div>
                   <div className="flex items-end justify-between gap-2">
                     <span className="text-[10px] font-extrabold text-brand-text leading-tight">{subcategory}</span>
