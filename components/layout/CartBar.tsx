@@ -1,13 +1,12 @@
 "use client";
 
-import { motion, AnimatePresence } from "framer-motion";
-import { useCartStore } from "@/store/cartStore";
+import { AnimatePresence, motion } from "framer-motion";
 import { ChevronRight, ShoppingBag } from "lucide-react";
 import Link from "next/link";
+import { useCartStore } from "@/store/cartStore";
 
 export default function CartBar() {
   const items = useCartStore((state) => state.items);
-  
   const totalItems = items.reduce((sum, item) => sum + item.quantity, 0);
   const totalPrice = items.reduce((sum, item) => sum + item.price * item.quantity, 0);
 
@@ -15,7 +14,7 @@ export default function CartBar() {
 
   return (
     <div className="fixed bottom-20 left-0 right-0 z-40 flex justify-center pointer-events-none px-4">
-      <div className="app-container w-full pointer-events-none flex justify-center">
+      <div className="w-full max-w-[420px] pointer-events-none flex justify-center">
         <AnimatePresence>
           <motion.div
             initial={{ y: 100, opacity: 0 }}
@@ -32,9 +31,7 @@ export default function CartBar() {
                 <span className="text-[11px] font-black text-brand-text-muted uppercase tracking-wider leading-none">
                   {totalItems} {totalItems === 1 ? "Item" : "Items"}
                 </span>
-                <span className="text-sm font-black text-brand-text mt-1 leading-none">
-                  ₹{totalPrice}
-                </span>
+                <span className="text-sm font-black text-brand-text mt-1 leading-none">Rs.{totalPrice}</span>
               </div>
             </div>
 

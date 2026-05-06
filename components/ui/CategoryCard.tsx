@@ -1,6 +1,7 @@
 "use client";
 
 import { motion } from "framer-motion";
+import { Baby, Cookie, CupSoda, Heart, Leaf, Milk, Sparkles, Wheat } from "lucide-react";
 
 interface CategoryCardProps {
   name: string;
@@ -17,6 +18,9 @@ export default function CategoryCard({
   isActive = false,
   onClick,
 }: CategoryCardProps) {
+  const icons = { Baby, Cookie, CupSoda, Heart, Leaf, Milk, Sparkles, Wheat };
+  const Icon = icons[icon as keyof typeof icons] || Leaf;
+
   return (
     <motion.div
       onClick={onClick}
@@ -31,14 +35,11 @@ export default function CategoryCard({
             scale: isActive ? 1.05 : 1,
           }}
           className={`
-            w-14 h-14 ${isActive ? "" : color} rounded-full flex items-center justify-center text-xl 
+            w-14 h-14 ${isActive ? "" : color} rounded-2xl flex items-center justify-center text-xl
             transition-colors duration-200 shadow-sm relative overflow-hidden
           `}
         >
-          {/* Active Overlay / Icon color */}
-          <span className={`${isActive ? "brightness-200" : ""}`}>
-            {icon}
-          </span>
+          <Icon size={24} className={isActive ? "text-white" : "text-brand-primary"} strokeWidth={2.5} />
 
           {/* Ripple/Flash Effect on Tap */}
           <motion.div
@@ -53,7 +54,7 @@ export default function CategoryCard({
         {isActive && (
           <motion.div
             layoutId="category-active-ring"
-            className="absolute -inset-1 border-2 border-brand-primary rounded-full"
+            className="absolute -inset-1 border-2 border-brand-primary rounded-[20px]"
             transition={{ type: "spring", stiffness: 400, damping: 25 }}
           />
         )}

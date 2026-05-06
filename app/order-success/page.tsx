@@ -1,89 +1,62 @@
 "use client";
 
 import { motion } from "framer-motion";
-import { Check, Truck, ArrowRight } from "lucide-react";
+import { ArrowRight, Check, Truck } from "lucide-react";
 import Link from "next/link";
 import PageWrapper from "@/components/layout/PageWrapper";
 import Button from "@/components/ui/Button";
-import { useEffect, useState } from "react";
 
-const Confetti = () => {
+const confettiPieces = Array.from({ length: 20 }, (_, index) => ({
+  id: index,
+  x: `${(index * 37) % 100}%`,
+  y: `${(index * 61) % 100}%`,
+  duration: 2 + (index % 4) * 0.35,
+  delay: (index % 6) * 0.45,
+  color: ["bg-brand-primary", "bg-brand-accent", "bg-yellow-400", "bg-blue-400"][index % 4],
+}));
+
+function Confetti() {
   return (
     <div className="absolute inset-0 pointer-events-none overflow-hidden">
-      {[...Array(20)].map((_, i) => (
+      {confettiPieces.map((piece) => (
         <motion.div
-          key={i}
-          initial={{ 
-            x: "50%", 
-            y: "50%", 
-            scale: 0,
-            rotate: 0 
-          }}
-          animate={{ 
-            x: `${Math.random() * 100}%`, 
-            y: `${Math.random() * 100}%`, 
-            scale: [0, 1, 0.5],
-            rotate: 360 
-          }}
-          transition={{ 
-            duration: 2 + Math.random() * 2,
+          key={piece.id}
+          initial={{ x: "50%", y: "50%", scale: 0, rotate: 0 }}
+          animate={{ x: piece.x, y: piece.y, scale: [0, 1, 0.5], rotate: 360 }}
+          transition={{
+            duration: piece.duration,
             ease: "easeOut",
             repeat: Infinity,
-            repeatDelay: Math.random() * 5
+            repeatDelay: piece.delay,
           }}
-          className={`absolute w-3 h-3 rounded-sm ${
-            ["bg-brand-primary", "bg-brand-accent", "bg-yellow-400", "bg-blue-400"][i % 4]
-          }`}
+          className={`absolute w-3 h-3 rounded-sm ${piece.color}`}
         />
       ))}
     </div>
   );
-};
+}
 
 export default function OrderSuccessPage() {
-  const [mounted, setMounted] = useState(false);
-
-  useEffect(() => {
-    setMounted(true);
-  }, []);
-
-  if (!mounted) return null;
-
   return (
     <PageWrapper>
       <div className="relative flex flex-col items-center justify-center min-h-[80vh] px-6 text-center overflow-hidden">
         <Confetti />
 
-        {/* Success Icon */}
         <motion.div
           initial={{ scale: 0, rotate: -45 }}
           animate={{ scale: 1, rotate: 0 }}
-          transition={{ 
-            type: "spring", 
-            stiffness: 260, 
-            damping: 20,
-            delay: 0.2 
-          }}
+          transition={{ type: "spring", stiffness: 260, damping: 20, delay: 0.2 }}
           className="w-24 h-24 bg-brand-accent rounded-full flex items-center justify-center text-white shadow-lg shadow-brand-accent/30 mb-8 z-10"
         >
           <Check size={48} strokeWidth={4} />
         </motion.div>
 
-        {/* Text Content */}
-        <motion.div
-          initial={{ y: 20, opacity: 0 }}
-          animate={{ y: 0, opacity: 1 }}
-          transition={{ delay: 0.4 }}
-          className="z-10"
-        >
-          <h1 className="text-3xl font-black text-brand-text mb-2">
-            Order Placed! 🎉
-          </h1>
+        <motion.div initial={{ y: 20, opacity: 0 }} animate={{ y: 0, opacity: 1 }} transition={{ delay: 0.4 }} className="z-10">
+          <h1 className="text-3xl font-black text-brand-text mb-2">Order Placed!</h1>
           <p className="text-sm text-brand-text-muted mb-8 font-medium">
-            Order ID: <span className="text-brand-text">#QC-82941</span>
+            Order ID: <span className="text-brand-text">#SV-82941</span>
           </p>
 
-          {/* Delivery Card */}
           <motion.div
             initial={{ scale: 0.9, opacity: 0 }}
             animate={{ scale: 1, opacity: 1 }}
@@ -104,22 +77,16 @@ export default function OrderSuccessPage() {
           </motion.div>
         </motion.div>
 
-        {/* Actions */}
-        <motion.div
-          initial={{ y: 20, opacity: 0 }}
-          animate={{ y: 0, opacity: 1 }}
-          transition={{ delay: 0.8 }}
-          className="w-full max-w-[280px] z-10"
-        >
+        <motion.div initial={{ y: 20, opacity: 0 }} animate={{ y: 0, opacity: 1 }} transition={{ delay: 0.8 }} className="w-full max-w-[280px] z-10">
           <Link href="/">
             <Button fullWidth size="lg" className="shadow-medium group">
               Continue Shopping
               <ArrowRight size={18} className="ml-2 group-hover:translate-x-1 transition-transform" />
             </Button>
           </Link>
-          
+
           <p className="text-[10px] font-bold text-gray-400 uppercase tracking-[0.2em] mt-8">
-            Thank you for choosing Q-Commerce
+            Thank you for choosing Savega
           </p>
         </motion.div>
       </div>

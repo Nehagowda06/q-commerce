@@ -1,5 +1,5 @@
 import PageWrapper from "@/components/layout/PageWrapper";
-import { User, Settings, CreditCard, MapPin, Bell, HelpCircle, LogOut } from "lucide-react";
+import { Bell, ChevronRight, CreditCard, HelpCircle, LogOut, MapPin, Settings } from "lucide-react";
 
 const menuItems = [
   { icon: CreditCard, label: "Payments & Refunds" },
@@ -41,14 +41,14 @@ export default function ProfilePage() {
                 <span className={`font-bold text-sm ${item.color || "text-brand-text"}`}>{item.label}</span>
               </div>
               <div className="text-gray-300">
-                <Settings size={16} /> {/* Using Settings as a generic chevron-like icon for now, or just remove */}
+                <ChevronRight size={16} />
               </div>
             </div>
           ))}
         </div>
         
         <p className="text-center text-[10px] text-gray-400 font-bold mt-8 uppercase tracking-widest">
-          Version 1.0.42
+          Savega Version 1.0.42
         </p>
       </div>
     </PageWrapper>

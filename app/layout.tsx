@@ -8,8 +8,8 @@ import CartBar from "@/components/layout/CartBar";
 const inter = Inter({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
-  title: "Q-Commerce | Quick Grocery Delivery",
-  description: "Experience the fastest grocery delivery in your city.",
+  title: "Savega | Groceries and Food in Minutes",
+  description: "Order quick groceries and food delivery with Savega.",
 };
 
 export default function RootLayout({
@@ -20,9 +20,9 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className={`${inter.className} bg-gray-100 min-h-screen`}>
-        <div className="app-container shadow-2xl overflow-x-hidden pb-24">
+        <div className="app-container shadow-2xl overflow-x-hidden">
           <Navbar />
-          <main className="min-h-screen">
+          <main className="min-h-screen pb-36">
             {children}
           </main>
           <CartBar />
