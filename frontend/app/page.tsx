@@ -137,12 +137,12 @@ function GroceryHome({
             See all <ChevronRight size={12} strokeWidth={3} />
           </Link>
         </div>
-        <div className="flex overflow-x-auto gap-2 px-3 pb-1 no-scrollbar">
+        <div className="flex overflow-x-auto overflow-y-visible gap-2 px-3 pt-2 pb-2 no-scrollbar">
           {groceryAisles.map((aisle) => (
             <CategoryCard
               key={aisle.name}
               name={aisle.name}
-              icon={aisle.icon}
+              image={aisle.image}
               color={aisle.color}
               isActive={activeAisle === aisle.name}
               onClick={() => setActiveAisle(aisle.name)}

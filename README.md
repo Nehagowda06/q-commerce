@@ -18,11 +18,16 @@ A fast and responsive Quick Commerce application built with Next.js, TypeScript,
 - **Animations**: [Framer Motion](https://www.framer.com/motion/)
 - **Icons**: [Lucide React](https://lucide.dev/)
 
+## Project Structure
+
+The application lives in the [`frontend/`](./frontend) directory. Run all `npm` commands from there.
+
 ## Getting Started
 
-First, install dependencies:
+From the `frontend/` directory, install dependencies:
 
 ```bash
+cd frontend
 npm install
 ```
 

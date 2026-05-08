@@ -1,49 +1,60 @@
+// Zepto-style 3D product icons — Microsoft Fluent UI Emoji served via jsDelivr.
+const FLUENT = "https://cdn.jsdelivr.net/gh/microsoft/fluentui-emoji@main/assets";
+
 export const groceryAisles = [
   {
     name: "Fresh",
     icon: "Leaf",
+    image: `${FLUENT}/Leafy%20green/3D/leafy_green_3d.png`,
     color: "bg-emerald-50",
     subcategories: ["Vegetables", "Fruits", "Herbs", "Cut & Peeled"],
   },
   {
     name: "Dairy",
     icon: "Milk",
+    image: `${FLUENT}/Glass%20of%20milk/3D/glass_of_milk_3d.png`,
     color: "bg-sky-50",
     subcategories: ["Milk", "Curd", "Paneer", "Butter & Cheese"],
   },
   {
     name: "Staples",
     icon: "Wheat",
+    image: `${FLUENT}/Sheaf%20of%20rice/3D/sheaf_of_rice_3d.png`,
     color: "bg-amber-50",
     subcategories: ["Atta", "Rice", "Dal", "Oil & Ghee"],
   },
   {
     name: "Snacks",
     icon: "Cookie",
+    image: `${FLUENT}/Cookie/3D/cookie_3d.png`,
     color: "bg-orange-50",
     subcategories: ["Chips", "Namkeen", "Biscuits", "Chocolates"],
   },
   {
     name: "Beverages",
     icon: "CupSoda",
+    image: `${FLUENT}/Cup%20with%20straw/3D/cup_with_straw_3d.png`,
     color: "bg-cyan-50",
     subcategories: ["Tea & Coffee", "Juices", "Soft Drinks", "Energy Drinks"],
   },
   {
     name: "Home Care",
     icon: "Sparkles",
+    image: `${FLUENT}/Soap/3D/soap_3d.png`,
     color: "bg-violet-50",
     subcategories: ["Detergents", "Cleaners", "Tissues", "Repellents"],
   },
   {
     name: "Personal Care",
     icon: "Heart",
+    image: `${FLUENT}/Lotion%20bottle/3D/lotion_bottle_3d.png`,
     color: "bg-rose-50",
     subcategories: ["Bath", "Hair", "Skin", "Oral Care"],
   },
   {
     name: "Baby & Pet",
     icon: "Baby",
+    image: `${FLUENT}/Baby/Default/3D/baby_3d_default.png`,
     color: "bg-lime-50",
     subcategories: ["Diapers", "Baby Food", "Pet Food", "Pet Treats"],
   },
