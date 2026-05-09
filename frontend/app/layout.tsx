@@ -19,7 +19,7 @@ export default function RootLayout({
       <body className="bg-gray-100 min-h-screen">
         <div className="app-container shadow-2xl overflow-x-hidden">
           <Navbar />
-          <main className="min-h-screen pb-20">{children}</main>
+          <main className="pb-24">{children}</main>
           <CartBar />
           <BottomNav />
         </div>

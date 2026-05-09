@@ -47,7 +47,7 @@ export default function Navbar() {
               </div>
               <div className="flex items-center gap-1 mt-1 min-w-0">
                 <MapPin size={12} className="text-brand-primary flex-shrink-0" strokeWidth={3} />
-                <span className="text-[12px] font-bold text-brand-text leading-none truncate">Home - Bangalore</span>
+                <span className="text-[12px] font-bold text-brand-text leading-none truncate">Home - Mandya</span>
                 <ChevronDown size={13} className="text-brand-primary flex-shrink-0" strokeWidth={3} />
               </div>
             </div>

@@ -8,7 +8,7 @@ import PageWrapper from "@/components/layout/PageWrapper";
 import ProductCard from "@/components/ui/ProductCard";
 import CategoryCard from "@/components/ui/CategoryCard";
 import PullToRefresh from "@/components/ui/PullToRefresh";
-import { allProducts, foodCategories, groceryAisles, restaurants } from "@/data/mockData";
+import { allProducts, foodCategories, groceryAisles, restaurants, type Subcategory } from "@/data/mockData";
 
 const containerVariants = {
   hidden: { opacity: 0 },
@@ -61,7 +61,7 @@ export default function Home() {
   return (
     <PageWrapper>
       <PullToRefresh onRefresh={handleRefresh}>
-        <motion.div variants={containerVariants} initial="hidden" animate="visible" className="pb-16">
+        <motion.div variants={containerVariants} initial="hidden" animate="visible" className="pb-4">
           <motion.section variants={sectionVariants} className="px-3 pt-2.5">
             <div className="grid grid-cols-2 gap-1 rounded-xl bg-gray-100 p-1">
               <button
@@ -105,7 +105,7 @@ function GroceryHome({
 }: {
   activeAisle: string;
   setActiveAisle: (name: string) => void;
-  activeSubcategories: string[];
+  activeSubcategories: Subcategory[];
 }) {
   return (
     <>
@@ -125,8 +125,8 @@ function GroceryHome({
         </div>
       </motion.section>
 
-      <motion.section variants={sectionVariants} className="mt-3.5">
-        <div className="px-3 flex items-center justify-between mb-2">
+      <motion.section variants={sectionVariants} className="mt-4">
+        <div className="px-3 flex items-center justify-between mb-2.5">
           <div>
             <h2 className="text-[13px] font-extrabold text-brand-text">Shop by Aisle</h2>
             <p className="text-[8px] text-brand-text-muted font-bold uppercase">
@@ -137,7 +137,7 @@ function GroceryHome({
             See all <ChevronRight size={12} strokeWidth={3} />
           </Link>
         </div>
-        <div className="flex overflow-x-auto overflow-y-visible gap-2 px-3 pt-2 pb-2 no-scrollbar">
+        <div className="flex overflow-x-auto gap-2 px-3 py-2 no-scrollbar">
           {groceryAisles.map((aisle) => (
             <CategoryCard
               key={aisle.name}
@@ -149,15 +149,19 @@ function GroceryHome({
             />
           ))}
         </div>
-        <div className="px-3 mt-2.5 grid grid-cols-2 gap-2">
+        <div className="px-3 mt-4 grid grid-cols-2 gap-2">
           {activeSubcategories.map((subcategory) => (
             <Link
               href="/categories"
-              key={subcategory}
-              className="min-h-10 rounded-xl border border-gray-100 bg-gray-50 px-2.5 py-2 flex items-center justify-between"
+              key={subcategory.name}
+              className="min-h-10 rounded-xl border border-gray-100 bg-gray-50 px-2.5 py-2 flex items-center justify-between gap-2"
             >
-              <span className="text-[10px] font-bold text-brand-text truncate">{subcategory}</span>
-              <ChevronRight size={12} className="text-brand-primary" strokeWidth={3} />
+              <div className="flex items-center gap-2 min-w-0">
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img src={subcategory.image} alt={subcategory.name} width={20} height={20} className="w-5 h-5 object-contain flex-shrink-0" loading="lazy" />
+                <span className="text-[10px] font-bold text-brand-text truncate">{subcategory.name}</span>
+              </div>
+              <ChevronRight size={12} className="text-brand-primary flex-shrink-0" strokeWidth={3} />
             </Link>
           ))}
         </div>
@@ -172,6 +176,8 @@ function GroceryHome({
 }
 
 function FoodHome() {
+  const [activeCategory, setActiveCategory] = useState<string | null>(null);
+
   return (
     <>
       <motion.section variants={sectionVariants} className="px-3 pt-3">
@@ -196,12 +202,21 @@ function FoodHome() {
         </div>
         <div className="flex overflow-x-auto gap-2 px-3 pb-1 no-scrollbar">
           {foodCategories.map((category) => (
-            <div key={category.name} className="w-[86px] flex-shrink-0">
-              <div className={`h-[70px] rounded-xl bg-gradient-to-br ${category.image} border border-gray-100 shadow-soft`} />
-              <p className="text-[10px] font-black text-center mt-1.5 leading-tight">{category.name}</p>
-            </div>
+            <button
+              key={category.name}
+              onClick={() => setActiveCategory(category.name)}
+              className={`w-[86px] flex-shrink-0 text-left transition-transform active:scale-95 ${activeCategory === category.name ? "scale-95" : ""}`}
+            >
+              <div className={`h-[70px] rounded-xl bg-gradient-to-br ${category.image} border shadow-soft ${activeCategory === category.name ? "border-brand-primary border-2" : "border-gray-100"}`} />
+              <p className={`text-[10px] font-black text-center mt-1.5 leading-tight ${activeCategory === category.name ? "text-brand-primary" : ""}`}>{category.name}</p>
+            </button>
           ))}
         </div>
+        {activeCategory && (
+          <p className="px-3 mt-2 text-[10px] font-bold text-brand-primary">
+            Showing results for: {activeCategory}
+          </p>
+        )}
       </motion.section>
 
       <motion.section variants={sectionVariants} className="mt-6 px-3.5">
@@ -215,9 +230,17 @@ function FoodHome() {
           </div>
         </div>
         <div className="space-y-3">
-          {restaurants.map((restaurant) => (
-            <RestaurantCard key={restaurant.id} restaurant={restaurant} />
-          ))}
+          {restaurants
+            .filter((r) => !activeCategory || r.cuisine.toLowerCase().includes(activeCategory.toLowerCase()) || r.popular.some((p) => p.toLowerCase().includes(activeCategory.toLowerCase())))
+            .concat(
+              activeCategory
+                ? restaurants.filter((r) => !r.cuisine.toLowerCase().includes(activeCategory.toLowerCase()) && !r.popular.some((p) => p.toLowerCase().includes(activeCategory.toLowerCase())))
+                : []
+            )
+            .filter((r, i, arr) => arr.findIndex((x) => x.id === r.id) === i)
+            .map((restaurant) => (
+              <RestaurantCard key={restaurant.id} restaurant={restaurant} />
+            ))}
         </div>
       </motion.section>
       <WatermarkFooter />
@@ -227,9 +250,9 @@ function FoodHome() {
 
 function WatermarkFooter() {
   return (
-    <motion.footer variants={sectionVariants} className="px-3 pt-7 pb-5 text-center">
-      <p className="text-[28px] font-bold lowercase text-gray-300/90 leading-none">savega</p>
-      <p className="mt-1.5 text-[12px] font-semibold lowercase text-gray-300/80">fast safe reliable</p>
+    <motion.footer variants={sectionVariants} className="px-3 pt-4 pb-2 text-center">
+      <p className="text-[16px] font-bold lowercase text-gray-300/80 leading-none">savega</p>
+      <p className="mt-1 text-[9px] font-semibold lowercase text-gray-300/70">fast safe reliable</p>
     </motion.footer>
   );
 }
@@ -291,6 +314,14 @@ function ProductGrid({ title, products }: { title: string; products: GroceryProd
 }
 
 function RestaurantCard({ restaurant }: { restaurant: (typeof restaurants)[number] }) {
+  const [ordering, setOrdering] = useState(false);
+  const [ordered, setOrdered] = useState(false);
+
+  const handleOrder = () => {
+    setOrdering(true);
+    setTimeout(() => { setOrdering(false); setOrdered(true); setTimeout(() => setOrdered(false), 2000); }, 800);
+  };
+
   return (
     <div className="rounded-xl border border-gray-100 bg-white p-2.5 shadow-soft flex gap-2.5">
       <div className={`w-[82px] h-[82px] rounded-xl bg-gradient-to-br ${restaurant.image} flex-shrink-0 relative overflow-hidden`}>
@@ -309,10 +340,21 @@ function RestaurantCard({ restaurant }: { restaurant: (typeof restaurants)[numbe
             {restaurant.eta}
           </span>
         </div>
-        <p className="text-[10px] font-bold text-brand-primary mt-1.5">{restaurant.offer}</p>
-        <p className="text-[9px] text-brand-text-muted mt-1.5 line-clamp-1">
-          Frequent picks: {restaurant.popular.join(", ")}
-        </p>
+        <p className="text-[10px] font-bold text-brand-primary mt-1">{restaurant.offer}</p>
+        <div className="flex items-center justify-between mt-1.5 gap-2">
+          <p className="text-[9px] text-brand-text-muted line-clamp-1 flex-1">
+            {restaurant.popular.join(", ")}
+          </p>
+          <button
+            onClick={handleOrder}
+            disabled={ordering || ordered}
+            className={`flex-shrink-0 px-2.5 py-1 rounded-lg text-[9px] font-black transition-colors ${
+              ordered ? "bg-brand-accent text-white" : "bg-brand-primary text-white"
+            }`}
+          >
+            {ordered ? "✓ Added" : ordering ? "..." : "Order"}
+          </button>
+        </div>
       </div>
     </div>
   );
