@@ -1,10 +1,11 @@
 "use client";
 
 import { AnimatePresence, motion } from "framer-motion";
-import { ChevronDown, MapPin, Search, User } from "lucide-react";
+import { ChevronDown, MapPin, Search, User, X } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
+import { useSearchStore } from "@/store/searchStore";
 
 const placeholders = [
   'Search "milk"',
@@ -20,8 +21,13 @@ const routesWithSearch = new Set(["/", "/categories"]);
 export default function Navbar() {
   const pathname = usePathname();
   const [placeholderIdx, setPlaceholderIdx] = useState(0);
-  const [query, setQuery] = useState("");
+  const { query, setQuery, reset } = useSearchStore();
   const showSearch = routesWithSearch.has(pathname);
+
+  // Reset search when leaving search pages
+  useEffect(() => {
+    if (!routesWithSearch.has(pathname)) reset();
+  }, [pathname, reset]);
 
   useEffect(() => {
     const interval = setInterval(() => {
@@ -70,17 +76,18 @@ export default function Navbar() {
               <Search size={16} strokeWidth={2.5} />
             </div>
 
-            <div className="relative w-full h-10 bg-gray-50 border border-gray-100 rounded-xl flex items-center shadow-inner overflow-hidden">
+            <div className="relative w-full h-10 bg-gray-50 border border-gray-100 rounded-xl flex items-center shadow-inner overflow-hidden focus-within:border-brand-primary transition-colors">
               <input
                 type="text"
                 value={query}
-                onChange={(event) => setQuery(event.target.value)}
+                onChange={(e) => setQuery(e.target.value)}
                 className="w-full h-full pl-9 pr-16 bg-transparent text-[12px] font-medium focus:outline-none z-10 text-brand-text"
                 aria-label="Search Savega"
+                placeholder=""
               />
 
               {!query && (
-                <div className="absolute left-9 inset-y-0 flex items-center pointer-events-none">
+                <div className="absolute left-9 inset-y-0 flex items-center pointer-events-none z-0">
                   <AnimatePresence mode="wait">
                     <motion.span
                       key={placeholderIdx}
@@ -96,9 +103,22 @@ export default function Navbar() {
               )}
             </div>
 
-            <div className="absolute right-3 inset-y-0 flex items-center z-10 pointer-events-none">
-              <div className="w-px h-4 bg-gray-200 mx-2" />
-              <span className="text-[11px] font-bold text-brand-primary">Search</span>
+            <div className="absolute right-3 inset-y-0 flex items-center z-10 gap-1">
+              {query ? (
+                <button
+                  type="button"
+                  onClick={() => setQuery("")}
+                  className="w-5 h-5 rounded-full bg-gray-200 flex items-center justify-center text-gray-500"
+                  aria-label="Clear search"
+                >
+                  <X size={11} strokeWidth={3} />
+                </button>
+              ) : (
+                <>
+                  <div className="w-px h-4 bg-gray-200 mx-1" />
+                  <span className="text-[11px] font-bold text-brand-primary">Search</span>
+                </>
+              )}
             </div>
           </div>
         )}

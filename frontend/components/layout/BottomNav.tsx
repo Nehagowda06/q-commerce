@@ -1,7 +1,7 @@
 "use client";
 
 import { motion } from "framer-motion";
-import { Home, LayoutGrid, ShoppingCart, User } from "lucide-react";
+import { Home, LayoutGrid, ListChecks, ShoppingCart } from "lucide-react";
 import { usePathname } from "next/navigation";
 import Link from "next/link";
 
@@ -9,7 +9,7 @@ const navItems = [
   { id: "home", label: "Home", icon: Home, href: "/" },
   { id: "categories", label: "Categories", icon: LayoutGrid, href: "/categories" },
   { id: "cart", label: "Cart", icon: ShoppingCart, href: "/cart" },
-  { id: "profile", label: "Profile", icon: User, href: "/profile" },
+  { id: "lists", label: "Lists", icon: ListChecks, href: "/lists" },
 ];
 
 export default function BottomNav() {
@@ -19,7 +19,7 @@ export default function BottomNav() {
     <nav className="fixed bottom-0 left-0 right-0 z-50 flex justify-center pointer-events-none">
       <div className="w-full max-w-[420px] bg-white/90 backdrop-blur-md border-t border-gray-100 flex items-center justify-around px-2 pt-1.5 pb-[calc(0.45rem+env(safe-area-inset-bottom))] pointer-events-auto shadow-[0_-8px_30px_rgba(0,0,0,0.05)]">
         {navItems.map((item) => {
-          const isActive = pathname === item.href;
+          const isActive = pathname === item.href || (item.href !== "/" && pathname.startsWith(item.href));
           const Icon = item.icon;
 
           return (
