@@ -11,13 +11,13 @@ export default function CategoriesPage() {
 
   return (
     <PageWrapper>
-      <div className="bg-white min-h-screen pb-36">
+      <div className="bg-white pb-4">
         <div className="px-3 pt-3 pb-2.5 border-b border-gray-100">
           <h1 className="text-[16px] font-extrabold text-brand-text leading-tight">Savega Categories</h1>
           <p className="text-[10px] font-semibold text-brand-text-muted mt-0.5">Pick an aisle, then shop the subcategories.</p>
         </div>
 
-        <div className="grid grid-cols-[82px_1fr] min-h-[calc(100vh-150px)]">
+        <div className="grid grid-cols-[82px_1fr]">
           <aside className="bg-gray-50 border-r border-gray-100 py-1.5">
             {groceryAisles.map((aisle) => {
               const isActive = aisle.name === activeAisle;
@@ -57,15 +57,15 @@ export default function CategoriesPage() {
             <div className="grid grid-cols-2 gap-2">
               {active.subcategories.map((subcategory) => (
                 <button
-                  key={subcategory}
+                  key={subcategory.name}
                   className="min-h-20 rounded-xl border border-gray-100 bg-white shadow-soft p-2 text-left flex flex-col justify-between"
                 >
                   <div className={`w-10 h-10 rounded-lg ${active.color} flex items-center justify-center`}>
                     {/* eslint-disable-next-line @next/next/no-img-element */}
-                    <img src={active.image} alt={active.name} width={28} height={28} className="w-7 h-7 object-contain drop-shadow-sm" />
+                    <img src={subcategory.image} alt={subcategory.name} width={28} height={28} className="w-7 h-7 object-contain drop-shadow-sm" />
                   </div>
                   <div className="flex items-end justify-between gap-2">
-                    <span className="text-[10px] font-extrabold text-brand-text leading-tight">{subcategory}</span>
+                    <span className="text-[10px] font-extrabold text-brand-text leading-tight">{subcategory.name}</span>
                     <ChevronRight size={12} className="text-brand-primary flex-shrink-0" strokeWidth={3} />
                   </div>
                 </button>

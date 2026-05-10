@@ -17,14 +17,14 @@ export default function CartPage() {
   if (totalItems === 0) {
     return (
       <PageWrapper>
-        <div className="flex flex-col items-center justify-center min-h-[70vh] px-8 text-center">
-          <motion.div initial={{ scale: 0.8, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} className="relative mb-8">
-            <div className="w-32 h-32 bg-brand-primary/5 rounded-full flex items-center justify-center">
-              <ShoppingBag size={64} className="text-brand-primary/20" strokeWidth={1} />
+        <div className="flex flex-col items-center justify-center min-h-[calc(100vh-180px)] px-8 py-8 text-center">
+          <motion.div initial={{ scale: 0.8, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} className="relative mb-6">
+            <div className="w-24 h-24 bg-brand-primary/5 rounded-full flex items-center justify-center">
+              <ShoppingBag size={48} className="text-brand-primary/20" strokeWidth={1} />
             </div>
           </motion.div>
-          <h2 className="text-2xl font-black text-brand-text mb-3">Your cart is empty</h2>
-          <p className="text-sm text-brand-text-muted mb-10 max-w-[260px] mx-auto">
+          <h2 className="text-xl font-black text-brand-text mb-2">Your cart is empty</h2>
+          <p className="text-xs text-brand-text-muted mb-6 max-w-[260px] mx-auto">
             Looks like you have not added anything to your cart yet.
           </p>
           <Link href="/" className="w-full max-w-[240px]">
@@ -37,17 +37,17 @@ export default function CartPage() {
 
   return (
     <PageWrapper>
-      <div className="pb-40 px-4">
-        <div className="flex items-center gap-3 py-6">
+      <div className="pb-32 px-4">
+        <div className="flex items-center gap-3 py-3">
           <Link href="/">
             <div className="w-10 h-10 rounded-full bg-white shadow-soft flex items-center justify-center text-brand-text">
               <ArrowLeft size={20} strokeWidth={3} />
             </div>
           </Link>
-          <h1 className="text-2xl font-black text-brand-text">My Cart ({totalItems})</h1>
+          <h1 className="text-xl font-black text-brand-text">My Cart ({totalItems})</h1>
         </div>
 
-        <div className="space-y-4">
+        <div className="space-y-3">
           <AnimatePresence mode="popLayout">
             {items.map((item) => (
               <motion.div
@@ -93,9 +93,9 @@ export default function CartPage() {
           </AnimatePresence>
         </div>
 
-        <div className="mt-8 bg-gray-50 rounded-3xl p-6 border-2 border-dashed border-gray-200">
-          <h2 className="text-sm font-black text-brand-text uppercase tracking-widest mb-4">Bill Details</h2>
-          <div className="space-y-3">
+        <div className="mt-4 bg-gray-50 rounded-2xl p-4 border border-dashed border-gray-200">
+          <h2 className="text-xs font-black text-brand-text uppercase tracking-widest mb-3">Bill Details</h2>
+          <div className="space-y-2.5">
             <div className="flex justify-between text-sm">
               <span className="text-brand-text-muted font-medium">Item Total</span>
               <span className="text-brand-text font-bold">Rs.{totalPrice}</span>
