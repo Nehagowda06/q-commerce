@@ -20,9 +20,14 @@ function toDetail(item: { id: string; name: string; price: number }): ProductDet
   if (p) {
     return {
       id: p.id, name: p.name, image: p.imageColor, price: p.price,
-      originalPrice: p.originalPrice, weight: p.weight, tag: p.tag,
-      brand: p.brand, category: p.category, description: p.description,
-      details: p.details, nutrition: p.nutrition,
+      originalPrice: "originalPrice" in p ? (p as { originalPrice?: number }).originalPrice : undefined,
+      weight: "weight" in p ? (p as { weight?: string }).weight : undefined,
+      tag: "tag" in p ? (p as { tag?: string }).tag : undefined,
+      brand: "brand" in p ? (p as { brand?: string }).brand : undefined,
+      category: "category" in p ? (p as { category?: string }).category : undefined,
+      description: "description" in p ? (p as { description?: string }).description : undefined,
+      details: "details" in p ? (p as { details?: string[] }).details : undefined,
+      nutrition: "nutrition" in p ? (p as { nutrition?: { label: string; value: string }[] }).nutrition : undefined,
     };
   }
   return { id: item.id, name: item.name, image: "from-gray-100 to-gray-50", price: item.price };
