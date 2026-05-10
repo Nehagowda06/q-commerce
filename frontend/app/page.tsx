@@ -2,7 +2,7 @@
 
 import { useEffect, useMemo, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
-import { ArrowUpDown, ChevronRight, Clock, Flame, Leaf, SlidersHorizontal, Star, Store, Utensils, X, Zap } from "lucide-react";
+import { ChevronRight, Clock, Flame, Leaf, SlidersHorizontal, Star, Store, Utensils, X, Zap } from "lucide-react";
 import Link from "next/link";
 import PageWrapper from "@/components/layout/PageWrapper";
 import ProductCard from "@/components/ui/ProductCard";
@@ -322,7 +322,6 @@ function GroceryHome({
   setSort: (s: SortOption) => void;
   setFilter: (f: FilterOption) => void;
 }) {
-  const hasActiveFilters = sort !== "relevance" || filter !== "all";
   return (
     <>
       <motion.section variants={sectionVariants} className="px-3 pt-3">
@@ -343,24 +342,10 @@ function GroceryHome({
 
       <motion.section variants={sectionVariants} className="mt-4">
         <div className="px-3 flex items-center justify-between mb-2.5">
-          <div>
-            <h2 className="text-[13px] font-extrabold text-brand-text">Shop by Aisle</h2>
-            <p className="text-[8px] text-brand-text-muted font-bold uppercase">Instamart-style categories</p>
-          </div>
-          <div className="flex items-center gap-2">
-            <button
-              onClick={() => setShowSortFilter(true)}
-              className={`flex items-center gap-1 px-2.5 py-1.5 rounded-xl text-[10px] font-black border transition-colors ${
-                hasActiveFilters ? "bg-brand-primary text-white border-brand-primary" : "bg-gray-50 text-brand-text border-gray-100"
-              }`}
-            >
-              <ArrowUpDown size={11} strokeWidth={2.5} />
-              Sort
-            </button>
-            <Link href="/categories" className="text-[10px] font-bold text-brand-primary flex items-center gap-0.5">
-              See all <ChevronRight size={12} strokeWidth={3} />
-            </Link>
-          </div>
+          <h2 className="text-[13px] font-extrabold text-brand-text">Shop by Aisle</h2>
+          <Link href="/categories" className="text-[10px] font-bold text-brand-primary flex items-center gap-0.5">
+            See all <ChevronRight size={12} strokeWidth={3} />
+          </Link>
         </div>
         <div className="flex overflow-x-auto gap-2 px-3 py-2 no-scrollbar">
           {groceryAisles.map((aisle) => (
@@ -377,7 +362,7 @@ function GroceryHome({
         <div className="px-3 mt-4 grid grid-cols-2 gap-2">
           {activeSubcategories.map((subcategory) => (
             <Link
-              href="/categories"
+              href={`/categories/${encodeURIComponent(subcategory.name)}`}
               key={subcategory.name}
               className="min-h-10 rounded-xl border border-gray-100 bg-gray-50 px-2.5 py-2 flex items-center justify-between gap-2"
             >
@@ -464,9 +449,9 @@ function FoodHome() {
 // ── Shared helpers ──────────────────────────────────────────────────────────
 function WatermarkFooter() {
   return (
-    <motion.footer variants={sectionVariants} className="px-3 pt-4 pb-2 text-center">
-      <p className="text-[16px] font-bold lowercase text-gray-300/80 leading-none">savega</p>
-      <p className="mt-1 text-[9px] font-semibold lowercase text-gray-300/70">fast safe reliable</p>
+    <motion.footer variants={sectionVariants} className="px-3 pt-4 pb-2 flex justify-center">
+      {/* eslint-disable-next-line @next/next/no-img-element */}
+      <img src="/savega delivery.svg" alt="Savega Delivery" className="h-10 object-contain opacity-30" />
     </motion.footer>
   );
 }

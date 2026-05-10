@@ -1,13 +1,26 @@
 "use client";
 
+import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { ChevronRight } from "lucide-react";
 import PageWrapper from "@/components/layout/PageWrapper";
 import { groceryAisles } from "@/data/mockData";
 
+const aisleTaglines: Record<string, string> = {
+  Fresh: "Farm-fresh, delivered in 10 mins",
+  Dairy: "Cold chain guaranteed by Savega",
+  Staples: "Pantry essentials, always in stock",
+  Snacks: "Your favourite bites, at your door",
+  Beverages: "Chilled or hot — Savega's got it",
+  "Home Care": "A cleaner home, the Savega way",
+  "Personal Care": "Your daily routine, sorted by Savega",
+  "Baby & Pet": "Trusted care for your little ones",
+};
+
 export default function CategoriesPage() {
   const [activeAisle, setActiveAisle] = useState(groceryAisles[0].name);
   const active = groceryAisles.find((aisle) => aisle.name === activeAisle) || groceryAisles[0];
+  const router = useRouter();
 
   return (
     <PageWrapper>
@@ -50,7 +63,9 @@ export default function CategoriesPage() {
               </div>
               <div>
                 <h2 className="text-[13px] font-extrabold leading-tight">{active.name}</h2>
-                <p className="text-[9px] font-semibold text-white/75">Curated quick-commerce aisle</p>
+                <p className="text-[9px] font-semibold text-white/75">
+                  {aisleTaglines[active.name] ?? "Savega — delivered in 10 mins"}
+                </p>
               </div>
             </div>
 
@@ -58,7 +73,8 @@ export default function CategoriesPage() {
               {active.subcategories.map((subcategory) => (
                 <button
                   key={subcategory.name}
-                  className="min-h-20 rounded-xl border border-gray-100 bg-white shadow-soft p-2 text-left flex flex-col justify-between"
+                  onClick={() => router.push(`/categories/${encodeURIComponent(subcategory.name)}`)}
+                  className="min-h-20 rounded-xl border border-gray-100 bg-white shadow-soft p-2 text-left flex flex-col justify-between active:scale-95 transition-transform"
                 >
                   <div className={`w-10 h-10 rounded-lg ${active.color} flex items-center justify-center`}>
                     {/* eslint-disable-next-line @next/next/no-img-element */}
