@@ -132,11 +132,16 @@ export default function Home() {
   if (loading) {
     return (
       <div className="px-4 py-4 space-y-4 bg-white">
-        <div className="h-11 rounded-2xl bg-gray-100 animate-pulse" />
-        <div className="h-32 rounded-3xl bg-gray-100 animate-pulse" />
+        <div className="h-11 rounded-2xl shimmer" />
+        <div className="h-32 rounded-3xl shimmer" />
         <div className="grid grid-cols-4 gap-3">
           {[1, 2, 3, 4].map((item) => (
-            <div key={item} className="h-20 rounded-2xl bg-gray-100 animate-pulse" />
+            <div key={item} className="h-20 rounded-2xl shimmer" />
+          ))}
+        </div>
+        <div className="grid grid-cols-2 gap-3">
+          {[1, 2, 3, 4].map((item) => (
+            <div key={item} className="h-44 rounded-2xl shimmer" />
           ))}
         </div>
       </div>
@@ -343,19 +348,32 @@ function GroceryHome({
   return (
     <>
       <motion.section variants={sectionVariants} className="px-3 pt-3">
-        <div className="w-full min-h-24 rounded-xl hero-gradient p-3.5 text-white relative overflow-hidden shadow-[0_8px_32px_rgba(95,37,159,0.35)]">
+        <div className="w-full min-h-24 rounded-2xl hero-gradient p-3.5 text-white relative overflow-hidden shadow-[0_8px_32px_rgba(95,37,159,0.4)]">
           <div className="relative z-10 max-w-[210px]">
-            <span className="text-[8px] font-bold uppercase bg-white/20 px-2 py-0.5 rounded-full tracking-wider">
+            <motion.span
+              initial={{ opacity: 0, y: -8 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1 }}
+              className="inline-block text-[8px] font-black uppercase bg-white/20 px-2 py-0.5 rounded-full tracking-wider mb-1.5"
+            >
               Savega Super Saver
-            </span>
-            <h1 className="text-[16px] font-extrabold mt-1.5 leading-[1.1]">Fresh groceries in 10 minutes</h1>
-            <p className="text-[10px] font-semibold text-white/80 mt-1 leading-snug">
+            </motion.span>
+            <motion.h1
+              initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2 }}
+              className="text-[17px] font-black leading-[1.1]"
+            >
+              Fresh groceries in 10 minutes
+            </motion.h1>
+            <motion.p
+              initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.35 }}
+              className="text-[10px] font-semibold text-white/80 mt-1 leading-snug"
+            >
               Daily essentials, fruits, dairy, snacks and home care.
-            </p>
+            </motion.p>
           </div>
-          <div className="absolute -right-6 -bottom-8 w-36 h-36 rounded-full bg-brand-orange/20" />
-          <div className="absolute -right-2 top-2 w-20 h-20 rounded-full bg-white/5" />
-          <Leaf className="absolute right-7 bottom-6 text-brand-orange/60" size={38} strokeWidth={1.6} />
+          {/* Floating orbs */}
+          <div className="float-orb absolute -right-4 -bottom-6 w-28 h-28 rounded-full bg-brand-orange/25 blur-sm" />
+          <div className="float-orb-slow absolute right-10 -top-4 w-16 h-16 rounded-full bg-white/10" />
+          <div className="float-orb absolute right-2 bottom-8 w-8 h-8 rounded-full bg-brand-orange/40" />
+          <Leaf className="absolute right-8 bottom-5 text-white/30 float-orb" size={36} strokeWidth={1.5} />
         </div>
       </motion.section>
 
@@ -411,17 +429,25 @@ function FoodHome() {
   return (
     <>
       <motion.section variants={sectionVariants} className="px-3 pt-3">
-        <div className="w-full min-h-24 rounded-xl hero-gradient p-3.5 text-white relative overflow-hidden shadow-[0_8px_32px_rgba(95,37,159,0.35)]">
+        <div className="w-full min-h-24 rounded-2xl hero-gradient p-3.5 text-white relative overflow-hidden shadow-[0_8px_32px_rgba(95,37,159,0.4)]">
           <div className="relative z-10 max-w-[220px]">
-            <span className="text-[8px] font-bold uppercase bg-white/20 px-2 py-0.5 rounded-full tracking-wider">Savega Food</span>
-            <h1 className="text-[16px] font-extrabold mt-1.5 leading-[1.1]">Order from local favorites</h1>
-            <p className="text-[10px] font-semibold text-white/85 mt-1 leading-snug">
+            <motion.span initial={{ opacity:0, y:-8 }} animate={{ opacity:1, y:0 }} transition={{ delay:0.1 }}
+              className="inline-block text-[8px] font-black uppercase bg-white/20 px-2 py-0.5 rounded-full tracking-wider mb-1.5">
+              Savega Food
+            </motion.span>
+            <motion.h1 initial={{ opacity:0, y:8 }} animate={{ opacity:1, y:0 }} transition={{ delay:0.2 }}
+              className="text-[17px] font-black leading-[1.1]">
+              Order from local favorites
+            </motion.h1>
+            <motion.p initial={{ opacity:0 }} animate={{ opacity:1 }} transition={{ delay:0.35 }}
+              className="text-[10px] font-semibold text-white/85 mt-1 leading-snug">
               Top restaurants, quick bites, desserts and dinner picks.
-            </p>
+            </motion.p>
           </div>
-          <div className="absolute -right-6 -bottom-8 w-36 h-36 rounded-full bg-brand-orange/20" />
-          <div className="absolute -right-2 top-2 w-20 h-20 rounded-full bg-white/5" />
-          <Flame className="absolute right-8 bottom-6 text-brand-orange/70" size={38} strokeWidth={1.6} />
+          <div className="float-orb absolute -right-4 -bottom-6 w-28 h-28 rounded-full bg-brand-orange/25 blur-sm" />
+          <div className="float-orb-slow absolute right-10 -top-4 w-16 h-16 rounded-full bg-white/10" />
+          <div className="float-orb absolute right-2 bottom-8 w-8 h-8 rounded-full bg-brand-orange/40" />
+          <Flame className="absolute right-8 bottom-5 text-white/30 float-orb" size={36} strokeWidth={1.5} />
         </div>
       </motion.section>
 
@@ -489,8 +515,14 @@ function ProductRow({ title, subtitle, products }: { title: string; subtitle: st
         </Link>
       </div>
       <div className="flex overflow-x-auto gap-2.5 px-3 pb-3 no-scrollbar">
-        {products.map((product) => (
-          <div key={product.id} className="w-[130px] flex-shrink-0">
+        {products.map((product, i) => (
+          <motion.div
+            key={product.id}
+            className="w-[130px] flex-shrink-0"
+            initial={{ opacity: 0, y: 16 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: i * 0.05, type: "spring", stiffness: 300, damping: 24 }}
+          >
             <ProductCard
               id={product.id} name={product.name} image={product.imageColor}
               price={product.price} originalPrice={product.originalPrice}
@@ -498,7 +530,7 @@ function ProductRow({ title, subtitle, products }: { title: string; subtitle: st
               brand={product.brand} category={product.category}
               description={product.description} details={product.details} nutrition={product.nutrition}
             />
-          </div>
+          </motion.div>
         ))}
       </div>
     </motion.section>

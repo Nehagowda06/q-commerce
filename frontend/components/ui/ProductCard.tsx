@@ -61,9 +61,14 @@ export default function ProductCard({
       >
         {/* Tag badge */}
         {tag && (
-          <div className={`absolute top-2 right-2 z-20 px-1.5 py-0.5 rounded-md text-[8px] font-black uppercase ${TAG_STYLES[tag] ?? "badge-fresh text-white"}`}>
+          <motion.div
+            initial={{ scale: 0, y: -4 }}
+            animate={{ scale: 1, y: 0 }}
+            transition={{ type: "spring", stiffness: 500, damping: 18 }}
+            className={`absolute top-2 right-2 z-20 px-1.5 py-0.5 rounded-md text-[8px] font-black uppercase ${TAG_STYLES[tag] ?? "badge-fresh text-white"}`}
+          >
             {tag}
-          </div>
+          </motion.div>
         )}
 
         {/* Bookmark */}
@@ -91,12 +96,17 @@ export default function ProductCard({
             </div>
           )}
 
-          {/* Discount badge — Zepto style: bold pill with lightning icon */}
+          {/* Discount badge — bold pill with lightning icon + pop animation */}
           {discount > 0 && (
-            <div className="absolute bottom-2 left-2 badge-sale text-white text-[9px] font-black px-1.5 py-0.5 rounded-lg flex items-center gap-0.5 shadow-sm">
+            <motion.div
+              initial={{ scale: 0, rotate: -12 }}
+              animate={{ scale: 1, rotate: 0 }}
+              transition={{ type: "spring", stiffness: 500, damping: 18, delay: 0.1 }}
+              className="absolute bottom-2 left-2 badge-sale text-white text-[9px] font-black px-1.5 py-0.5 rounded-lg flex items-center gap-0.5 shadow-sm"
+            >
               <Zap size={8} fill="white" strokeWidth={0} />
               {discount}% OFF
-            </div>
+            </motion.div>
           )}
         </div>
 

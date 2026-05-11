@@ -67,21 +67,30 @@ export default function Navbar() {
 
   return (
     <>
-      <header className="sticky top-0 z-50 bg-white border-b border-gray-100 shadow-[0_2px_12px_rgba(6,31,65,0.08)]">
+      <header className="sticky top-0 z-50 bg-white border-b border-purple-50 shadow-[0_2px_16px_rgba(95,37,159,0.1)]">
         <div className="px-3.5 py-2.5">
           <div className="flex items-center justify-between mb-2.5">
             <div className="flex items-center gap-2 min-w-0">
               {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img src="/savega logo.svg" alt="Savega" className="w-8 h-8 object-contain flex-shrink-0" />
+              <motion.img
+                src="/savega logo.svg" alt="Savega"
+                className="w-9 h-9 object-contain flex-shrink-0"
+                whileTap={{ rotate: -10, scale: 0.9 }}
+                transition={{ type: "spring", stiffness: 500, damping: 15 }}
+              />
               <div className="min-w-0">
+                <div className="flex items-center gap-1.5 mb-0.5">
+                  <span className="text-[8px] font-black text-brand-primary uppercase tracking-wider">savega</span>
+                  <span className="badge-hot text-white text-[7px] font-black px-1.5 py-0.5 rounded-full">10 mins</span>
+                </div>
                 <button
                   type="button"
                   onClick={() => setShowAddressPicker(true)}
-                  className="flex items-center gap-1 mt-1 min-w-0 group"
+                  className="flex items-center gap-1 min-w-0 group"
                   aria-label="Change delivery address"
                 >
-                  <MapPin size={12} className="text-brand-primary flex-shrink-0" strokeWidth={3} />
-                  <span className="text-[12px] font-bold text-brand-text leading-none truncate max-w-[160px]">
+                  <MapPin size={11} className="text-brand-primary flex-shrink-0" strokeWidth={3} />
+                  <span className="text-[12px] font-black text-brand-text leading-none truncate max-w-[150px]">
                     {activeAddress.label} - Mandya
                   </span>
                   <motion.span
@@ -89,27 +98,35 @@ export default function Navbar() {
                     transition={{ duration: 0.2 }}
                     className="flex-shrink-0"
                   >
-                    <ChevronDown size={13} className="text-brand-primary" strokeWidth={3} />
+                    <ChevronDown size={12} className="text-brand-primary" strokeWidth={3} />
                   </motion.span>
                 </button>
               </div>
             </div>
 
             <Link href="/profile">
-              <motion.div whileTap={{ scale: 0.9 }}
-                className="w-9 h-9 rounded-full bg-gray-100 flex items-center justify-center text-gray-600 cursor-pointer"
-                aria-label="Profile">
-                <User size={18} />
+              <motion.div
+                whileTap={{ scale: 0.88 }}
+                whileHover={{ scale: 1.05 }}
+                className="w-9 h-9 rounded-full savega-gradient flex items-center justify-center text-white cursor-pointer shadow-[0_4px_12px_rgba(95,37,159,0.35)]"
+                aria-label="Profile"
+              >
+                <User size={16} strokeWidth={2.5} />
               </motion.div>
             </Link>
           </div>
 
           {showSearch && (
-            <div className="relative group">
-              <div className="absolute inset-y-0 left-3 flex items-center pointer-events-none text-gray-400 group-focus-within:text-brand-primary transition-colors z-10">
-                <Search size={16} strokeWidth={2.5} />
+            <div className="relative">
+              <div className="absolute inset-y-0 left-3 flex items-center pointer-events-none z-10">
+                <motion.div
+                  animate={{ color: query ? "#5f259f" : "#8fa0b8" }}
+                  transition={{ duration: 0.2 }}
+                >
+                  <Search size={15} strokeWidth={2.5} />
+                </motion.div>
               </div>
-              <div className="relative w-full h-10 bg-gray-50 border border-gray-100 rounded-xl flex items-center shadow-inner overflow-hidden focus-within:border-brand-primary transition-colors">
+              <div className="search-bar relative w-full h-10 rounded-xl flex items-center overflow-hidden">
                 <input type="text" value={query} onChange={(e) => setQuery(e.target.value)}
                   className="w-full h-full pl-9 pr-16 bg-transparent text-[12px] font-medium focus:outline-none z-10 text-brand-text"
                   aria-label="Search Savega" placeholder="" />
@@ -117,8 +134,9 @@ export default function Navbar() {
                   <div className="absolute left-9 inset-y-0 flex items-center pointer-events-none z-0">
                     <AnimatePresence mode="wait">
                       <motion.span key={placeholderIdx}
-                        initial={{ y: 10, opacity: 0 }} animate={{ y: 0, opacity: 1 }} exit={{ y: -10, opacity: 0 }}
-                        className="text-gray-400 text-[12px] font-medium">
+                        initial={{ y: 8, opacity: 0 }} animate={{ y: 0, opacity: 1 }} exit={{ y: -8, opacity: 0 }}
+                        transition={{ duration: 0.2 }}
+                        className="text-brand-text-muted text-[12px] font-medium">
                         {placeholders[placeholderIdx]}
                       </motion.span>
                     </AnimatePresence>
@@ -126,18 +144,21 @@ export default function Navbar() {
                 )}
               </div>
               <div className="absolute right-3 inset-y-0 flex items-center z-10 gap-1">
-                {query ? (
-                  <button type="button" onClick={() => setQuery("")}
-                    className="w-5 h-5 rounded-full bg-gray-200 flex items-center justify-center text-gray-500"
-                    aria-label="Clear search">
-                    <X size={11} strokeWidth={3} />
-                  </button>
-                ) : (
-                  <>
-                    <div className="w-px h-4 bg-gray-200 mx-1" />
-                    <span className="text-[11px] font-bold text-brand-primary">Search</span>
-                  </>
-                )}
+                <AnimatePresence mode="wait">
+                  {query ? (
+                    <motion.button key="clear" type="button" onClick={() => setQuery("")}
+                      initial={{ scale: 0, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} exit={{ scale: 0, opacity: 0 }}
+                      className="w-5 h-5 rounded-full bg-brand-primary/20 flex items-center justify-center text-brand-primary"
+                      aria-label="Clear search">
+                      <X size={11} strokeWidth={3} />
+                    </motion.button>
+                  ) : (
+                    <motion.span key="label" initial={{ opacity: 0 }} animate={{ opacity: 1 }}
+                      className="text-[11px] font-black text-brand-primary">
+                      Search
+                    </motion.span>
+                  )}
+                </AnimatePresence>
               </div>
             </div>
           )}
