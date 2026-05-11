@@ -24,14 +24,27 @@ const sectionVariants = {
 type Mode = "grocery" | "food";
 type GroceryProduct = (typeof allProducts.vegetables)[number];
 
-// All grocery products flat
-const allGroceryProducts: GroceryProduct[] = [
-  ...allProducts.vegetables,
-  ...allProducts.fruits,
-  ...allProducts.staples,
-  ...allProducts.snacks,
-  ...allProducts.dairy,
-];
+// All grocery products flat — includes every subcategory key (deduped by id)
+const allGroceryProducts = (() => {
+  const seen = new Set<string>();
+  const result: GroceryProduct[] = [];
+  const keys: (keyof typeof allProducts)[] = [
+    "vegetables", "fruits", "herbs", "cutAndPeeled",
+    "milk", "curd", "paneer", "butterAndCheese",
+    "atta", "rice", "dal", "oilAndGhee",
+    "chips", "namkeen", "biscuits", "chocolates",
+    "teaAndCoffee", "juices", "softDrinks", "energyDrinks",
+    "detergents", "cleaners", "tissues", "repellents",
+    "bath", "hair", "skin", "oralCare",
+    "diapers", "babyFood", "petFood", "petTreats",
+  ];
+  for (const key of keys) {
+    for (const p of allProducts[key] as GroceryProduct[]) {
+      if (!seen.has(p.id)) { seen.add(p.id); result.push(p); }
+    }
+  }
+  return result;
+})();
 
 const SORT_LABELS: Record<SortOption, string> = {
   relevance: "Relevance",
