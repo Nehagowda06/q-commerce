@@ -1,11 +1,16 @@
 "use client";
 
 import { AnimatePresence, motion } from "framer-motion";
-import { Check, ChevronDown, Home, MapPin, Plus, Search, Briefcase, User, X } from "lucide-react";
+import { Briefcase, Check, ChevronDown, Home, MapPin, Navigation, Plus, Search, User, X } from "lucide-react";
 import Link from "next/link";
+import dynamic from "next/dynamic";
 import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
 import { useSearchStore } from "@/store/searchStore";
+import { MANDYA_CENTER } from "@/components/ui/LeafletMap";
+
+// Dynamically import map to avoid SSR issues
+const LeafletMap = dynamic(() => import("@/components/ui/LeafletMap"), { ssr: false });
 
 const placeholders = [
   'Search "milk"',
@@ -18,9 +23,9 @@ const placeholders = [
 
 const routesWithSearch = new Set(["/", "/categories"]);
 
-const savedAddresses = [
-  { id: "home", label: "Home", detail: "12, MG Road, Mandya", icon: Home },
-  { id: "work", label: "Work", detail: "45, Industrial Area, Mandya", icon: Briefcase },
+const SAVED_ADDRESSES = [
+  { id: "home", label: "Home", detail: "12, MG Road, Mandya", icon: Home, lat: 12.5218, lng: 76.8951 },
+  { id: "work", label: "Work", detail: "45, Industrial Area, Mandya", icon: Briefcase, lat: 12.5280, lng: 76.9010 },
 ];
 
 export default function Navbar() {
@@ -31,10 +36,12 @@ export default function Navbar() {
 
   const [showAddressPicker, setShowAddressPicker] = useState(false);
   const [activeAddressId, setActiveAddressId] = useState("home");
-  const [customInput, setCustomInput] = useState("");
   const [addingNew, setAddingNew] = useState(false);
+  const [customInput, setCustomInput] = useState("");
+  const [pinLat, setPinLat] = useState<number | null>(null);
+  const [pinLng, setPinLng] = useState<number | null>(null);
 
-  const activeAddress = savedAddresses.find((a) => a.id === activeAddressId) ?? savedAddresses[0];
+  const activeAddress = SAVED_ADDRESSES.find((a) => a.id === activeAddressId) ?? SAVED_ADDRESSES[0];
 
   useEffect(() => {
     if (!routesWithSearch.has(pathname)) reset();
@@ -47,23 +54,43 @@ export default function Navbar() {
     return () => clearInterval(interval);
   }, []);
 
+  const handleClose = () => { setShowAddressPicker(false); setAddingNew(false); setPinLat(null); setPinLng(null); };
+
+  const mapMarkers = [
+    // Always show the active address
+    { lat: activeAddress.lat, lng: activeAddress.lng, label: activeAddress.label, color: "purple" as const },
+    // Show pin if user tapped the map
+    ...(pinLat !== null && pinLng !== null
+      ? [{ lat: pinLat, lng: pinLng, label: "New location", color: "green" as const }]
+      : []),
+  ];
+
   return (
     <>
-      <header className="sticky top-0 z-50 bg-white shadow-soft">
+      <header className="sticky top-0 z-50 bg-white border-b border-purple-50 shadow-[0_2px_16px_rgba(95,37,159,0.1)]">
         <div className="px-3.5 py-2.5">
           <div className="flex items-center justify-between mb-2.5">
             <div className="flex items-center gap-2 min-w-0">
               {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img src="/savega logo.svg" alt="Savega" className="w-8 h-8 object-contain flex-shrink-0" />
+              <motion.img
+                src="/savega logo.svg" alt="Savega"
+                className="w-9 h-9 object-contain flex-shrink-0"
+                whileTap={{ rotate: -10, scale: 0.9 }}
+                transition={{ type: "spring", stiffness: 500, damping: 15 }}
+              />
               <div className="min-w-0">
+                <div className="flex items-center gap-1.5 mb-0.5">
+                  <span className="text-[8px] font-black text-brand-primary uppercase tracking-wider">savega</span>
+                  <span className="badge-hot text-white text-[7px] font-black px-1.5 py-0.5 rounded-full">10 mins</span>
+                </div>
                 <button
                   type="button"
                   onClick={() => setShowAddressPicker(true)}
-                  className="flex items-center gap-1 mt-1 min-w-0 group"
+                  className="flex items-center gap-1 min-w-0 group"
                   aria-label="Change delivery address"
                 >
-                  <MapPin size={12} className="text-brand-primary flex-shrink-0" strokeWidth={3} />
-                  <span className="text-[12px] font-bold text-brand-text leading-none truncate max-w-[160px]">
+                  <MapPin size={11} className="text-brand-primary flex-shrink-0" strokeWidth={3} />
+                  <span className="text-[12px] font-black text-brand-text leading-none truncate max-w-[150px]">
                     {activeAddress.label} - Mandya
                   </span>
                   <motion.span
@@ -71,7 +98,7 @@ export default function Navbar() {
                     transition={{ duration: 0.2 }}
                     className="flex-shrink-0"
                   >
-                    <ChevronDown size={13} className="text-brand-primary" strokeWidth={3} />
+                    <ChevronDown size={12} className="text-brand-primary" strokeWidth={3} />
                   </motion.span>
                 </button>
               </div>
@@ -79,64 +106,59 @@ export default function Navbar() {
 
             <Link href="/profile">
               <motion.div
-                whileTap={{ scale: 0.9 }}
-                className="w-9 h-9 rounded-full bg-gray-100 flex items-center justify-center text-gray-600 cursor-pointer"
+                whileTap={{ scale: 0.88 }}
+                whileHover={{ scale: 1.05 }}
+                className="w-9 h-9 rounded-full savega-gradient flex items-center justify-center text-white cursor-pointer shadow-[0_4px_12px_rgba(95,37,159,0.35)]"
                 aria-label="Profile"
               >
-                <User size={18} />
+                <User size={16} strokeWidth={2.5} />
               </motion.div>
             </Link>
           </div>
 
           {showSearch && (
-            <div className="relative group">
-              <div className="absolute inset-y-0 left-3 flex items-center pointer-events-none text-gray-400 group-focus-within:text-brand-primary transition-colors z-10">
-                <Search size={16} strokeWidth={2.5} />
+            <div className="relative">
+              <div className="absolute inset-y-0 left-3 flex items-center pointer-events-none z-10">
+                <motion.div
+                  animate={{ color: query ? "#5f259f" : "#8fa0b8" }}
+                  transition={{ duration: 0.2 }}
+                >
+                  <Search size={15} strokeWidth={2.5} />
+                </motion.div>
               </div>
-
-              <div className="relative w-full h-10 bg-gray-50 border border-gray-100 rounded-xl flex items-center shadow-inner overflow-hidden focus-within:border-brand-primary transition-colors">
-                <input
-                  type="text"
-                  value={query}
-                  onChange={(e) => setQuery(e.target.value)}
+              <div className="search-bar relative w-full h-10 rounded-xl flex items-center overflow-hidden">
+                <input type="text" value={query} onChange={(e) => setQuery(e.target.value)}
                   className="w-full h-full pl-9 pr-16 bg-transparent text-[12px] font-medium focus:outline-none z-10 text-brand-text"
-                  aria-label="Search Savega"
-                  placeholder=""
-                />
-
+                  aria-label="Search Savega" placeholder="" />
                 {!query && (
                   <div className="absolute left-9 inset-y-0 flex items-center pointer-events-none z-0">
                     <AnimatePresence mode="wait">
-                      <motion.span
-                        key={placeholderIdx}
-                        initial={{ y: 10, opacity: 0 }}
-                        animate={{ y: 0, opacity: 1 }}
-                        exit={{ y: -10, opacity: 0 }}
-                        className="text-gray-400 text-[12px] font-medium"
-                      >
+                      <motion.span key={placeholderIdx}
+                        initial={{ y: 8, opacity: 0 }} animate={{ y: 0, opacity: 1 }} exit={{ y: -8, opacity: 0 }}
+                        transition={{ duration: 0.2 }}
+                        className="text-brand-text-muted text-[12px] font-medium">
                         {placeholders[placeholderIdx]}
                       </motion.span>
                     </AnimatePresence>
                   </div>
                 )}
               </div>
-
               <div className="absolute right-3 inset-y-0 flex items-center z-10 gap-1">
-                {query ? (
-                  <button
-                    type="button"
-                    onClick={() => setQuery("")}
-                    className="w-5 h-5 rounded-full bg-gray-200 flex items-center justify-center text-gray-500"
-                    aria-label="Clear search"
-                  >
-                    <X size={11} strokeWidth={3} />
-                  </button>
-                ) : (
-                  <>
-                    <div className="w-px h-4 bg-gray-200 mx-1" />
-                    <span className="text-[11px] font-bold text-brand-primary">Search</span>
-                  </>
-                )}
+                <AnimatePresence mode="wait">
+                  {query ? (
+                    <motion.button key="clear" type="button" onClick={() => setQuery("")}
+                      initial={{ scale: 0, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} exit={{ scale: 0, opacity: 0 }}
+                      className="w-5 h-5 rounded-full bg-brand-primary/20 flex items-center justify-center text-brand-primary"
+                      aria-label="Clear search">
+                      <X size={11} strokeWidth={3} />
+                    </motion.button>
+                  ) : (
+                    <motion.span key="label" initial={{ opacity: 0 }} animate={{ opacity: 1 }}
+                      className="text-[11px] font-black text-brand-primary">
+                      Search
+                    </motion.span>
+                  )}
+                </AnimatePresence>
               </div>
             </div>
           )}
@@ -147,102 +169,88 @@ export default function Navbar() {
       <AnimatePresence>
         {showAddressPicker && (
           <>
-            <motion.div
-              key="addr-bd"
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              className="fixed inset-0 bg-black/50 z-[59]"
-              onClick={() => { setShowAddressPicker(false); setAddingNew(false); }}
-            />
-            <motion.div
-              key="addr-modal"
-              initial={{ scale: 0.88, opacity: 0 }}
-              animate={{ scale: 1, opacity: 1 }}
-              exit={{ scale: 0.88, opacity: 0 }}
+            <motion.div key="addr-bd" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
+              className="fixed inset-0 bg-black/50 z-[59]" onClick={handleClose} />
+            <motion.div key="addr-modal"
+              initial={{ scale: 0.88, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} exit={{ scale: 0.88, opacity: 0 }}
               transition={{ type: "spring", stiffness: 500, damping: 35 }}
-              className="fixed inset-0 z-[60] flex items-center justify-center pointer-events-none px-5"
-            >
-              <div className="w-full max-w-[340px] bg-white rounded-3xl p-5 pointer-events-auto shadow-2xl">
-                {/* Header */}
-                <div className="flex items-center justify-between mb-4">
-                  <h3 className="text-sm font-black text-brand-text">Deliver to</h3>
-                  <button
-                    onClick={() => { setShowAddressPicker(false); setAddingNew(false); }}
-                    className="w-8 h-8 rounded-full bg-gray-100 flex items-center justify-center"
-                  >
-                    <X size={16} strokeWidth={2.5} />
-                  </button>
-                </div>
+              className="fixed inset-0 z-[60] flex items-center justify-center pointer-events-none px-4">
+              <div className="w-full max-w-[360px] bg-white rounded-3xl overflow-hidden pointer-events-auto shadow-2xl flex flex-col max-h-[85vh]">
 
-                {/* Saved addresses */}
-                <div className="space-y-2 mb-3">
-                  {savedAddresses.map((addr) => {
-                    const Icon = addr.icon;
-                    const isActive = activeAddressId === addr.id;
-                    return (
-                      <button
-                        key={addr.id}
-                        type="button"
-                        onClick={() => { setActiveAddressId(addr.id); setShowAddressPicker(false); setAddingNew(false); }}
-                        className={`w-full flex items-center gap-3 p-3 rounded-2xl border transition-colors text-left ${
-                          isActive
-                            ? "bg-brand-primary/10 border-brand-primary"
-                            : "bg-gray-50 border-gray-100"
-                        }`}
-                      >
-                        <div className={`w-9 h-9 rounded-xl flex items-center justify-center flex-shrink-0 ${
-                          isActive ? "bg-brand-primary text-white" : "bg-white text-gray-500 border border-gray-100"
-                        }`}>
-                          <Icon size={16} strokeWidth={2} />
-                        </div>
-                        <div className="flex-1 min-w-0">
-                          <p className="text-xs font-black text-brand-text">{addr.label}</p>
-                          <p className="text-[10px] text-brand-text-muted truncate">{addr.detail}</p>
-                        </div>
-                        {isActive && (
-                          <Check size={15} strokeWidth={3} className="text-brand-primary flex-shrink-0" />
-                        )}
-                      </button>
-                    );
-                  })}
-                </div>
-
-                {/* Add new address */}
-                {addingNew ? (
-                  <div className="space-y-2">
-                    <input
-                      autoFocus
-                      value={customInput}
-                      onChange={(e) => setCustomInput(e.target.value)}
-                      placeholder="Enter your address..."
-                      className="w-full h-10 px-3 rounded-xl border border-gray-200 bg-white text-xs font-bold text-brand-text focus:outline-none focus:border-brand-primary transition-colors"
-                    />
-                    <div className="flex gap-2">
-                      <button
-                        onClick={() => { setAddingNew(false); setCustomInput(""); }}
-                        className="flex-1 h-9 rounded-xl border border-gray-200 text-xs font-black text-brand-text-muted"
-                      >
-                        Cancel
-                      </button>
-                      <button
-                        onClick={() => { setAddingNew(false); setCustomInput(""); setShowAddressPicker(false); }}
-                        className="flex-1 h-9 rounded-xl bg-brand-primary text-white text-xs font-black"
-                      >
-                        Save
-                      </button>
-                    </div>
+                {/* Map */}
+                <div className="relative">
+                  <LeafletMap
+                    center={[activeAddress.lat, activeAddress.lng]}
+                    zoom={14}
+                    markers={mapMarkers}
+                    className="h-44"
+                    selectable
+                    onLocationSelect={(lat, lng) => { setPinLat(lat); setPinLng(lng); }}
+                  />
+                  <div className="absolute top-2 right-2 z-[400]">
+                    <button onClick={handleClose}
+                      className="w-7 h-7 rounded-full bg-white shadow-soft flex items-center justify-center text-brand-text">
+                      <X size={14} strokeWidth={2.5} />
+                    </button>
                   </div>
-                ) : (
-                  <button
-                    type="button"
-                    onClick={() => setAddingNew(true)}
-                    className="w-full h-10 rounded-2xl border-2 border-dashed border-gray-200 flex items-center justify-center gap-2 text-xs font-bold text-brand-text-muted hover:border-brand-primary hover:text-brand-primary transition-colors"
-                  >
-                    <Plus size={14} strokeWidth={2.5} />
-                    Add new address
-                  </button>
-                )}
+                  {pinLat !== null && (
+                    <div className="absolute bottom-2 left-2 right-2 z-[400] bg-white/95 rounded-xl px-3 py-1.5 flex items-center gap-2 shadow-soft">
+                      <Navigation size={12} className="text-brand-accent flex-shrink-0" strokeWidth={2.5} />
+                      <p className="text-[10px] font-bold text-brand-text truncate">
+                        {pinLat.toFixed(4)}, {pinLng!.toFixed(4)}
+                      </p>
+                      <button onClick={() => { setPinLat(null); setPinLng(null); }}
+                        className="ml-auto text-[9px] font-black text-brand-primary">Clear</button>
+                    </div>
+                  )}
+                </div>
+
+                <div className="p-4 overflow-y-auto no-scrollbar">
+                  <h3 className="text-sm font-black text-brand-text mb-3">Deliver to</h3>
+
+                  {/* Saved addresses */}
+                  <div className="space-y-2 mb-3">
+                    {SAVED_ADDRESSES.map((addr) => {
+                      const Icon = addr.icon;
+                      const isActive = activeAddressId === addr.id;
+                      return (
+                        <button key={addr.id} type="button"
+                          onClick={() => { setActiveAddressId(addr.id); handleClose(); }}
+                          className={`w-full flex items-center gap-3 p-3 rounded-2xl border transition-colors text-left ${isActive ? "bg-brand-primary/10 border-brand-primary" : "bg-gray-50 border-gray-100"}`}>
+                          <div className={`w-9 h-9 rounded-xl flex items-center justify-center flex-shrink-0 ${isActive ? "bg-brand-primary text-white" : "bg-white text-gray-500 border border-gray-100"}`}>
+                            <Icon size={16} strokeWidth={2} />
+                          </div>
+                          <div className="flex-1 min-w-0">
+                            <p className="text-xs font-black text-brand-text">{addr.label}</p>
+                            <p className="text-[10px] text-brand-text-muted truncate">{addr.detail}</p>
+                          </div>
+                          {isActive && <Check size={15} strokeWidth={3} className="text-brand-primary flex-shrink-0" />}
+                        </button>
+                      );
+                    })}
+                  </div>
+
+                  {/* Add new */}
+                  {addingNew ? (
+                    <div className="space-y-2">
+                      <input autoFocus value={customInput} onChange={(e) => setCustomInput(e.target.value)}
+                        placeholder="Enter your address..."
+                        className="w-full h-10 px-3 rounded-xl border border-gray-200 bg-white text-xs font-bold text-brand-text focus:outline-none focus:border-brand-primary transition-colors" />
+                      <div className="flex gap-2">
+                        <button onClick={() => { setAddingNew(false); setCustomInput(""); }}
+                          className="flex-1 h-9 rounded-xl border border-gray-200 text-xs font-black text-brand-text-muted">Cancel</button>
+                        <button onClick={() => { setAddingNew(false); setCustomInput(""); handleClose(); }}
+                          className="flex-1 h-9 rounded-xl bg-brand-primary text-white text-xs font-black">Save</button>
+                      </div>
+                    </div>
+                  ) : (
+                    <button type="button" onClick={() => setAddingNew(true)}
+                      className="w-full h-10 rounded-2xl border-2 border-dashed border-gray-200 flex items-center justify-center gap-2 text-xs font-bold text-brand-text-muted hover:border-brand-primary hover:text-brand-primary transition-colors">
+                      <Plus size={14} strokeWidth={2.5} />
+                      Add new address
+                    </button>
+                  )}
+                </div>
               </div>
             </motion.div>
           </>

@@ -1,12 +1,13 @@
 "use client";
 
 import { AnimatePresence, motion } from "framer-motion";
-import { Bell, ChevronRight, CreditCard, HelpCircle, LogOut, MapPin, Pencil, Settings } from "lucide-react";
+import { Bell, ChevronRight, ClipboardList, CreditCard, HelpCircle, LogOut, MapPin, Pencil, Settings } from "lucide-react";
 import Link from "next/link";
 import { useState } from "react";
 import PageWrapper from "@/components/layout/PageWrapper";
 
 const menuItems = [
+  { icon: ClipboardList, label: "My Orders", href: "/orders" },
   { icon: CreditCard, label: "Payments & Refunds", href: "/profile/payments" },
   { icon: MapPin, label: "My Addresses", href: "/profile/addresses" },
   { icon: Bell, label: "Notifications", href: "/profile/notifications" },
@@ -19,7 +20,7 @@ export default function ProfilePage() {
 
   return (
     <PageWrapper>
-      <div className="p-3">
+      <div className="p-3 pb-28">
         {/* Header */}
         <div className="flex items-center justify-between mb-5">
           <div className="flex items-center gap-3">

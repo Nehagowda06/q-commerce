@@ -24,14 +24,27 @@ const sectionVariants = {
 type Mode = "grocery" | "food";
 type GroceryProduct = (typeof allProducts.vegetables)[number];
 
-// All grocery products flat
-const allGroceryProducts: GroceryProduct[] = [
-  ...allProducts.vegetables,
-  ...allProducts.fruits,
-  ...allProducts.staples,
-  ...allProducts.snacks,
-  ...allProducts.dairy,
-];
+// All grocery products flat — includes every subcategory key (deduped by id)
+const allGroceryProducts = (() => {
+  const seen = new Set<string>();
+  const result: GroceryProduct[] = [];
+  const keys: (keyof typeof allProducts)[] = [
+    "vegetables", "fruits", "herbs", "cutAndPeeled",
+    "milk", "curd", "paneer", "butterAndCheese",
+    "atta", "rice", "dal", "oilAndGhee",
+    "chips", "namkeen", "biscuits", "chocolates",
+    "teaAndCoffee", "juices", "softDrinks", "energyDrinks",
+    "detergents", "cleaners", "tissues", "repellents",
+    "bath", "hair", "skin", "oralCare",
+    "diapers", "babyFood", "petFood", "petTreats",
+  ];
+  for (const key of keys) {
+    for (const p of allProducts[key] as GroceryProduct[]) {
+      if (!seen.has(p.id)) { seen.add(p.id); result.push(p); }
+    }
+  }
+  return result;
+})();
 
 const SORT_LABELS: Record<SortOption, string> = {
   relevance: "Relevance",
@@ -119,11 +132,16 @@ export default function Home() {
   if (loading) {
     return (
       <div className="px-4 py-4 space-y-4 bg-white">
-        <div className="h-11 rounded-2xl bg-gray-100 animate-pulse" />
-        <div className="h-32 rounded-3xl bg-gray-100 animate-pulse" />
+        <div className="h-11 rounded-2xl shimmer" />
+        <div className="h-32 rounded-3xl shimmer" />
         <div className="grid grid-cols-4 gap-3">
           {[1, 2, 3, 4].map((item) => (
-            <div key={item} className="h-20 rounded-2xl bg-gray-100 animate-pulse" />
+            <div key={item} className="h-20 rounded-2xl shimmer" />
+          ))}
+        </div>
+        <div className="grid grid-cols-2 gap-3">
+          {[1, 2, 3, 4].map((item) => (
+            <div key={item} className="h-44 rounded-2xl shimmer" />
           ))}
         </div>
       </div>
@@ -134,21 +152,26 @@ export default function Home() {
     <PageWrapper>
       <PullToRefresh onRefresh={handleRefresh}>
         <motion.div variants={containerVariants} initial="hidden" animate="visible" className="pb-4">
-          {/* Mode toggle */}
+          {/* Mode toggle — Zepto style: gradient active pill */}
           <motion.section variants={sectionVariants} className="px-3 pt-2.5">
-            <div className="grid grid-cols-2 gap-1 rounded-xl bg-gray-100 p-1">
+            <div className="grid grid-cols-2 gap-1 rounded-2xl p-1"
+              style={{ background: "linear-gradient(135deg, #f0ebf8, #e8e0f4)" }}>
               <button
                 onClick={() => setMode("grocery")}
-                className={`h-8 rounded-lg text-[10px] font-bold uppercase flex items-center justify-center gap-1.5 transition ${
-                  mode === "grocery" ? "bg-white text-brand-primary shadow-soft" : "text-gray-500"
+                className={`h-9 rounded-xl text-[11px] font-black flex items-center justify-center gap-1.5 transition-all ${
+                  mode === "grocery"
+                    ? "savega-gradient text-white shadow-[0_4px_12px_rgba(95,37,159,0.35)]"
+                    : "text-brand-text-muted bg-transparent"
                 }`}
               >
                 <Store size={14} /> Groceries
               </button>
               <button
                 onClick={() => setMode("food")}
-                className={`h-8 rounded-lg text-[10px] font-bold uppercase flex items-center justify-center gap-1.5 transition ${
-                  mode === "food" ? "bg-white text-brand-primary shadow-soft" : "text-gray-500"
+                className={`h-9 rounded-xl text-[11px] font-black flex items-center justify-center gap-1.5 transition-all ${
+                  mode === "food"
+                    ? "savega-gradient text-white shadow-[0_4px_12px_rgba(95,37,159,0.35)]"
+                    : "text-brand-text-muted bg-transparent"
                 }`}
               >
                 <Utensils size={14} /> Food
@@ -325,26 +348,40 @@ function GroceryHome({
   return (
     <>
       <motion.section variants={sectionVariants} className="px-3 pt-3">
-        <div className="w-full min-h-24 rounded-xl bg-[#5f259f] p-3.5 text-white relative overflow-hidden shadow-soft">
+        <div className="w-full min-h-24 rounded-2xl hero-gradient p-3.5 text-white relative overflow-hidden shadow-[0_8px_32px_rgba(95,37,159,0.4)]">
           <div className="relative z-10 max-w-[210px]">
-            <span className="text-[8px] font-bold uppercase bg-white/20 px-2 py-0.5 rounded-full">
+            <motion.span
+              initial={{ opacity: 0, y: -8 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1 }}
+              className="inline-block text-[8px] font-black uppercase bg-white/20 px-2 py-0.5 rounded-full tracking-wider mb-1.5"
+            >
               Savega Super Saver
-            </span>
-            <h1 className="text-[16px] font-extrabold mt-1.5 leading-[1.1]">Fresh groceries in 10 minutes</h1>
-            <p className="text-[10px] font-semibold text-white/80 mt-1 leading-snug">
+            </motion.span>
+            <motion.h1
+              initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2 }}
+              className="text-[17px] font-black leading-[1.1]"
+            >
+              Fresh groceries in 10 minutes
+            </motion.h1>
+            <motion.p
+              initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.35 }}
+              className="text-[10px] font-semibold text-white/80 mt-1 leading-snug"
+            >
               Daily essentials, fruits, dairy, snacks and home care.
-            </p>
+            </motion.p>
           </div>
-          <div className="absolute -right-8 -bottom-10 w-32 h-32 rounded-full bg-emerald-300/25" />
-          <Leaf className="absolute right-7 bottom-6 text-emerald-200" size={38} strokeWidth={1.6} />
+          {/* Floating orbs */}
+          <div className="float-orb absolute -right-4 -bottom-6 w-28 h-28 rounded-full bg-brand-orange/25 blur-sm" />
+          <div className="float-orb-slow absolute right-10 -top-4 w-16 h-16 rounded-full bg-white/10" />
+          <div className="float-orb absolute right-2 bottom-8 w-8 h-8 rounded-full bg-brand-orange/40" />
+          <Leaf className="absolute right-8 bottom-5 text-white/30 float-orb" size={36} strokeWidth={1.5} />
         </div>
       </motion.section>
 
       <motion.section variants={sectionVariants} className="mt-4">
         <div className="px-3 flex items-center justify-between mb-2.5">
-          <h2 className="text-[13px] font-extrabold text-brand-text">Shop by Aisle</h2>
-          <Link href="/categories" className="text-[10px] font-bold text-brand-primary flex items-center gap-0.5">
-            See all <ChevronRight size={12} strokeWidth={3} />
+          <h2 className="text-[14px] font-black text-brand-text">Shop by Aisle</h2>
+          <Link href="/categories" className="text-[10px] font-black text-brand-primary bg-brand-primary/10 px-2.5 py-1 rounded-full flex items-center gap-0.5">
+            See all <ChevronRight size={11} strokeWidth={3} />
           </Link>
         </div>
         <div className="flex overflow-x-auto gap-2 px-3 py-2 no-scrollbar">
@@ -359,19 +396,19 @@ function GroceryHome({
             />
           ))}
         </div>
-        <div className="px-3 mt-4 grid grid-cols-2 gap-2">
+        <div className="px-3 mt-3 grid grid-cols-2 gap-2">
           {activeSubcategories.map((subcategory) => (
             <Link
               href={`/categories/${encodeURIComponent(subcategory.name)}`}
               key={subcategory.name}
-              className="min-h-10 rounded-xl border border-gray-100 bg-gray-50 px-2.5 py-2 flex items-center justify-between gap-2"
+              className="min-h-10 rounded-xl border border-brand-primary/15 bg-brand-primary/5 px-2.5 py-2 flex items-center justify-between gap-2 active:scale-95 transition-transform"
             >
               <div className="flex items-center gap-2 min-w-0">
                 {/* eslint-disable-next-line @next/next/no-img-element */}
                 <img src={subcategory.image} alt={subcategory.name} width={20} height={20} className="w-5 h-5 object-contain flex-shrink-0" loading="lazy" />
-                <span className="text-[10px] font-bold text-brand-text truncate">{subcategory.name}</span>
+                <span className="text-[10px] font-black text-brand-text truncate">{subcategory.name}</span>
               </div>
-              <ChevronRight size={12} className="text-brand-primary flex-shrink-0" strokeWidth={3} />
+              <ChevronRight size={11} className="text-brand-primary flex-shrink-0" strokeWidth={3} />
             </Link>
           ))}
         </div>
@@ -392,16 +429,25 @@ function FoodHome() {
   return (
     <>
       <motion.section variants={sectionVariants} className="px-3 pt-3">
-        <div className="w-full min-h-24 rounded-xl bg-[#5f259f] p-3.5 text-white relative overflow-hidden shadow-soft">
+        <div className="w-full min-h-24 rounded-2xl hero-gradient p-3.5 text-white relative overflow-hidden shadow-[0_8px_32px_rgba(95,37,159,0.4)]">
           <div className="relative z-10 max-w-[220px]">
-            <span className="text-[8px] font-bold uppercase bg-white/20 px-2 py-0.5 rounded-full">Savega Food</span>
-            <h1 className="text-[16px] font-extrabold mt-1.5 leading-[1.1]">Order from local favorites</h1>
-            <p className="text-[10px] font-semibold text-white/85 mt-1 leading-snug">
+            <motion.span initial={{ opacity:0, y:-8 }} animate={{ opacity:1, y:0 }} transition={{ delay:0.1 }}
+              className="inline-block text-[8px] font-black uppercase bg-white/20 px-2 py-0.5 rounded-full tracking-wider mb-1.5">
+              Savega Food
+            </motion.span>
+            <motion.h1 initial={{ opacity:0, y:8 }} animate={{ opacity:1, y:0 }} transition={{ delay:0.2 }}
+              className="text-[17px] font-black leading-[1.1]">
+              Order from local favorites
+            </motion.h1>
+            <motion.p initial={{ opacity:0 }} animate={{ opacity:1 }} transition={{ delay:0.35 }}
+              className="text-[10px] font-semibold text-white/85 mt-1 leading-snug">
               Top restaurants, quick bites, desserts and dinner picks.
-            </p>
+            </motion.p>
           </div>
-          <div className="absolute -right-8 -bottom-10 w-32 h-32 rounded-full bg-pink-200/25" />
-          <Flame className="absolute right-8 bottom-6 text-pink-100" size={38} strokeWidth={1.6} />
+          <div className="float-orb absolute -right-4 -bottom-6 w-28 h-28 rounded-full bg-brand-orange/25 blur-sm" />
+          <div className="float-orb-slow absolute right-10 -top-4 w-16 h-16 rounded-full bg-white/10" />
+          <div className="float-orb absolute right-2 bottom-8 w-8 h-8 rounded-full bg-brand-orange/40" />
+          <Flame className="absolute right-8 bottom-5 text-white/30 float-orb" size={36} strokeWidth={1.5} />
         </div>
       </motion.section>
 
@@ -458,19 +504,25 @@ function WatermarkFooter() {
 
 function ProductRow({ title, subtitle, products }: { title: string; subtitle: string; products: GroceryProduct[] }) {
   return (
-    <motion.section variants={sectionVariants} className="mt-6">
+    <motion.section variants={sectionVariants} className="mt-5">
       <div className="px-3 flex items-center justify-between mb-2.5">
         <div>
-          <h2 className="text-[13px] font-extrabold text-brand-text">{title}</h2>
-          <p className="text-[8px] text-brand-text-muted font-bold uppercase">{subtitle}</p>
+          <h2 className="text-[14px] font-black text-brand-text">{title}</h2>
+          <p className="text-[9px] text-brand-text-muted font-bold uppercase tracking-wide">{subtitle}</p>
         </div>
-        <Link href="/categories" className="text-[10px] font-bold text-brand-primary flex items-center gap-0.5">
-          View all <ChevronRight size={12} strokeWidth={3} />
+        <Link href="/categories" className="text-[10px] font-black text-brand-primary bg-brand-primary/10 px-2.5 py-1 rounded-full flex items-center gap-0.5">
+          View all <ChevronRight size={11} strokeWidth={3} />
         </Link>
       </div>
-      <div className="flex overflow-x-auto gap-2.5 px-3 pb-4 no-scrollbar">
-        {products.map((product) => (
-          <div key={product.id} className="w-[122px] flex-shrink-0">
+      <div className="flex overflow-x-auto gap-2.5 px-3 pb-3 no-scrollbar">
+        {products.map((product, i) => (
+          <motion.div
+            key={product.id}
+            className="w-[130px] flex-shrink-0"
+            initial={{ opacity: 0, y: 16 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: i * 0.05, type: "spring", stiffness: 300, damping: 24 }}
+          >
             <ProductCard
               id={product.id} name={product.name} image={product.imageColor}
               price={product.price} originalPrice={product.originalPrice}
@@ -478,7 +530,7 @@ function ProductRow({ title, subtitle, products }: { title: string; subtitle: st
               brand={product.brand} category={product.category}
               description={product.description} details={product.details} nutrition={product.nutrition}
             />
-          </div>
+          </motion.div>
         ))}
       </div>
     </motion.section>
@@ -489,9 +541,9 @@ function ProductGrid({ title, products }: { title: string; products: GroceryProd
   return (
     <motion.section variants={sectionVariants} className="mt-3 px-3">
       <div className="flex items-center justify-between mb-2.5">
-        <h2 className="text-[13px] font-extrabold text-brand-text">{title}</h2>
-        <div className="bg-emerald-500 text-white px-2 py-0.5 rounded-full text-[8px] font-black uppercase flex items-center gap-1 shadow-md">
-          <Zap size={10} fill="white" /> Limited time
+        <h2 className="text-[14px] font-black text-brand-text">{title}</h2>
+        <div className="badge-hot text-white px-2.5 py-1 rounded-full text-[9px] font-black flex items-center gap-1">
+          <Zap size={10} fill="white" strokeWidth={0} /> Limited time
         </div>
       </div>
       <div className="grid grid-cols-2 gap-2.5">

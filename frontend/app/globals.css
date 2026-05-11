@@ -2,28 +2,31 @@
 
 @theme {
   --color-brand-primary: #5f259f;
-  --color-brand-primary-light: #8a3ffc;
+  --color-brand-primary-light: #7c3abf;
+  --color-brand-primary-dark: #4a1a80;
+  --color-brand-navy: #061F41;
+  --color-brand-navy-light: #0d3166;
+  --color-brand-orange: #E96710;
+  --color-brand-orange-light: #f5832e;
   --color-brand-accent: #00b761;
-  --color-brand-bg: #f9fafb;
-  --color-brand-text: #111827;
-  --color-brand-text-muted: #6b7280;
-
+  --color-brand-accent-light: #00d472;
+  --color-brand-bg: #f2eef9;
+  --color-brand-surface: #ffffff;
+  --color-brand-surface-2: #f8f5fc;
+  --color-brand-text: #061F41;
+  --color-brand-text-muted: #5a6a82;
+  --color-brand-text-light: #8fa0b8;
   --radius-xl: 12px;
   --radius-2xl: 16px;
   --radius-3xl: 24px;
-
-  --shadow-soft: 0 4px 20px -2px rgba(0, 0, 0, 0.05);
-  --shadow-medium: 0 10px 25px -5px rgba(0, 0, 0, 0.1);
+  --shadow-soft: 0 4px 20px -2px rgba(6, 31, 65, 0.08);
+  --shadow-medium: 0 10px 25px -5px rgba(6, 31, 65, 0.14);
+  --shadow-purple: 0 8px 24px -4px rgba(95, 37, 159, 0.28);
+  --shadow-card: 0 2px 12px rgba(6, 31, 65, 0.07);
 }
 
-:root {
-  --background: #f9fafb;
-  --foreground: #111827;
-}
-
-html {
-  background: var(--background);
-}
+:root { --background: #f2eef9; --foreground: #061F41; }
+html  { background: var(--background); }
 
 body {
   background: var(--background);
@@ -42,51 +45,105 @@ body {
   min-height: 100vh;
   background: white;
   position: relative;
-  box-shadow: 0 0 50px rgba(0, 0, 0, 0.05);
+  box-shadow: 0 0 60px rgba(6, 31, 65, 0.12);
   scroll-padding-bottom: 96px;
   padding-bottom: env(safe-area-inset-bottom);
 }
 
-button,
-input {
-  font: inherit;
+button, input { font: inherit; }
+.app-container .font-black    { font-weight: 700; }
+.app-container .font-extrabold{ font-weight: 700; }
+.app-container .font-bold     { font-weight: 600; }
+.app-container .font-semibold { font-weight: 600; }
+.app-container .uppercase     { text-transform: none; }
+.app-container h1,.app-container h2,.app-container h3 { letter-spacing: 0; }
+.app-container [class*="tracking-"] { letter-spacing: 0; }
+.no-scrollbar::-webkit-scrollbar { display: none; }
+.no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+
+/* ─── Gradients ─────────────────────────────────────────────────────────── */
+.savega-gradient      { background: linear-gradient(135deg, #5f259f 0%, #4a1a80 100%); }
+.savega-gradient-warm { background: linear-gradient(135deg, #7c3abf 0%, #E96710 100%); }
+.savega-gradient-navy { background: linear-gradient(135deg, #061F41 0%, #0d3166 100%); }
+.hero-gradient        { background: linear-gradient(135deg, #5f259f 0%, #3d1570 60%, #061F41 100%); }
+
+/* ─── Badge gradients ───────────────────────────────────────────────────── */
+.badge-fresh { background: linear-gradient(135deg, #00b761, #00d472); }
+.badge-hot   { background: linear-gradient(135deg, #E96710, #f5832e); }
+.badge-new   { background: linear-gradient(135deg, #5f259f, #7c3abf); }
+.badge-sale  { background: linear-gradient(135deg, #e11d48, #f43f5e); }
+.badge-best  { background: linear-gradient(135deg, #d97706, #f59e0b); }
+
+/* ─── Glow ──────────────────────────────────────────────────────────────── */
+.glow-purple { box-shadow: 0 0 20px rgba(95,37,159,0.45); }
+.glow-green  { box-shadow: 0 0 20px rgba(0,183,97,0.45); }
+.glow-orange { box-shadow: 0 0 20px rgba(233,103,16,0.45); }
+
+/* ─── Shimmer skeleton ──────────────────────────────────────────────────── */
+@keyframes shimmer {
+  0%   { background-position: -200% 0; }
+  100% { background-position:  200% 0; }
+}
+.shimmer {
+  background: linear-gradient(90deg, #f0ebf8 25%, #e4daf2 50%, #f0ebf8 75%);
+  background-size: 200% 100%;
+  animation: shimmer 1.4s infinite;
 }
 
-.app-container .font-black {
-  font-weight: 700;
+/* ─── Floating orb (hero decoration) ───────────────────────────────────── */
+@keyframes float-orb {
+  0%,100% { transform: translateY(0) scale(1); }
+  50%     { transform: translateY(-8px) scale(1.04); }
+}
+.float-orb { animation: float-orb 4s ease-in-out infinite; }
+.float-orb-slow { animation: float-orb 6s ease-in-out infinite; }
+
+/* ─── Pulse dot ─────────────────────────────────────────────────────────── */
+@keyframes pulse-dot {
+  0%,100% { opacity:1; transform:scale(1); }
+  50%     { opacity:.6; transform:scale(1.35); }
+}
+.pulse-dot { animation: pulse-dot 1.4s ease-in-out infinite; }
+
+/* ─── Bounce-in for badges ──────────────────────────────────────────────── */
+@keyframes badge-pop {
+  0%   { transform: scale(0) rotate(-12deg); opacity:0; }
+  70%  { transform: scale(1.15) rotate(3deg); opacity:1; }
+  100% { transform: scale(1) rotate(0deg); opacity:1; }
+}
+.badge-pop { animation: badge-pop 0.35s cubic-bezier(.34,1.56,.64,1) forwards; }
+
+/* ─── Slide-up-fade for cards ───────────────────────────────────────────── */
+@keyframes slide-up {
+  from { opacity:0; transform:translateY(18px); }
+  to   { opacity:1; transform:translateY(0); }
+}
+.slide-up { animation: slide-up 0.4s ease forwards; }
+
+/* ─── Gradient text ─────────────────────────────────────────────────────── */
+.gradient-text {
+  background: linear-gradient(135deg, #5f259f, #E96710);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
 }
 
-.app-container .font-extrabold {
-  font-weight: 700;
+/* ─── Search bar purple tint ────────────────────────────────────────────── */
+.search-bar {
+  background: linear-gradient(135deg, #f5f0fc 0%, #f0ebf8 100%);
+  border: 1.5px solid rgba(95,37,159,0.15);
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+.search-bar:focus-within {
+  border-color: rgba(95,37,159,0.5);
+  box-shadow: 0 0 0 3px rgba(95,37,159,0.1);
 }
 
-.app-container .font-bold {
-  font-weight: 600;
+/* ─── Card hover lift ───────────────────────────────────────────────────── */
+.card-hover {
+  transition: transform 0.18s ease, box-shadow 0.18s ease;
 }
-
-.app-container .font-semibold {
-  font-weight: 600;
-}
-
-.app-container .uppercase {
-  text-transform: none;
-}
-
-.app-container h1,
-.app-container h2,
-.app-container h3 {
-  letter-spacing: 0;
-}
-
-.app-container [class*="tracking-"] {
-  letter-spacing: 0;
-}
-
-.no-scrollbar::-webkit-scrollbar {
-  display: none;
-}
-
-.no-scrollbar {
-  -ms-overflow-style: none;
-  scrollbar-width: none;
+.card-hover:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 24px rgba(6,31,65,0.13);
 }

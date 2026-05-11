@@ -4,6 +4,7 @@ import { AnimatePresence, motion } from "framer-motion";
 import { Check, ChevronDown, ChevronRight, Minus, Plus, ShoppingBag, Trash2 } from "lucide-react";
 import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
+import { usePathname } from "next/navigation";
 import { useCartStore } from "@/store/cartStore";
 import ProductDetailSheet from "@/components/ui/ProductDetailSheet";
 import { allProducts } from "@/data/mockData";
@@ -39,6 +40,7 @@ export default function CartBar() {
   const updateQuantity = useCartStore((state) => state.updateQuantity);
   const totalItems = items.reduce((sum, item) => sum + item.quantity, 0);
   const totalPrice = items.reduce((sum, item) => sum + item.price * item.quantity, 0);
+  const pathname = usePathname();
 
   const hasMultiple = items.length > 1;
   const [expanded, setExpanded] = useState(false);
@@ -50,7 +52,9 @@ export default function CartBar() {
     return () => { if (confirmTimerRef.current) clearTimeout(confirmTimerRef.current); };
   }, []);
 
-  if (totalItems === 0) return null;
+  // Hide on cart, order-success, and orders pages
+  const hiddenPaths = ["/cart", "/order-success", "/orders"];
+  if (totalItems === 0 || hiddenPaths.some((p) => pathname.startsWith(p))) return null;
 
   const firstItemName = items[0]?.name ?? "";
 
