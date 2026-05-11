@@ -75,7 +75,7 @@ export default function SubcategoryPage({
 
   return (
     <PageWrapper>
-      <div className="bg-white min-h-screen pb-28">
+      <div className="bg-white pb-28">
         {/* Header */}
         <div className="sticky top-0 z-10 bg-white border-b border-gray-100 px-3 py-2.5 flex items-center gap-3">
           <button

@@ -142,7 +142,7 @@ function OrderSuccessContent() {
 
   return (
     <PageWrapper>
-      <div className="relative flex flex-col items-center px-4 py-6 overflow-hidden">
+      <div className="relative flex flex-col items-center px-4 py-6 pb-32 overflow-hidden">
         {/* Confetti */}
         <div className="absolute inset-0 pointer-events-none overflow-hidden">
           {confettiPieces.map((p) => (
