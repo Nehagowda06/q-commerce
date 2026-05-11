@@ -10,9 +10,9 @@
   --color-brand-orange-light: #f5832e;
   --color-brand-accent: #00b761;
   --color-brand-accent-light: #00d472;
-  --color-brand-bg: #f2eef9;
+  --color-brand-bg: #f5f5f5;
   --color-brand-surface: #ffffff;
-  --color-brand-surface-2: #f8f5fc;
+  --color-brand-surface-2: #fafafa;
   --color-brand-text: #061F41;
   --color-brand-text-muted: #5a6a82;
   --color-brand-text-light: #8fa0b8;
@@ -25,7 +25,7 @@
   --shadow-card: 0 2px 12px rgba(6, 31, 65, 0.07);
 }
 
-:root { --background: #f2eef9; --foreground: #061F41; }
+:root { --background: #f5f5f5; --foreground: #061F41; }
 html  { background: var(--background); }
 
 body {
@@ -130,13 +130,14 @@ button, input { font: inherit; }
 
 /* ─── Search bar purple tint ────────────────────────────────────────────── */
 .search-bar {
-  background: linear-gradient(135deg, #f5f0fc 0%, #f0ebf8 100%);
-  border: 1.5px solid rgba(95,37,159,0.15);
+  background: #f5f5f5;
+  border: 1.5px solid #e8e8e8;
   transition: border-color 0.2s, box-shadow 0.2s;
 }
 .search-bar:focus-within {
-  border-color: rgba(95,37,159,0.5);
-  box-shadow: 0 0 0 3px rgba(95,37,159,0.1);
+  border-color: rgba(95,37,159,0.4);
+  box-shadow: 0 0 0 3px rgba(95,37,159,0.08);
+  background: #fff;
 }
 
 /* ─── Card hover lift ───────────────────────────────────────────────────── */

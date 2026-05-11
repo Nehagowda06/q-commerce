@@ -2,7 +2,7 @@
 
 import { useEffect, useMemo, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
-import { ChevronRight, Clock, Flame, Leaf, SlidersHorizontal, Star, Store, Utensils, X, Zap } from "lucide-react";
+import { ChevronRight, Clock, SlidersHorizontal, Star, Store, Utensils, X, Zap } from "lucide-react";
 import Link from "next/link";
 import PageWrapper from "@/components/layout/PageWrapper";
 import ProductCard from "@/components/ui/ProductCard";
@@ -152,16 +152,15 @@ export default function Home() {
     <PageWrapper>
       <PullToRefresh onRefresh={handleRefresh}>
         <motion.div variants={containerVariants} initial="hidden" animate="visible" className="pb-4">
-          {/* Mode toggle — Zepto style: gradient active pill */}
+          {/* Mode toggle — clean white pill, teal/green active like Zepto */}
           <motion.section variants={sectionVariants} className="px-3 pt-2.5">
-            <div className="grid grid-cols-2 gap-1 rounded-2xl p-1"
-              style={{ background: "linear-gradient(135deg, #f0ebf8, #e8e0f4)" }}>
+            <div className="grid grid-cols-2 gap-1 bg-gray-100 rounded-2xl p-1">
               <button
                 onClick={() => setMode("grocery")}
                 className={`h-9 rounded-xl text-[11px] font-black flex items-center justify-center gap-1.5 transition-all ${
                   mode === "grocery"
-                    ? "savega-gradient text-white shadow-[0_4px_12px_rgba(95,37,159,0.35)]"
-                    : "text-brand-text-muted bg-transparent"
+                    ? "bg-white text-brand-navy shadow-sm"
+                    : "text-gray-500 bg-transparent"
                 }`}
               >
                 <Store size={14} /> Groceries
@@ -170,8 +169,8 @@ export default function Home() {
                 onClick={() => setMode("food")}
                 className={`h-9 rounded-xl text-[11px] font-black flex items-center justify-center gap-1.5 transition-all ${
                   mode === "food"
-                    ? "savega-gradient text-white shadow-[0_4px_12px_rgba(95,37,159,0.35)]"
-                    : "text-brand-text-muted bg-transparent"
+                    ? "bg-white text-brand-navy shadow-sm"
+                    : "text-gray-500 bg-transparent"
                 }`}
               >
                 <Utensils size={14} /> Food
@@ -348,39 +347,45 @@ function GroceryHome({
   return (
     <>
       <motion.section variants={sectionVariants} className="px-3 pt-3">
-        <div className="w-full min-h-24 rounded-2xl hero-gradient p-3.5 text-white relative overflow-hidden shadow-[0_8px_32px_rgba(95,37,159,0.4)]">
-          <div className="relative z-10 max-w-[210px]">
-            <motion.span
-              initial={{ opacity: 0, y: -8 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1 }}
-              className="inline-block text-[8px] font-black uppercase bg-white/20 px-2 py-0.5 rounded-full tracking-wider mb-1.5"
+        {/* Zepto-style banner: bright solid colour, clean layout, no muddy orbs */}
+        <div className="w-full rounded-2xl overflow-hidden relative"
+          style={{ background: "linear-gradient(135deg, #0f7b5c 0%, #0a9e72 100%)", minHeight: "110px" }}>
+          {/* Right decorative circle */}
+          <div className="absolute right-0 top-0 bottom-0 w-36 flex items-center justify-center">
+            <div className="w-28 h-28 rounded-full bg-white/10 flex items-center justify-center text-5xl select-none">
+              🛒
+            </div>
+          </div>
+          {/* Subtle arc */}
+          <div className="absolute -right-8 -top-8 w-40 h-40 rounded-full bg-white/5" />
+
+          <div className="relative z-10 px-4 py-4 max-w-[220px]">
+            <motion.div
+              initial={{ opacity: 0, y: -6 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1 }}
+              className="inline-flex items-center gap-1 bg-white/20 text-white text-[8px] font-black uppercase px-2 py-0.5 rounded-full tracking-wider mb-2"
             >
-              Savega Super Saver
-            </motion.span>
+              ⚡ 10 min delivery
+            </motion.div>
             <motion.h1
-              initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2 }}
-              className="text-[17px] font-black leading-[1.1]"
+              initial={{ opacity: 0, y: 6 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.18 }}
+              className="text-[18px] font-black text-white leading-[1.15]"
             >
-              Fresh groceries in 10 minutes
+              Fresh groceries,<br />at your door
             </motion.h1>
             <motion.p
-              initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.35 }}
-              className="text-[10px] font-semibold text-white/80 mt-1 leading-snug"
+              initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.3 }}
+              className="text-[10px] text-white/80 mt-1.5 font-semibold"
             >
-              Daily essentials, fruits, dairy, snacks and home care.
+              Fruits, dairy, snacks & more
             </motion.p>
           </div>
-          {/* Floating orbs */}
-          <div className="float-orb absolute -right-4 -bottom-6 w-28 h-28 rounded-full bg-brand-orange/25 blur-sm" />
-          <div className="float-orb-slow absolute right-10 -top-4 w-16 h-16 rounded-full bg-white/10" />
-          <div className="float-orb absolute right-2 bottom-8 w-8 h-8 rounded-full bg-brand-orange/40" />
-          <Leaf className="absolute right-8 bottom-5 text-white/30 float-orb" size={36} strokeWidth={1.5} />
         </div>
       </motion.section>
 
       <motion.section variants={sectionVariants} className="mt-4">
         <div className="px-3 flex items-center justify-between mb-2.5">
           <h2 className="text-[14px] font-black text-brand-text">Shop by Aisle</h2>
-          <Link href="/categories" className="text-[10px] font-black text-brand-primary bg-brand-primary/10 px-2.5 py-1 rounded-full flex items-center gap-0.5">
+          <Link href="/categories" className="text-[10px] font-black text-brand-primary bg-gray-100 px-2.5 py-1 rounded-full flex items-center gap-0.5">
             See all <ChevronRight size={11} strokeWidth={3} />
           </Link>
         </div>
@@ -401,14 +406,14 @@ function GroceryHome({
             <Link
               href={`/categories/${encodeURIComponent(subcategory.name)}`}
               key={subcategory.name}
-              className="min-h-10 rounded-xl border border-brand-primary/15 bg-brand-primary/5 px-2.5 py-2 flex items-center justify-between gap-2 active:scale-95 transition-transform"
+              className="min-h-10 rounded-xl border border-gray-200 bg-white px-2.5 py-2 flex items-center justify-between gap-2 active:scale-95 transition-transform shadow-sm"
             >
               <div className="flex items-center gap-2 min-w-0">
                 {/* eslint-disable-next-line @next/next/no-img-element */}
                 <img src={subcategory.image} alt={subcategory.name} width={20} height={20} className="w-5 h-5 object-contain flex-shrink-0" loading="lazy" />
-                <span className="text-[10px] font-black text-brand-text truncate">{subcategory.name}</span>
+                <span className="text-[10px] font-black text-brand-navy truncate">{subcategory.name}</span>
               </div>
-              <ChevronRight size={11} className="text-brand-primary flex-shrink-0" strokeWidth={3} />
+              <ChevronRight size={11} className="text-gray-400 flex-shrink-0" strokeWidth={2.5} />
             </Link>
           ))}
         </div>
@@ -429,25 +434,34 @@ function FoodHome() {
   return (
     <>
       <motion.section variants={sectionVariants} className="px-3 pt-3">
-        <div className="w-full min-h-24 rounded-2xl hero-gradient p-3.5 text-white relative overflow-hidden shadow-[0_8px_32px_rgba(95,37,159,0.4)]">
-          <div className="relative z-10 max-w-[220px]">
-            <motion.span initial={{ opacity:0, y:-8 }} animate={{ opacity:1, y:0 }} transition={{ delay:0.1 }}
-              className="inline-block text-[8px] font-black uppercase bg-white/20 px-2 py-0.5 rounded-full tracking-wider mb-1.5">
-              Savega Food
-            </motion.span>
-            <motion.h1 initial={{ opacity:0, y:8 }} animate={{ opacity:1, y:0 }} transition={{ delay:0.2 }}
-              className="text-[17px] font-black leading-[1.1]">
-              Order from local favorites
+        <div className="w-full rounded-2xl overflow-hidden relative"
+          style={{ background: "linear-gradient(135deg, #c0392b 0%, #e74c3c 100%)", minHeight: "110px" }}>
+          <div className="absolute right-0 top-0 bottom-0 w-36 flex items-center justify-center">
+            <div className="w-28 h-28 rounded-full bg-white/10 flex items-center justify-center text-5xl select-none">
+              🍔
+            </div>
+          </div>
+          <div className="absolute -right-8 -top-8 w-40 h-40 rounded-full bg-white/5" />
+          <div className="relative z-10 px-4 py-4 max-w-[220px]">
+            <motion.div
+              initial={{ opacity: 0, y: -6 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1 }}
+              className="inline-flex items-center gap-1 bg-white/20 text-white text-[8px] font-black uppercase px-2 py-0.5 rounded-full tracking-wider mb-2"
+            >
+              🔥 Hot & fresh
+            </motion.div>
+            <motion.h1
+              initial={{ opacity: 0, y: 6 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.18 }}
+              className="text-[18px] font-black text-white leading-[1.15]"
+            >
+              Order from<br />local favorites
             </motion.h1>
-            <motion.p initial={{ opacity:0 }} animate={{ opacity:1 }} transition={{ delay:0.35 }}
-              className="text-[10px] font-semibold text-white/85 mt-1 leading-snug">
-              Top restaurants, quick bites, desserts and dinner picks.
+            <motion.p
+              initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.3 }}
+              className="text-[10px] text-white/80 mt-1.5 font-semibold"
+            >
+              Restaurants, quick bites & desserts
             </motion.p>
           </div>
-          <div className="float-orb absolute -right-4 -bottom-6 w-28 h-28 rounded-full bg-brand-orange/25 blur-sm" />
-          <div className="float-orb-slow absolute right-10 -top-4 w-16 h-16 rounded-full bg-white/10" />
-          <div className="float-orb absolute right-2 bottom-8 w-8 h-8 rounded-full bg-brand-orange/40" />
-          <Flame className="absolute right-8 bottom-5 text-white/30 float-orb" size={36} strokeWidth={1.5} />
         </div>
       </motion.section>
 
@@ -510,7 +524,7 @@ function ProductRow({ title, subtitle, products }: { title: string; subtitle: st
           <h2 className="text-[14px] font-black text-brand-text">{title}</h2>
           <p className="text-[9px] text-brand-text-muted font-bold uppercase tracking-wide">{subtitle}</p>
         </div>
-        <Link href="/categories" className="text-[10px] font-black text-brand-primary bg-brand-primary/10 px-2.5 py-1 rounded-full flex items-center gap-0.5">
+        <Link href="/categories" className="text-[10px] font-black text-brand-primary bg-gray-100 px-2.5 py-1 rounded-full flex items-center gap-0.5">
           View all <ChevronRight size={11} strokeWidth={3} />
         </Link>
       </div>
