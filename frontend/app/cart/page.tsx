@@ -7,12 +7,23 @@ import { useRouter } from "next/navigation";
 import PageWrapper from "@/components/layout/PageWrapper";
 import Button from "@/components/ui/Button";
 import { useCartStore } from "@/store/cartStore";
+import { useOrderStore } from "@/store/orderStore";
 
 export default function CartPage() {
-  const { items, updateQuantity } = useCartStore();
+  const { items, updateQuantity, clearCart } = useCartStore();
+  const placeOrder = useOrderStore((s) => s.placeOrder);
   const router = useRouter();
   const totalItems = items.reduce((sum, item) => sum + item.quantity, 0);
   const totalPrice = items.reduce((sum, item) => sum + item.price * item.quantity, 0);
+
+  const handleCheckout = () => {
+    const order = placeOrder(
+      items.map((i) => ({ id: i.id, name: i.name, price: i.price, quantity: i.quantity })),
+      totalPrice
+    );
+    clearCart();
+    router.push(`/order-success?orderId=${order.id}`);
+  };
 
   if (totalItems === 0) {
     return (
@@ -61,28 +72,23 @@ export default function CartPage() {
                 <div className="w-20 h-20 rounded-2xl bg-gray-50 flex items-center justify-center shrink-0 border border-gray-50 text-brand-primary">
                   <Package size={30} strokeWidth={1.8} />
                 </div>
-
                 <div className="flex-1 min-w-0">
                   <h3 className="text-sm font-bold text-brand-text leading-tight">{item.name}</h3>
                   <p className="text-xs text-brand-text-muted mt-1 font-medium">Rs.{item.price} per unit</p>
                   <div className="mt-3 flex items-center justify-between gap-3">
                     <span className="text-sm font-black text-brand-text">Rs.{item.price * item.quantity}</span>
                     <div className="flex items-center bg-brand-primary text-white rounded-full p-1 shadow-soft">
-                      <motion.button
-                        whileTap={{ scale: 0.8 }}
+                      <motion.button whileTap={{ scale: 0.8 }}
                         onClick={() => updateQuantity(item.id, item.quantity - 1)}
                         className="w-7 h-7 flex items-center justify-center rounded-full hover:bg-white/10"
-                        aria-label={`Remove ${item.name}`}
-                      >
+                        aria-label={`Remove ${item.name}`}>
                         <Minus size={14} strokeWidth={3} />
                       </motion.button>
                       <span className="text-xs font-bold w-6 text-center">{item.quantity}</span>
-                      <motion.button
-                        whileTap={{ scale: 0.8 }}
+                      <motion.button whileTap={{ scale: 0.8 }}
                         onClick={() => updateQuantity(item.id, item.quantity + 1)}
                         className="w-7 h-7 flex items-center justify-center rounded-full hover:bg-white/10"
-                        aria-label={`Add ${item.name}`}
-                      >
+                        aria-label={`Add ${item.name}`}>
                         <Plus size={14} strokeWidth={3} />
                       </motion.button>
                     </div>
@@ -117,7 +123,7 @@ export default function CartPage() {
               fullWidth
               size="lg"
               className="h-14 shadow-medium flex items-center justify-between px-6"
-              onClick={() => router.push("/order-success")}
+              onClick={handleCheckout}
             >
               <div className="flex flex-col items-start leading-none">
                 <span className="text-[10px] font-black uppercase tracking-widest opacity-80">Total to pay</span>
