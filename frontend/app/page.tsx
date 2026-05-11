@@ -338,9 +338,9 @@ function GroceryHome({
   return (
     <>
       <motion.section variants={sectionVariants} className="px-3 pt-3">
-        <div className="w-full min-h-24 rounded-xl bg-[#5f259f] p-3.5 text-white relative overflow-hidden shadow-soft">
+        <div className="w-full min-h-24 rounded-xl hero-gradient p-3.5 text-white relative overflow-hidden shadow-[0_8px_32px_rgba(95,37,159,0.35)]">
           <div className="relative z-10 max-w-[210px]">
-            <span className="text-[8px] font-bold uppercase bg-white/20 px-2 py-0.5 rounded-full">
+            <span className="text-[8px] font-bold uppercase bg-white/20 px-2 py-0.5 rounded-full tracking-wider">
               Savega Super Saver
             </span>
             <h1 className="text-[16px] font-extrabold mt-1.5 leading-[1.1]">Fresh groceries in 10 minutes</h1>
@@ -348,8 +348,9 @@ function GroceryHome({
               Daily essentials, fruits, dairy, snacks and home care.
             </p>
           </div>
-          <div className="absolute -right-8 -bottom-10 w-32 h-32 rounded-full bg-emerald-300/25" />
-          <Leaf className="absolute right-7 bottom-6 text-emerald-200" size={38} strokeWidth={1.6} />
+          <div className="absolute -right-6 -bottom-8 w-36 h-36 rounded-full bg-brand-orange/20" />
+          <div className="absolute -right-2 top-2 w-20 h-20 rounded-full bg-white/5" />
+          <Leaf className="absolute right-7 bottom-6 text-brand-orange/60" size={38} strokeWidth={1.6} />
         </div>
       </motion.section>
 
@@ -405,16 +406,17 @@ function FoodHome() {
   return (
     <>
       <motion.section variants={sectionVariants} className="px-3 pt-3">
-        <div className="w-full min-h-24 rounded-xl bg-[#5f259f] p-3.5 text-white relative overflow-hidden shadow-soft">
+        <div className="w-full min-h-24 rounded-xl hero-gradient p-3.5 text-white relative overflow-hidden shadow-[0_8px_32px_rgba(95,37,159,0.35)]">
           <div className="relative z-10 max-w-[220px]">
-            <span className="text-[8px] font-bold uppercase bg-white/20 px-2 py-0.5 rounded-full">Savega Food</span>
+            <span className="text-[8px] font-bold uppercase bg-white/20 px-2 py-0.5 rounded-full tracking-wider">Savega Food</span>
             <h1 className="text-[16px] font-extrabold mt-1.5 leading-[1.1]">Order from local favorites</h1>
             <p className="text-[10px] font-semibold text-white/85 mt-1 leading-snug">
               Top restaurants, quick bites, desserts and dinner picks.
             </p>
           </div>
-          <div className="absolute -right-8 -bottom-10 w-32 h-32 rounded-full bg-pink-200/25" />
-          <Flame className="absolute right-8 bottom-6 text-pink-100" size={38} strokeWidth={1.6} />
+          <div className="absolute -right-6 -bottom-8 w-36 h-36 rounded-full bg-brand-orange/20" />
+          <div className="absolute -right-2 top-2 w-20 h-20 rounded-full bg-white/5" />
+          <Flame className="absolute right-8 bottom-6 text-brand-orange/70" size={38} strokeWidth={1.6} />
         </div>
       </motion.section>
 

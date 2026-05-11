@@ -115,8 +115,8 @@ export default function CartPage() {
 
         {/* ── Delivery promise ── */}
         <div className="bg-white px-4 py-3 flex items-center gap-3 border-b border-gray-100">
-          <div className="w-9 h-9 rounded-xl bg-brand-primary/10 flex items-center justify-center flex-shrink-0">
-            <Zap size={16} className="text-brand-primary" strokeWidth={2.5} />
+          <div className="w-9 h-9 rounded-xl bg-brand-orange/10 flex items-center justify-center flex-shrink-0">
+            <Zap size={16} className="text-brand-orange" strokeWidth={2.5} />
           </div>
           <div className="flex-1">
             <p className="text-[12px] font-black text-brand-text">Delivery in 10 minutes</p>
@@ -368,7 +368,7 @@ export default function CartPage() {
 
           {/* Main button */}
           <motion.button whileTap={{ scale: 0.99 }} onClick={handleCheckout}
-            className="w-full bg-brand-primary flex items-center px-4 py-3.5 shadow-[0_-6px_24px_rgba(95,37,159,0.3)]">
+            className="w-full savega-gradient flex items-center px-4 py-3.5 shadow-[0_-6px_24px_rgba(95,37,159,0.3)]">
 
             {/* Left: total */}
             <div className="flex flex-col items-start leading-none mr-auto">

@@ -67,7 +67,7 @@ export default function Navbar() {
 
   return (
     <>
-      <header className="sticky top-0 z-50 bg-white shadow-soft">
+      <header className="sticky top-0 z-50 bg-white border-b border-gray-100 shadow-[0_2px_12px_rgba(6,31,65,0.08)]">
         <div className="px-3.5 py-2.5">
           <div className="flex items-center justify-between mb-2.5">
             <div className="flex items-center gap-2 min-w-0">

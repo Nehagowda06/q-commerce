@@ -1,24 +1,46 @@
 @import "tailwindcss";
 
 @theme {
+  /* ── Savega brand palette extracted from logo SVGs ── */
+  /* Primary: rich purple from the logo mark */
   --color-brand-primary: #5f259f;
-  --color-brand-primary-light: #8a3ffc;
+  --color-brand-primary-light: #7c3abf;
+  --color-brand-primary-dark: #4a1a80;
+
+  /* Navy: deep dark blue from the wordmark (#061F41) */
+  --color-brand-navy: #061F41;
+  --color-brand-navy-light: #0d3166;
+
+  /* Orange: warm delivery accent (#E96710) */
+  --color-brand-orange: #E96710;
+  --color-brand-orange-light: #f5832e;
+
+  /* Accent: keep green for "fresh/savings" signals */
   --color-brand-accent: #00b761;
-  --color-brand-bg: #f9fafb;
-  --color-brand-text: #111827;
-  --color-brand-text-muted: #6b7280;
+  --color-brand-accent-light: #00d472;
+
+  /* Surfaces */
+  --color-brand-bg: #f4f0f9;
+  --color-brand-surface: #ffffff;
+  --color-brand-surface-2: #f8f5fc;
+
+  /* Text */
+  --color-brand-text: #061F41;
+  --color-brand-text-muted: #5a6a82;
+  --color-brand-text-light: #8fa0b8;
 
   --radius-xl: 12px;
   --radius-2xl: 16px;
   --radius-3xl: 24px;
 
-  --shadow-soft: 0 4px 20px -2px rgba(0, 0, 0, 0.05);
-  --shadow-medium: 0 10px 25px -5px rgba(0, 0, 0, 0.1);
+  --shadow-soft: 0 4px 20px -2px rgba(6, 31, 65, 0.08);
+  --shadow-medium: 0 10px 25px -5px rgba(6, 31, 65, 0.14);
+  --shadow-purple: 0 8px 24px -4px rgba(95, 37, 159, 0.28);
 }
 
 :root {
-  --background: #f9fafb;
-  --foreground: #111827;
+  --background: #f4f0f9;
+  --foreground: #061F41;
 }
 
 html {
@@ -42,7 +64,7 @@ body {
   min-height: 100vh;
   background: white;
   position: relative;
-  box-shadow: 0 0 50px rgba(0, 0, 0, 0.05);
+  box-shadow: 0 0 60px rgba(6, 31, 65, 0.12);
   scroll-padding-bottom: 96px;
   padding-bottom: env(safe-area-inset-bottom);
 }
@@ -89,4 +111,31 @@ input {
 .no-scrollbar {
   -ms-overflow-style: none;
   scrollbar-width: none;
+}
+
+/* ── Savega gradient utilities ── */
+.savega-gradient {
+  background: linear-gradient(135deg, #5f259f 0%, #4a1a80 100%);
+}
+
+.savega-gradient-warm {
+  background: linear-gradient(135deg, #5f259f 0%, #E96710 100%);
+}
+
+.savega-gradient-navy {
+  background: linear-gradient(135deg, #061F41 0%, #0d3166 100%);
+}
+
+/* ── Hero banner gradient ── */
+.hero-gradient {
+  background: linear-gradient(135deg, #5f259f 0%, #3d1570 60%, #061F41 100%);
+}
+
+/* ── Card hover lift ── */
+.card-lift {
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+.card-lift:active {
+  transform: scale(0.98);
+  box-shadow: 0 2px 8px rgba(6, 31, 65, 0.1);
 }

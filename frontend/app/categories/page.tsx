@@ -56,7 +56,7 @@ export default function CategoriesPage() {
           </aside>
 
           <main className="p-3 pb-28">
-            <div className="rounded-xl bg-brand-primary text-white p-2.5 mb-2.5 flex items-center gap-2.5">
+            <div className="rounded-xl hero-gradient text-white p-2.5 mb-2.5 flex items-center gap-2.5 shadow-[0_4px_16px_rgba(95,37,159,0.3)]">
               <div className="w-11 h-11 rounded-lg bg-white flex items-center justify-center shadow-soft">
                 {/* eslint-disable-next-line @next/next/no-img-element */}
                 <img src={active.image} alt={active.name} width={32} height={32} className="w-8 h-8 object-contain" />
