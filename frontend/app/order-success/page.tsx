@@ -1,13 +1,17 @@
 "use client";
 
 import { motion } from "framer-motion";
-import { ArrowRight, Check, ChevronRight, ClipboardList, Truck } from "lucide-react";
+import { ArrowRight, Check, ClipboardList, Truck } from "lucide-react";
 import Link from "next/link";
+import dynamic from "next/dynamic";
 import { useSearchParams } from "next/navigation";
-import { Suspense, useEffect, useState } from "react";
+import { Suspense, useEffect } from "react";
 import PageWrapper from "@/components/layout/PageWrapper";
 import Button from "@/components/ui/Button";
 import { useOrderStore, type Order, type OrderStatus } from "@/store/orderStore";
+import { MANDYA_CENTER } from "@/components/ui/LeafletMap";
+
+const LeafletMap = dynamic(() => import("@/components/ui/LeafletMap"), { ssr: false });
 
 const STATUS_STEPS: { key: OrderStatus; label: string; desc: string }[] = [
   { key: "confirmed", label: "Order Confirmed", desc: "We've received your order" },
@@ -102,6 +106,19 @@ function OrderTracker({ order }: { order: Order }) {
           </p>
         </div>
       )}
+
+      {/* Delivery map */}
+      <div className="mt-3 rounded-xl overflow-hidden border border-gray-100">
+        <LeafletMap
+          center={MANDYA_CENTER}
+          zoom={14}
+          markers={[
+            { lat: MANDYA_CENTER[0], lng: MANDYA_CENTER[1], label: "Store", color: "purple" },
+            { lat: 12.5218, lng: 76.8951, label: "Your location", color: "green" },
+          ]}
+          className="h-36"
+        />
+      </div>
     </div>
   );
 }

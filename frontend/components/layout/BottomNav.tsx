@@ -2,8 +2,8 @@
 
 import { motion } from "framer-motion";
 import { Home, LayoutGrid, ListChecks, ShoppingCart } from "lucide-react";
-import { usePathname } from "next/navigation";
-import Link from "next/link";
+import { usePathname, useRouter } from "next/navigation";
+import { useSearchStore } from "@/store/searchStore";
 
 const navItems = [
   { id: "home", label: "Home", icon: Home, href: "/" },
@@ -14,6 +14,13 @@ const navItems = [
 
 export default function BottomNav() {
   const pathname = usePathname();
+  const router = useRouter();
+  const reset = useSearchStore((s) => s.reset);
+
+  const handleNav = (href: string) => {
+    if (href === "/") reset(); // clear search when going home
+    router.push(href);
+  };
 
   return (
     <nav className="fixed bottom-0 left-0 right-0 z-50 flex justify-center pointer-events-none">
@@ -23,9 +30,10 @@ export default function BottomNav() {
           const Icon = item.icon;
 
           return (
-            <Link
+            <button
               key={item.id}
-              href={item.href}
+              type="button"
+              onClick={() => handleNav(item.href)}
               className="relative flex flex-col items-center justify-center py-1 px-3 flex-1 group"
             >
               <div className="relative">
@@ -54,7 +62,7 @@ export default function BottomNav() {
               </span>
 
               {isActive && <motion.div layoutId="activeDot" className="absolute bottom-0 w-1 h-1 bg-brand-primary rounded-full" />}
-            </Link>
+            </button>
           );
         })}
       </div>
