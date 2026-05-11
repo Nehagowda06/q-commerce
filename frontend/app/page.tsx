@@ -152,28 +152,31 @@ export default function Home() {
     <PageWrapper>
       <PullToRefresh onRefresh={handleRefresh}>
         <motion.div variants={containerVariants} initial="hidden" animate="visible" className="pb-4">
-          {/* Mode toggle — clean white pill, teal/green active like Zepto */}
+          {/* Mode toggle — smooth layoutId animation */}
           <motion.section variants={sectionVariants} className="px-3 pt-2.5">
-            <div className="grid grid-cols-2 gap-1 bg-gray-100 rounded-2xl p-1">
+            <div className="relative grid grid-cols-2 gap-0 bg-gray-100 rounded-xl p-1">
+              {/* Sliding active pill */}
+              <motion.div
+                layoutId="mode-pill"
+                className="absolute top-1 bottom-1 w-[calc(50%-4px)] bg-white rounded-lg shadow-sm"
+                animate={{ x: mode === "grocery" ? 0 : "calc(100% + 4px)" }}
+                transition={{ type: "spring", stiffness: 500, damping: 35 }}
+              />
               <button
                 onClick={() => setMode("grocery")}
-                className={`h-9 rounded-xl text-[11px] font-black flex items-center justify-center gap-1.5 transition-all ${
-                  mode === "grocery"
-                    ? "bg-white text-brand-navy shadow-sm"
-                    : "text-gray-500 bg-transparent"
+                className={`relative z-10 h-8 rounded-lg text-[11px] font-black flex items-center justify-center gap-1.5 transition-colors ${
+                  mode === "grocery" ? "text-brand-navy" : "text-gray-400"
                 }`}
               >
-                <Store size={14} /> Groceries
+                <Store size={13} strokeWidth={mode === "grocery" ? 2.5 : 2} /> Groceries
               </button>
               <button
                 onClick={() => setMode("food")}
-                className={`h-9 rounded-xl text-[11px] font-black flex items-center justify-center gap-1.5 transition-all ${
-                  mode === "food"
-                    ? "bg-white text-brand-navy shadow-sm"
-                    : "text-gray-500 bg-transparent"
+                className={`relative z-10 h-8 rounded-lg text-[11px] font-black flex items-center justify-center gap-1.5 transition-colors ${
+                  mode === "food" ? "text-brand-navy" : "text-gray-400"
                 }`}
               >
-                <Utensils size={14} /> Food
+                <Utensils size={13} strokeWidth={mode === "food" ? 2.5 : 2} /> Food
               </button>
             </div>
           </motion.section>
