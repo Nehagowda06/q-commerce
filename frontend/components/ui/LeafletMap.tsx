@@ -14,12 +14,10 @@ interface LeafletMapProps {
   zoom?: number;
   markers?: MapMarker[];
   className?: string;
-  /** If true, clicking the map calls onLocationSelect with the clicked coords */
   selectable?: boolean;
   onLocationSelect?: (lat: number, lng: number) => void;
 }
 
-// Mandya, Karnataka coordinates
 export const MANDYA_CENTER: [number, number] = [12.5218, 76.8951];
 
 const MARKER_COLORS: Record<string, string> = {
@@ -41,13 +39,25 @@ export default function LeafletMap({
   const mapRef = useRef<any>(null);
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const markersRef = useRef<any[]>([]);
+  const initializedRef = useRef(false);
 
   useEffect(() => {
-    if (!containerRef.current || mapRef.current) return;
+    // Guard against double-init (React StrictMode / remounts)
+    if (initializedRef.current) return;
+    if (!containerRef.current) return;
 
-    // Dynamically import Leaflet (avoids SSR issues)
+    // If Leaflet already stamped this container, bail out
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    if ((containerRef.current as any)._leaflet_id) return;
+
+    initializedRef.current = true;
+
     import("leaflet").then((L) => {
-      // Fix default icon paths broken by webpack
+      // Bail if container was removed while we were loading
+      if (!containerRef.current) return;
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      if ((containerRef.current as any)._leaflet_id) return;
+
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       delete (L.Icon.Default.prototype as any)._getIconUrl;
       L.Icon.Default.mergeOptions({
@@ -69,20 +79,25 @@ export default function LeafletMap({
 
       mapRef.current = map;
 
-      // Add initial markers
-      markers.forEach((m) => {
-        const color = MARKER_COLORS[m.color ?? "purple"];
-        const icon = L.divIcon({
-          className: "",
-          html: `<div style="width:14px;height:14px;border-radius:50%;background:${color};border:2.5px solid white;box-shadow:0 2px 6px rgba(0,0,0,0.35)"></div>`,
-          iconSize: [14, 14],
-          iconAnchor: [7, 7],
+      const addMarkers = () => {
+        markersRef.current.forEach((m) => m.remove());
+        markersRef.current = [];
+        markers.forEach((m) => {
+          const color = MARKER_COLORS[m.color ?? "purple"];
+          const icon = L.divIcon({
+            className: "",
+            html: `<div style="width:14px;height:14px;border-radius:50%;background:${color};border:2.5px solid white;box-shadow:0 2px 6px rgba(0,0,0,0.35)"></div>`,
+            iconSize: [14, 14],
+            iconAnchor: [7, 7],
+          });
+          const marker = L.marker([m.lat, m.lng], { icon });
+          if (m.label) marker.bindPopup(m.label);
+          marker.addTo(map);
+          markersRef.current.push(marker);
         });
-        const marker = L.marker([m.lat, m.lng], { icon });
-        if (m.label) marker.bindPopup(m.label);
-        marker.addTo(map);
-        markersRef.current.push(marker);
-      });
+      };
+
+      addMarkers();
 
       if (selectable && onLocationSelect) {
         map.on("click", (e: { latlng: { lat: number; lng: number } }) => {
@@ -96,14 +111,16 @@ export default function LeafletMap({
         mapRef.current.remove();
         mapRef.current = null;
       }
+      initializedRef.current = false;
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  // Update markers when they change
+  // Update markers when they change after init
   useEffect(() => {
     if (!mapRef.current) return;
     import("leaflet").then((L) => {
+      if (!mapRef.current) return;
       markersRef.current.forEach((m) => m.remove());
       markersRef.current = [];
       markers.forEach((m) => {
@@ -120,17 +137,13 @@ export default function LeafletMap({
         markersRef.current.push(marker);
       });
     });
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [JSON.stringify(markers)]);
 
   return (
     <>
-      {/* Leaflet CSS */}
       {/* eslint-disable-next-line @next/next/no-css-tags */}
-      <link
-        rel="stylesheet"
-        href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
-      />
+      <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
       <div ref={containerRef} className={`w-full ${className}`} />
     </>
   );
