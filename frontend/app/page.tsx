@@ -147,21 +147,26 @@ export default function Home() {
     <PageWrapper>
       <PullToRefresh onRefresh={handleRefresh}>
         <motion.div variants={containerVariants} initial="hidden" animate="visible" className="pb-4">
-          {/* Mode toggle */}
+          {/* Mode toggle — Zepto style: gradient active pill */}
           <motion.section variants={sectionVariants} className="px-3 pt-2.5">
-            <div className="grid grid-cols-2 gap-1 rounded-xl bg-gray-100 p-1">
+            <div className="grid grid-cols-2 gap-1 rounded-2xl p-1"
+              style={{ background: "linear-gradient(135deg, #f0ebf8, #e8e0f4)" }}>
               <button
                 onClick={() => setMode("grocery")}
-                className={`h-8 rounded-lg text-[10px] font-bold uppercase flex items-center justify-center gap-1.5 transition ${
-                  mode === "grocery" ? "bg-white text-brand-primary shadow-soft" : "text-gray-500"
+                className={`h-9 rounded-xl text-[11px] font-black flex items-center justify-center gap-1.5 transition-all ${
+                  mode === "grocery"
+                    ? "savega-gradient text-white shadow-[0_4px_12px_rgba(95,37,159,0.35)]"
+                    : "text-brand-text-muted bg-transparent"
                 }`}
               >
                 <Store size={14} /> Groceries
               </button>
               <button
                 onClick={() => setMode("food")}
-                className={`h-8 rounded-lg text-[10px] font-bold uppercase flex items-center justify-center gap-1.5 transition ${
-                  mode === "food" ? "bg-white text-brand-primary shadow-soft" : "text-gray-500"
+                className={`h-9 rounded-xl text-[11px] font-black flex items-center justify-center gap-1.5 transition-all ${
+                  mode === "food"
+                    ? "savega-gradient text-white shadow-[0_4px_12px_rgba(95,37,159,0.35)]"
+                    : "text-brand-text-muted bg-transparent"
                 }`}
               >
                 <Utensils size={14} /> Food
@@ -356,9 +361,9 @@ function GroceryHome({
 
       <motion.section variants={sectionVariants} className="mt-4">
         <div className="px-3 flex items-center justify-between mb-2.5">
-          <h2 className="text-[13px] font-extrabold text-brand-text">Shop by Aisle</h2>
-          <Link href="/categories" className="text-[10px] font-bold text-brand-primary flex items-center gap-0.5">
-            See all <ChevronRight size={12} strokeWidth={3} />
+          <h2 className="text-[14px] font-black text-brand-text">Shop by Aisle</h2>
+          <Link href="/categories" className="text-[10px] font-black text-brand-primary bg-brand-primary/10 px-2.5 py-1 rounded-full flex items-center gap-0.5">
+            See all <ChevronRight size={11} strokeWidth={3} />
           </Link>
         </div>
         <div className="flex overflow-x-auto gap-2 px-3 py-2 no-scrollbar">
@@ -373,19 +378,19 @@ function GroceryHome({
             />
           ))}
         </div>
-        <div className="px-3 mt-4 grid grid-cols-2 gap-2">
+        <div className="px-3 mt-3 grid grid-cols-2 gap-2">
           {activeSubcategories.map((subcategory) => (
             <Link
               href={`/categories/${encodeURIComponent(subcategory.name)}`}
               key={subcategory.name}
-              className="min-h-10 rounded-xl border border-gray-100 bg-gray-50 px-2.5 py-2 flex items-center justify-between gap-2"
+              className="min-h-10 rounded-xl border border-brand-primary/15 bg-brand-primary/5 px-2.5 py-2 flex items-center justify-between gap-2 active:scale-95 transition-transform"
             >
               <div className="flex items-center gap-2 min-w-0">
                 {/* eslint-disable-next-line @next/next/no-img-element */}
                 <img src={subcategory.image} alt={subcategory.name} width={20} height={20} className="w-5 h-5 object-contain flex-shrink-0" loading="lazy" />
-                <span className="text-[10px] font-bold text-brand-text truncate">{subcategory.name}</span>
+                <span className="text-[10px] font-black text-brand-text truncate">{subcategory.name}</span>
               </div>
-              <ChevronRight size={12} className="text-brand-primary flex-shrink-0" strokeWidth={3} />
+              <ChevronRight size={11} className="text-brand-primary flex-shrink-0" strokeWidth={3} />
             </Link>
           ))}
         </div>
@@ -473,19 +478,19 @@ function WatermarkFooter() {
 
 function ProductRow({ title, subtitle, products }: { title: string; subtitle: string; products: GroceryProduct[] }) {
   return (
-    <motion.section variants={sectionVariants} className="mt-6">
+    <motion.section variants={sectionVariants} className="mt-5">
       <div className="px-3 flex items-center justify-between mb-2.5">
         <div>
-          <h2 className="text-[13px] font-extrabold text-brand-text">{title}</h2>
-          <p className="text-[8px] text-brand-text-muted font-bold uppercase">{subtitle}</p>
+          <h2 className="text-[14px] font-black text-brand-text">{title}</h2>
+          <p className="text-[9px] text-brand-text-muted font-bold uppercase tracking-wide">{subtitle}</p>
         </div>
-        <Link href="/categories" className="text-[10px] font-bold text-brand-primary flex items-center gap-0.5">
-          View all <ChevronRight size={12} strokeWidth={3} />
+        <Link href="/categories" className="text-[10px] font-black text-brand-primary bg-brand-primary/10 px-2.5 py-1 rounded-full flex items-center gap-0.5">
+          View all <ChevronRight size={11} strokeWidth={3} />
         </Link>
       </div>
-      <div className="flex overflow-x-auto gap-2.5 px-3 pb-4 no-scrollbar">
+      <div className="flex overflow-x-auto gap-2.5 px-3 pb-3 no-scrollbar">
         {products.map((product) => (
-          <div key={product.id} className="w-[122px] flex-shrink-0">
+          <div key={product.id} className="w-[130px] flex-shrink-0">
             <ProductCard
               id={product.id} name={product.name} image={product.imageColor}
               price={product.price} originalPrice={product.originalPrice}
@@ -504,9 +509,9 @@ function ProductGrid({ title, products }: { title: string; products: GroceryProd
   return (
     <motion.section variants={sectionVariants} className="mt-3 px-3">
       <div className="flex items-center justify-between mb-2.5">
-        <h2 className="text-[13px] font-extrabold text-brand-text">{title}</h2>
-        <div className="bg-emerald-500 text-white px-2 py-0.5 rounded-full text-[8px] font-black uppercase flex items-center gap-1 shadow-md">
-          <Zap size={10} fill="white" /> Limited time
+        <h2 className="text-[14px] font-black text-brand-text">{title}</h2>
+        <div className="badge-hot text-white px-2.5 py-1 rounded-full text-[9px] font-black flex items-center gap-1">
+          <Zap size={10} fill="white" strokeWidth={0} /> Limited time
         </div>
       </div>
       <div className="grid grid-cols-2 gap-2.5">
