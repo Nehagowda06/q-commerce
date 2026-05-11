@@ -13,7 +13,7 @@ import { useSearchStore, type SortOption, type FilterOption } from "@/store/sear
 
 const containerVariants = {
   hidden: { opacity: 0 },
-  visible: { opacity: 1, transition: { staggerChildren: 0.08 } },
+  visible: { opacity: 1, transition: { staggerChildren: 0.04 } },
 } as const;
 
 const sectionVariants = {
@@ -120,29 +120,25 @@ export default function Home() {
 
   const handleRefresh = async () => {
     setLoading(true);
-    await new Promise((resolve) => setTimeout(resolve, 700));
+    await new Promise((resolve) => setTimeout(resolve, 400));
     setLoading(false);
   };
 
   useEffect(() => {
-    const timer = setTimeout(() => setLoading(false), 400);
+    const timer = setTimeout(() => setLoading(false), 80);
     return () => clearTimeout(timer);
   }, []);
 
   if (loading) {
     return (
-      <div className="px-4 py-4 space-y-4 bg-white">
-        <div className="h-11 rounded-2xl shimmer" />
-        <div className="h-32 rounded-3xl shimmer" />
-        <div className="grid grid-cols-4 gap-3">
-          {[1, 2, 3, 4].map((item) => (
-            <div key={item} className="h-20 rounded-2xl shimmer" />
-          ))}
+      <div className="px-3 py-3 space-y-3 bg-white min-h-screen">
+        <div className="h-8 rounded-xl shimmer" />
+        <div className="h-28 rounded-2xl shimmer" />
+        <div className="flex gap-2 overflow-hidden">
+          {[1,2,3,4].map((i) => <div key={i} className="w-16 h-16 rounded-2xl shimmer flex-shrink-0" />)}
         </div>
-        <div className="grid grid-cols-2 gap-3">
-          {[1, 2, 3, 4].map((item) => (
-            <div key={item} className="h-44 rounded-2xl shimmer" />
-          ))}
+        <div className="grid grid-cols-2 gap-2.5">
+          {[1,2,3,4].map((i) => <div key={i} className="h-40 rounded-2xl shimmer" />)}
         </div>
       </div>
     );
@@ -538,7 +534,7 @@ function ProductRow({ title, subtitle, products }: { title: string; subtitle: st
             className="w-[130px] flex-shrink-0"
             initial={{ opacity: 0, y: 16 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: i * 0.05, type: "spring", stiffness: 300, damping: 24 }}
+            transition={{ delay: Math.min(i * 0.03, 0.15), type: "spring", stiffness: 300, damping: 24 }}
           >
             <ProductCard
               id={product.id} name={product.name} image={product.imageColor}
