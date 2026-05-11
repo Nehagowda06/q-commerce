@@ -107,7 +107,7 @@ export default function CartPage() {
         </div>
       </div>
 
-      <div className="pb-36">
+      <div className="pb-44">
         {/* Delivery promise banner */}
         <div className="mx-3 mt-3 bg-brand-primary/5 border border-brand-primary/20 rounded-xl px-3 py-2 flex items-center gap-2">
           <Zap size={14} className="text-brand-primary flex-shrink-0" strokeWidth={2.5} />
@@ -293,15 +293,15 @@ export default function CartPage() {
         </p>
       </div>
 
-      {/* Sticky checkout bar */}
-      <div className="fixed bottom-0 left-0 right-0 z-50 flex justify-center pointer-events-none">
-        <div className="w-full max-w-[420px] pointer-events-auto bg-white border-t border-gray-100 px-3 py-3 pb-[calc(0.75rem+env(safe-area-inset-bottom))]">
+      {/* Sticky checkout bar — sits above bottom nav */}
+      <div className="fixed bottom-[calc(3.5rem+env(safe-area-inset-bottom))] left-0 right-0 z-[55] flex justify-center pointer-events-none px-3">
+        <div className="w-full max-w-[420px] pointer-events-auto">
           {/* Savings strip */}
           {(savings > 0 || couponDiscount > 0) && (
-            <div className="bg-brand-accent/10 rounded-xl px-3 py-1.5 mb-2 flex items-center justify-center gap-1.5">
-              <Tag size={11} className="text-brand-accent" strokeWidth={2.5} />
-              <p className="text-[10px] font-black text-brand-accent">
-                Total savings: Rs.{Math.round(savings + couponDiscount)} on this order
+            <div className="bg-brand-accent text-white rounded-t-xl px-4 py-1.5 flex items-center justify-center gap-1.5">
+              <Tag size={11} strokeWidth={2.5} />
+              <p className="text-[10px] font-black">
+                Total savings: Rs.{Math.round(savings + couponDiscount)} on this order 🎉
               </p>
             </div>
           )}
@@ -309,23 +309,25 @@ export default function CartPage() {
           <motion.button
             whileTap={{ scale: 0.98 }}
             onClick={handleCheckout}
-            className="w-full h-13 rounded-xl bg-brand-primary text-white flex items-center justify-between px-4 py-3 shadow-soft"
+            className={`w-full bg-brand-primary text-white flex items-center justify-between px-5 py-4 shadow-[0_-4px_20px_rgba(95,37,159,0.25)] ${(savings > 0 || couponDiscount > 0) ? "rounded-b-2xl" : "rounded-2xl"}`}
           >
-            {/* Left: item count + total */}
+            {/* Left: total */}
             <div className="flex flex-col items-start leading-none">
               <span className="text-[9px] font-bold text-white/70 uppercase tracking-wider">
-                {totalItems} item{totalItems !== 1 ? "s" : ""}
+                {totalItems} item{totalItems !== 1 ? "s" : ""} · Total
               </span>
-              <span className="text-[15px] font-black mt-0.5">Rs.{Math.round(grandTotal)}</span>
+              <span className="text-[17px] font-black mt-1">Rs.{Math.round(grandTotal)}</span>
             </div>
 
-            {/* Center: label */}
-            <span className="text-[13px] font-black uppercase tracking-wide">
+            {/* Center: CTA */}
+            <span className="text-[14px] font-black uppercase tracking-wide">
               {paymentMethod === "cod" ? "Place Order" : "Proceed to Pay"}
             </span>
 
             {/* Right: arrow */}
-            <ChevronRight size={18} strokeWidth={3} />
+            <div className="w-8 h-8 rounded-full bg-white/20 flex items-center justify-center">
+              <ChevronRight size={16} strokeWidth={3} />
+            </div>
           </motion.button>
         </div>
       </div>
