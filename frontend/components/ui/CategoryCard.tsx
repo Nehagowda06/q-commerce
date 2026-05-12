@@ -24,10 +24,8 @@ export default function CategoryCard({ name, image, color, isActive = false, onC
         transition={{ type: "spring", stiffness: 400, damping: 22 }}
         className={`w-[64px] h-[64px] ${color} rounded-[20px] flex items-center justify-center relative overflow-hidden`}
         style={{
-          outline: isActive ? "2px solid #6941c6" : "none",
-          outlineOffset: "2px",
           boxShadow: isActive
-            ? "0 4px 14px rgba(105,65,198,0.22)"
+            ? "0 0 0 2px #6941c6, 0 4px 14px rgba(105,65,198,0.22)"
             : "0 4px 12px rgba(6,31,65,0.12)",
         }}
       >
@@ -53,6 +51,7 @@ export default function CategoryCard({ name, image, color, isActive = false, onC
           color: isActive ? "#6941c6" : "#4a5568",
           fontWeight: isActive ? 600 : 400,
         }}
+        transition={{ duration: 0.15 }}
         className="block w-full truncate text-[9px] mt-1.5 text-center leading-tight"
         title={name}
       >

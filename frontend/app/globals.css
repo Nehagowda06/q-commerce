@@ -53,10 +53,7 @@ body {
 }
 
 button, input { font: inherit; }
-.app-container .font-black    { font-weight: 700; }
-.app-container .font-extrabold{ font-weight: 700; }
-.app-container .font-bold     { font-weight: 600; }
-.app-container .font-semibold { font-weight: 500; }
+/* Remove font-weight overrides — let Tailwind utilities work as intended */
 .app-container .uppercase     { text-transform: none; }
 .app-container h1,.app-container h2,.app-container h3 { letter-spacing: 0; }
 .app-container [class*="tracking-"] { letter-spacing: 0; }
