@@ -1,5 +1,7 @@
-// Zepto-style 3D product icons — Microsoft Fluent UI Emoji served via jsDelivr.
+// Fluent UI Emoji 3D icons via jsDelivr — verified working paths
 const FLUENT = "https://cdn.jsdelivr.net/gh/microsoft/fluentui-emoji@main/assets";
+// Twemoji SVG fallback for items not in Fluent
+const TW = "https://cdn.jsdelivr.net/gh/twitter/twemoji@14.0.2/assets/svg";
 
 export interface Subcategory {
   name: string;
@@ -16,8 +18,8 @@ export const groceryAisles = [
     subcategories: [
       { name: "Vegetables", image: `${FLUENT}/Broccoli/3D/broccoli_3d.png` },
       { name: "Fruits", image: `${FLUENT}/Red%20apple/3D/red_apple_3d.png` },
-      { name: "Herbs", image: `${FLUENT}/Herb/3D/herb_3d.png` },
-      { name: "Cut & Peeled", image: `${FLUENT}/Kitchen%20knife/3D/kitchen_knife_3d.png` },
+      { name: "Herbs", image: `${FLUENT}/Potted plant/3D/potted_plant_3d.png` },
+      { name: "Cut & Peeled", image: `${FLUENT}/Leafy green/3D/leafy_green_3d.png` },
     ] as Subcategory[],
   },
   {
@@ -28,15 +30,15 @@ export const groceryAisles = [
     ring: "ring-sky-200/70",
     subcategories: [
       { name: "Milk", image: `${FLUENT}/Glass%20of%20milk/3D/glass_of_milk_3d.png` },
-      { name: "Curd", image: `${FLUENT}/Bowl%20with%20spoon/3D/bowl_with_spoon_3d.png` },
-      { name: "Paneer", image: `${FLUENT}/Cheese%20wedge/3D/cheese_wedge_3d.png` },
-      { name: "Butter & Cheese", image: `${FLUENT}/Butter/3D/butter_3d.png` },
+      { name: "Curd", image: `${FLUENT}/Custard/3D/custard_3d.png` },
+      { name: "Paneer", image: `${FLUENT}/Cheese wedge/3D/cheese_wedge_3d.png` },
+      { name: "Butter & Cheese", image: `${FLUENT}/Cheese wedge/3D/cheese_wedge_3d.png` },
     ] as Subcategory[],
   },
   {
     name: "Staples",
     icon: "Wheat",
-    image: `${FLUENT}/Sheaf%20of%20rice/3D/sheaf_of_rice_3d.png`,
+    image: `${FLUENT}/Ear of corn/3D/ear_of_corn_3d.png`,
     color: "bg-gradient-to-br from-amber-200 via-yellow-100 to-orange-50",
     ring: "ring-amber-200/70",
     subcategories: [
@@ -53,10 +55,10 @@ export const groceryAisles = [
     color: "bg-gradient-to-br from-orange-200 via-red-100 to-rose-50",
     ring: "ring-orange-200/70",
     subcategories: [
-      { name: "Chips", image: `${FLUENT}/French%20fries/3D/french_fries_3d.png` },
+      { name: "Chips", image: `${FLUENT}/Pretzel/3D/pretzel_3d.png` },
       { name: "Namkeen", image: `${FLUENT}/Peanuts/3D/peanuts_3d.png` },
       { name: "Biscuits", image: `${FLUENT}/Cookie/3D/cookie_3d.png` },
-      { name: "Chocolates", image: `${FLUENT}/Chocolate%20bar/3D/chocolate_bar_3d.png` },
+      { name: "Chocolates", image: `${FLUENT}/Lollipop/3D/lollipop_3d.png` },
     ] as Subcategory[],
   },
   {
@@ -66,7 +68,7 @@ export const groceryAisles = [
     color: "bg-gradient-to-br from-cyan-200 via-teal-100 to-sky-50",
     ring: "ring-cyan-200/70",
     subcategories: [
-      { name: "Tea & Coffee", image: `${FLUENT}/Hot%20beverage/3D/hot_beverage_3d.png` },
+      { name: "Tea & Coffee", image: `${FLUENT}/Teacup without handle/3D/teacup_without_handle_3d.png` },
       { name: "Juices", image: `${FLUENT}/Tropical%20drink/3D/tropical_drink_3d.png` },
       { name: "Soft Drinks", image: `${FLUENT}/Cup%20with%20straw/3D/cup_with_straw_3d.png` },
       { name: "Energy Drinks", image: `${FLUENT}/Beverage%20box/3D/beverage_box_3d.png` },
@@ -81,7 +83,7 @@ export const groceryAisles = [
     subcategories: [
       { name: "Detergents", image: `${FLUENT}/Soap/3D/soap_3d.png` },
       { name: "Cleaners", image: `${FLUENT}/Bubbles/3D/bubbles_3d.png` },
-      { name: "Tissues", image: `${FLUENT}/Roll%20of%20paper/3D/roll_of_paper_3d.png` },
+      { name: "Tissues", image: `${FLUENT}/Toilet/3D/toilet_3d.png` },
       { name: "Repellents", image: `${FLUENT}/Mosquito/3D/mosquito_3d.png` },
     ] as Subcategory[],
   },
@@ -106,9 +108,9 @@ export const groceryAisles = [
     ring: "ring-lime-200/70",
     subcategories: [
       { name: "Diapers", image: `${FLUENT}/Baby/Default/3D/baby_3d_default.png` },
-      { name: "Baby Food", image: `${FLUENT}/Baby%20bottle/3D/baby_bottle_3d.png` },
+      { name: "Baby Food", image: `${FLUENT}/Baby/Default/3D/baby_3d_default.png` },
       { name: "Pet Food", image: `${FLUENT}/Bone/3D/bone_3d.png` },
-      { name: "Pet Treats", image: `${FLUENT}/Paw%20prints/3D/paw_prints_3d.png` },
+      { name: "Pet Treats", image: `${FLUENT}/Paw prints/3D/paw_prints_3d.png` },
     ] as Subcategory[],
   },
 ];
