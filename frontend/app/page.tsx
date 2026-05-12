@@ -222,8 +222,6 @@ function SearchResultsView({
   filter: FilterOption;
   setSort: (s: SortOption) => void;
   setFilter: (f: FilterOption) => void;
-  showSortFilter: boolean;
-  setShowSortFilter: (v: boolean) => void;
 }) {
   const { reset } = useSearchStore();
   const [sortOpen, setSortOpen] = useState(false);
