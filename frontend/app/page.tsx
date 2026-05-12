@@ -1,8 +1,8 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
-import { ChevronRight, Clock, SlidersHorizontal, Star, Store, Utensils, X, Zap } from "lucide-react";
+import { Check, ChevronDown, ChevronRight, Clock, Star, Store, Utensils, X, Zap } from "lucide-react";
 import Link from "next/link";
 import PageWrapper from "@/components/layout/PageWrapper";
 import ProductCard from "@/components/ui/ProductCard";
@@ -103,20 +103,29 @@ export default function Home() {
   const [loading, setLoading] = useState(true);
   const [mode, setMode] = useState<Mode>("grocery");
   const [activeAisle, setActiveAisle] = useState(groceryAisles[0].name);
-  const { query, sort, filter, setSort, setFilter } = useSearchStore();
-  const [showSortFilter, setShowSortFilter] = useState(false);
+  const { query, sort, filter, setSort, setFilter, reset } = useSearchStore();
 
   const activeSubcategories = useMemo(
     () => groceryAisles.find((aisle) => aisle.name === activeAisle)?.subcategories || [],
     [activeAisle]
   );
 
-  const isSearching = query.trim().length > 0 || filter !== "all" || sort !== "relevance";
+  // Only enter search results view when there's an actual query.
+  // Sort/filter alone shouldn't hijack the home view — they apply on top of results.
+  const isSearching = query.trim().length > 0;
 
   const searchResults = useMemo(
     () => applySearchFiltersSort(allGroceryProducts, query, filter, sort),
     [query, filter, sort]
   );
+
+  // Reset sort+filter when query is cleared so stale filters don't linger
+  useEffect(() => {
+    if (!query.trim()) {
+      setSort("relevance");
+      setFilter("all");
+    }
+  }, [query, setSort, setFilter]);
 
   const handleRefresh = async () => {
     setLoading(true);
@@ -148,31 +157,30 @@ export default function Home() {
     <PageWrapper>
       <PullToRefresh onRefresh={handleRefresh}>
         <motion.div variants={containerVariants} initial="hidden" animate="visible" className="pb-4">
-          {/* Mode toggle — smooth layoutId animation */}
+          {/* Mode toggle */}
           <motion.section variants={sectionVariants} className="px-3 pt-2.5">
-            <div className="relative grid grid-cols-2 gap-0 bg-gray-100 rounded-xl p-1">
-              {/* Sliding active pill */}
+            <div className="relative flex bg-gray-100 rounded-xl p-1 gap-1">
+              {/* Sliding pill — uses left % so it's always perfectly half */}
               <motion.div
-                layoutId="mode-pill"
-                className="absolute top-1 bottom-1 w-[calc(50%-4px)] bg-white rounded-lg shadow-sm"
-                animate={{ x: mode === "grocery" ? 0 : "calc(100% + 4px)" }}
-                transition={{ type: "spring", stiffness: 500, damping: 35 }}
+                className="absolute top-1 bottom-1 rounded-lg bg-white shadow-sm"
+                animate={{ left: mode === "grocery" ? "4px" : "50%", width: "calc(50% - 6px)" }}
+                transition={{ type: "spring", stiffness: 500, damping: 38, mass: 0.8 }}
               />
               <button
-                onClick={() => setMode("grocery")}
-                className={`relative z-10 h-8 rounded-lg text-[11px] font-black flex items-center justify-center gap-1.5 transition-colors ${
-                  mode === "grocery" ? "text-brand-navy" : "text-gray-400"
+                onClick={() => { setMode("grocery"); reset(); }}
+                className={`relative z-10 flex-1 h-7 rounded-lg text-[11px] flex items-center justify-center gap-1.5 transition-colors duration-150 ${
+                  mode === "grocery" ? "font-medium text-brand-navy" : "font-normal text-gray-400"
                 }`}
               >
-                <Store size={13} strokeWidth={mode === "grocery" ? 2.5 : 2} /> Groceries
+                <Store size={12} strokeWidth={1.6} /> Groceries
               </button>
               <button
-                onClick={() => setMode("food")}
-                className={`relative z-10 h-8 rounded-lg text-[11px] font-black flex items-center justify-center gap-1.5 transition-colors ${
-                  mode === "food" ? "text-brand-navy" : "text-gray-400"
+                onClick={() => { setMode("food"); reset(); }}
+                className={`relative z-10 flex-1 h-7 rounded-lg text-[11px] flex items-center justify-center gap-1.5 transition-colors duration-150 ${
+                  mode === "food" ? "font-medium text-brand-navy" : "font-normal text-gray-400"
                 }`}
               >
-                <Utensils size={13} strokeWidth={mode === "food" ? 2.5 : 2} /> Food
+                <Utensils size={12} strokeWidth={1.6} /> Food
               </button>
             </div>
           </motion.section>
@@ -186,20 +194,12 @@ export default function Home() {
               filter={filter}
               setSort={setSort}
               setFilter={setFilter}
-              showSortFilter={showSortFilter}
-              setShowSortFilter={setShowSortFilter}
             />
           ) : mode === "grocery" ? (
             <GroceryHome
               activeAisle={activeAisle}
               setActiveAisle={setActiveAisle}
               activeSubcategories={activeSubcategories}
-              showSortFilter={showSortFilter}
-              setShowSortFilter={setShowSortFilter}
-              sort={sort}
-              filter={filter}
-              setSort={setSort}
-              setFilter={setFilter}
             />
           ) : (
             <FoodHome />
@@ -207,67 +207,14 @@ export default function Home() {
         </motion.div>
       </PullToRefresh>
 
-      {/* Sort & Filter sheet */}
-      <AnimatePresence>
-        {showSortFilter && (
-          <>
-            <motion.div key="bd" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
-              className="fixed inset-0 bg-black/50 z-[59]" onClick={() => setShowSortFilter(false)} />
-            <motion.div key="sheet" initial={{ y: "100%" }} animate={{ y: 0 }} exit={{ y: "100%" }}
-              transition={{ type: "spring", stiffness: 400, damping: 35 }}
-              className="fixed bottom-0 left-0 right-0 z-[60] flex justify-center pointer-events-none">
-              <div className="w-full max-w-[420px] bg-white rounded-t-3xl pt-4 px-4 pb-10 pointer-events-auto">
-                <div className="w-10 h-1 rounded-full bg-gray-200 mx-auto mb-4" />
-                <div className="flex items-center justify-between mb-4">
-                  <h3 className="text-sm font-black text-brand-text">Sort & Filter</h3>
-                  <button onClick={() => setShowSortFilter(false)}
-                    className="w-8 h-8 rounded-full bg-gray-100 flex items-center justify-center">
-                    <X size={16} strokeWidth={2.5} />
-                  </button>
-                </div>
-
-                {/* Sort */}
-                <p className="text-[10px] font-black text-brand-text-muted uppercase tracking-wider mb-2">Sort by</p>
-                <div className="flex flex-wrap gap-2 mb-5">
-                  {(Object.keys(SORT_LABELS) as SortOption[]).map((s) => (
-                    <button key={s} onClick={() => setSort(s)}
-                      className={`px-3 py-1.5 rounded-xl text-[11px] font-bold border transition-colors ${
-                        sort === s ? "bg-brand-primary text-white border-brand-primary" : "bg-gray-50 text-brand-text border-gray-100"
-                      }`}>
-                      {SORT_LABELS[s]}
-                    </button>
-                  ))}
-                </div>
-
-                {/* Filter */}
-                <p className="text-[10px] font-black text-brand-text-muted uppercase tracking-wider mb-2">Filter</p>
-                <div className="flex flex-wrap gap-2 mb-4">
-                  {(Object.keys(FILTER_LABELS) as FilterOption[]).map((f) => (
-                    <button key={f} onClick={() => setFilter(f)}
-                      className={`px-3 py-1.5 rounded-xl text-[11px] font-bold border transition-colors ${
-                        filter === f ? "bg-brand-primary text-white border-brand-primary" : "bg-gray-50 text-brand-text border-gray-100"
-                      }`}>
-                      {FILTER_LABELS[f]}
-                    </button>
-                  ))}
-                </div>
-
-                <button onClick={() => { setSort("relevance"); setFilter("all"); }}
-                  className="w-full h-10 rounded-xl border border-gray-200 text-xs font-black text-brand-text-muted">
-                  Reset
-                </button>
-              </div>
-            </motion.div>
-          </>
-        )}
-      </AnimatePresence>
+      {/* Sort & Filter — no sheet needed, inline chips in SearchResultsView */}
     </PageWrapper>
   );
 }
 
 // ── Search results ──────────────────────────────────────────────────────────
 function SearchResultsView({
-  results, query, sort, filter, setSort, setFilter, showSortFilter, setShowSortFilter,
+  results, query, sort, filter, setSort, setFilter,
 }: {
   results: GroceryProduct[];
   query: string;
@@ -278,33 +225,136 @@ function SearchResultsView({
   showSortFilter: boolean;
   setShowSortFilter: (v: boolean) => void;
 }) {
-  const hasActiveFilters = sort !== "relevance" || filter !== "all";
+  const { reset } = useSearchStore();
+  const [sortOpen, setSortOpen] = useState(false);
+  const pillRef = useRef<HTMLButtonElement>(null);
+  const [pillRect, setPillRect] = useState<{ top: number; left: number } | null>(null);
+  const hasActiveSort = sort !== "relevance";
+  const hasActiveFilter = filter !== "all";
+
+  const openSort = () => {
+    if (pillRef.current) {
+      const r = pillRef.current.getBoundingClientRect();
+      setPillRect({ top: r.bottom + 6, left: r.left });
+    }
+    setSortOpen(true);
+  };
+
   return (
-    <motion.section variants={sectionVariants} className="px-3 pt-3">
-      {/* Toolbar */}
-      <div className="flex items-center justify-between mb-3">
-        <p className="text-[11px] font-bold text-brand-text-muted">
-          {results.length} result{results.length !== 1 ? "s" : ""}
-          {query ? ` for "${query}"` : ""}
-        </p>
+    <motion.section variants={sectionVariants} className="pt-2">
+      {/* ── Filter / sort bar ── */}
+      <div className="flex items-center gap-2 px-3 pb-1 overflow-x-auto no-scrollbar">
+
+        {/* Clear pill */}
+        <AnimatePresence>
+          {(hasActiveSort || hasActiveFilter) && (
+            <motion.button
+              key="reset"
+              initial={{ opacity: 0, scale: 0.8, width: 0, paddingLeft: 0, paddingRight: 0 }}
+              animate={{ opacity: 1, scale: 1, width: "auto", paddingLeft: 10, paddingRight: 10 }}
+              exit={{ opacity: 0, scale: 0.8, width: 0, paddingLeft: 0, paddingRight: 0 }}
+              transition={{ type: "spring", stiffness: 400, damping: 28 }}
+              onClick={() => { setSort("relevance"); setFilter("all"); setSortOpen(false); }}
+              className="flex-shrink-0 flex items-center gap-1 h-7 rounded-full bg-red-50 border border-red-200 text-red-500 text-[10px] font-semibold overflow-hidden"
+            >
+              <X size={9} strokeWidth={3} /> Clear
+            </motion.button>
+          )}
+        </AnimatePresence>
+
+        {/* Sort pill */}
         <button
-          onClick={() => setShowSortFilter(true)}
-          className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-[11px] font-black border transition-colors ${
-            hasActiveFilters ? "bg-brand-primary text-white border-brand-primary" : "bg-gray-50 text-brand-text border-gray-100"
+          ref={pillRef}
+          onClick={openSort}
+          className={`flex-shrink-0 flex items-center gap-1.5 h-7 px-3 rounded-full text-[10px] font-medium border transition-all ${
+            hasActiveSort
+              ? "bg-brand-primary text-white border-brand-primary shadow-sm"
+              : "bg-white text-brand-text-muted border-gray-200"
           }`}
         >
-          <SlidersHorizontal size={12} strokeWidth={2.5} />
-          {hasActiveFilters ? `${SORT_LABELS[sort]} · ${FILTER_LABELS[filter]}` : "Sort & Filter"}
+          {hasActiveSort && <Check size={9} strokeWidth={3} />}
+          {hasActiveSort ? SORT_LABELS[sort] : "Sort"}
+          <motion.span animate={{ rotate: sortOpen ? 180 : 0 }} transition={{ duration: 0.18 }}>
+            <ChevronDown size={9} strokeWidth={2.5} />
+          </motion.span>
         </button>
+
+        {/* Divider */}
+        <div className="flex-shrink-0 w-px h-4 bg-gray-200" />
+
+        {/* Filter chips */}
+        {(Object.keys(FILTER_LABELS) as FilterOption[]).filter(f => f !== "all").map((f) => {
+          const active = filter === f;
+          return (
+            <motion.button
+              key={f}
+              onClick={() => { setFilter(active ? "all" : f); setSortOpen(false); }}
+              whileTap={{ scale: 0.94 }}
+              className={`flex-shrink-0 flex items-center gap-1 h-7 px-3 rounded-full text-[10px] font-medium border transition-all ${
+                active
+                  ? "bg-brand-primary text-white border-brand-primary shadow-sm"
+                  : "bg-white text-brand-text-muted border-gray-200"
+              }`}
+            >
+              {active && <Check size={9} strokeWidth={3} />}
+              {FILTER_LABELS[f]}
+            </motion.button>
+          );
+        })}
+      </div>
+
+      {/* Sort dropdown — fixed so it escapes all overflow containers */}
+      <AnimatePresence>
+        {sortOpen && pillRect && (
+          <>
+            <div className="fixed inset-0 z-40" onClick={() => setSortOpen(false)} />
+            <motion.div
+              initial={{ opacity: 0, y: -4, scale: 0.96 }}
+              animate={{ opacity: 1, y: 0, scale: 1 }}
+              exit={{ opacity: 0, y: -4, scale: 0.96 }}
+              transition={{ type: "spring", stiffness: 500, damping: 32 }}
+              className="fixed z-50 bg-white rounded-2xl shadow-xl border border-gray-100 overflow-hidden"
+              style={{ top: pillRect.top, left: pillRect.left, minWidth: 180 }}
+            >
+              {(Object.keys(SORT_LABELS) as SortOption[]).map((s) => (
+                <button
+                  key={s}
+                  onClick={() => { setSort(s); setSortOpen(false); }}
+                  className={`w-full flex items-center justify-between gap-3 px-4 py-2.5 text-[11px] transition-colors text-left ${
+                    sort === s
+                      ? "bg-brand-primary/10 text-brand-primary font-semibold"
+                      : "text-brand-text hover:bg-gray-50 font-normal"
+                  }`}
+                >
+                  {SORT_LABELS[s]}
+                  {sort === s && <Check size={11} strokeWidth={2.5} className="text-brand-primary flex-shrink-0" />}
+                </button>
+              ))}
+            </motion.div>
+          </>
+        )}
+      </AnimatePresence>
+
+      {/* ── Result count ── */}
+      <div className="px-3 pt-1 pb-2.5">
+        <p className="text-[10px] text-brand-text-muted">
+          <span className="font-semibold text-brand-text">{results.length}</span> result{results.length !== 1 ? "s" : ""}
+          {query ? <> for <span className="font-semibold text-brand-text">&ldquo;{query}&rdquo;</span></> : ""}
+        </p>
       </div>
 
       {results.length === 0 ? (
-        <div className="flex flex-col items-center justify-center py-16 text-center">
-          <p className="text-sm font-black text-brand-text mb-1">No results found</p>
-          <p className="text-[11px] text-brand-text-muted">Try a different search or clear filters</p>
+        <div className="flex flex-col items-center justify-center py-16 text-center px-6">
+          <div className="text-4xl mb-3">🔍</div>
+          <p className="text-sm font-semibold text-brand-text mb-1">No results found</p>
+          <p className="text-[11px] text-brand-text-muted mb-4">Try a different search or adjust filters</p>
+          <button onClick={() => reset()}
+            className="px-4 py-2 rounded-full bg-brand-primary/10 text-brand-primary text-[11px] font-semibold">
+            Clear search
+          </button>
         </div>
       ) : (
-        <div className="grid grid-cols-2 gap-2.5">
+        <div className="px-3 grid grid-cols-2 gap-2.5">
           {results.map((product) => (
             <ProductCard
               key={product.id}
@@ -331,53 +381,178 @@ function SearchResultsView({
 // ── Grocery home ────────────────────────────────────────────────────────────
 function GroceryHome({
   activeAisle, setActiveAisle, activeSubcategories,
-  showSortFilter, setShowSortFilter, sort, filter, setSort, setFilter,
 }: {
   activeAisle: string;
   setActiveAisle: (name: string) => void;
   activeSubcategories: Subcategory[];
-  showSortFilter: boolean;
-  setShowSortFilter: (v: boolean) => void;
-  sort: SortOption;
-  filter: FilterOption;
-  setSort: (s: SortOption) => void;
-  setFilter: (f: FilterOption) => void;
 }) {
   return (
     <>
       <motion.section variants={sectionVariants} className="px-3 pt-3">
-        {/* Zepto-style banner: bright solid colour, clean layout, no muddy orbs */}
-        <div className="w-full rounded-2xl overflow-hidden relative"
-          style={{ background: "linear-gradient(135deg, #0f7b5c 0%, #0a9e72 100%)", minHeight: "110px" }}>
-          {/* Right decorative circle */}
-          <div className="absolute right-0 top-0 bottom-0 w-36 flex items-center justify-center">
-            <div className="w-28 h-28 rounded-full bg-white/10 flex items-center justify-center text-5xl select-none">
-              🛒
-            </div>
-          </div>
-          {/* Subtle arc */}
-          <div className="absolute -right-8 -top-8 w-40 h-40 rounded-full bg-white/5" />
+        {/* Grocery banner */}
+        <div className="w-full rounded-2xl overflow-hidden relative flex"
+          style={{ background: "linear-gradient(120deg, #0a5c42 0%, #0e8a60 50%, #10a870 100%)", minHeight: "130px" }}>
 
-          <div className="relative z-10 px-4 py-4 max-w-[220px]">
+          {/* Diagonal stripe pattern */}
+          <div className="absolute inset-0 opacity-[0.08]"
+            style={{ backgroundImage: "repeating-linear-gradient(45deg, #fff 0px, #fff 1px, transparent 1px, transparent 14px)" }} />
+
+          {/* Soft glow behind illustration */}
+          <div className="absolute right-0 top-0 bottom-0 w-48 pointer-events-none"
+            style={{ background: "radial-gradient(ellipse at 80% 50%, rgba(255,255,255,0.15) 0%, transparent 65%)" }} />
+
+          {/* Left: text content */}
+          <div className="relative z-10 flex-1 px-4 py-4 flex flex-col justify-between">
+            <div>
+              <motion.div
+                initial={{ opacity: 0, y: -6 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.08 }}
+                className="inline-flex items-center gap-1 mb-2"
+              >
+                <span className="bg-yellow-400 text-yellow-900 text-[8px] font-black uppercase px-2 py-0.5 rounded-full tracking-wider leading-none">⚡ 10 min delivery</span>
+              </motion.div>
+              <motion.h1
+                initial={{ opacity: 0, y: 6 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.14 }}
+                className="text-[19px] font-black text-white leading-[1.18] tracking-tight"
+              >
+                Fresh groceries,<br />at your door
+              </motion.h1>
+              <motion.p
+                initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.24 }}
+                className="text-[9.5px] text-white/70 mt-1 font-semibold"
+              >
+                Fruits · Dairy · Snacks · Essentials
+              </motion.p>
+            </div>
             <motion.div
-              initial={{ opacity: 0, y: -6 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1 }}
-              className="inline-flex items-center gap-1 bg-white/20 text-white text-[8px] font-black uppercase px-2 py-0.5 rounded-full tracking-wider mb-2"
+              initial={{ opacity: 0, y: 4 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.32 }}
+              className="mt-3 self-start inline-flex items-center gap-1 bg-white text-[#0a5c42] text-[9px] font-black px-3 py-1.5 rounded-full shadow-md"
             >
-              ⚡ 10 min delivery
+              Shop now <ChevronRight size={10} strokeWidth={3} />
             </motion.div>
-            <motion.h1
-              initial={{ opacity: 0, y: 6 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.18 }}
-              className="text-[18px] font-black text-white leading-[1.15]"
-            >
-              Fresh groceries,<br />at your door
-            </motion.h1>
-            <motion.p
-              initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.3 }}
-              className="text-[10px] text-white/80 mt-1.5 font-semibold"
-            >
-              Fruits, dairy, snacks & more
-            </motion.p>
           </div>
+
+          {/* Right: inline SVG grocery illustration — full-height scene */}
+          <motion.div
+            initial={{ opacity: 0, x: 24 }} animate={{ opacity: 1, x: 0 }}
+            transition={{ delay: 0.12, type: "spring", stiffness: 200, damping: 22 }}
+            className="relative w-[160px] flex-shrink-0 self-stretch flex items-center justify-center select-none overflow-hidden"
+          >
+            <svg width="160" height="130" viewBox="0 0 160 130" fill="none" xmlns="http://www.w3.org/2000/svg">
+              {/* ── Shadow under everything ── */}
+              <ellipse cx="80" cy="122" rx="58" ry="6" fill="black" fillOpacity="0.12"/>
+
+              {/* ── Bag body ── */}
+              <rect x="28" y="48" width="88" height="70" rx="14" fill="white" fillOpacity="0.18"/>
+              <rect x="28" y="48" width="88" height="70" rx="14" stroke="white" strokeOpacity="0.45" strokeWidth="2"/>
+              {/* Bag shine */}
+              <ellipse cx="46" cy="62" rx="8" ry="4" fill="white" fillOpacity="0.18" transform="rotate(-25 46 62)"/>
+
+              {/* ── Bag handles ── */}
+              <path d="M48 48 C48 30 58 22 72 22 C86 22 96 30 96 48" stroke="white" strokeOpacity="0.65" strokeWidth="4" strokeLinecap="round" fill="none"/>
+
+              {/* ── Broccoli (left, sticking out tall) ── */}
+              <rect x="50" y="36" width="6" height="18" rx="3" fill="#15803d"/>
+              <circle cx="50" cy="30" r="13" fill="#4ade80" fillOpacity="0.95"/>
+              <circle cx="42" cy="35" r="9" fill="#22c55e" fillOpacity="0.95"/>
+              <circle cx="59" cy="34" r="11" fill="#16a34a" fillOpacity="0.95"/>
+              <circle cx="50" cy="24" r="8" fill="#4ade80" fillOpacity="0.9"/>
+              {/* Broccoli highlight */}
+              <circle cx="46" cy="22" r="3" fill="white" fillOpacity="0.25"/>
+
+              {/* ── Carrot (right, sticking out, tilted) ── */}
+              <g transform="rotate(18 96 30)">
+                <ellipse cx="96" cy="36" rx="6" ry="16" fill="#fb923c" fillOpacity="0.97"/>
+                <ellipse cx="96" cy="36" rx="6" ry="16" fill="url(#carrotGrad)" fillOpacity="0.4"/>
+                <path d="M91 32 Q96 30 101 32" stroke="#ea580c" strokeWidth="1" strokeOpacity="0.5" fill="none"/>
+                <path d="M91 37 Q96 35 101 37" stroke="#ea580c" strokeWidth="1" strokeOpacity="0.5" fill="none"/>
+                <path d="M93 20 C90 12 86 10 88 18" stroke="#4ade80" strokeWidth="2.5" strokeLinecap="round" fill="none"/>
+                <path d="M96 18 C96 10 100 8 99 16" stroke="#22c55e" strokeWidth="2.5" strokeLinecap="round" fill="none"/>
+                <path d="M99 20 C102 12 106 12 104 20" stroke="#4ade80" strokeWidth="2.5" strokeLinecap="round" fill="none"/>
+              </g>
+
+              {/* ── Apple (inside bag, left) ── */}
+              <circle cx="54" cy="84" r="18" fill="#f87171" fillOpacity="0.95"/>
+              <circle cx="54" cy="84" r="18" fill="url(#appleGrad)" fillOpacity="0.5"/>
+              <path d="M54 66 C54 61 58 59 58 63" stroke="#15803d" strokeWidth="2.5" strokeLinecap="round" fill="none"/>
+              <path d="M54 66 C50 60 44 61 46 66" fill="#22c55e" fillOpacity="0.9"/>
+              <ellipse cx="47" cy="76" rx="4" ry="6" fill="white" fillOpacity="0.22" transform="rotate(-20 47 76)"/>
+
+              {/* ── Milk carton (inside bag, right) ── */}
+              <rect x="78" y="68" width="28" height="38" rx="4" fill="white" fillOpacity="0.88"/>
+              <polygon points="78,68 92,58 106,68" fill="white" fillOpacity="0.75"/>
+              <line x1="92" y1="58" x2="92" y2="68" stroke="#d1fae5" strokeWidth="1.5"/>
+              <rect x="82" y="74" width="20" height="4" rx="2" fill="#0e8a60" fillOpacity="0.55"/>
+              <rect x="82" y="81" width="14" height="2.5" rx="1.25" fill="#0e8a60" fillOpacity="0.35"/>
+              <rect x="82" y="86" width="16" height="2.5" rx="1.25" fill="#0e8a60" fillOpacity="0.35"/>
+              <rect x="100" y="70" width="4" height="20" rx="2" fill="white" fillOpacity="0.2"/>
+
+              {/* ── Banana peeking top-right of bag ── */}
+              <path d="M100 52 C108 44 118 46 116 56 C114 64 106 62 102 58" stroke="#fde047" strokeWidth="6" strokeLinecap="round" fill="none"/>
+              <path d="M100 52 C108 44 118 46 116 56 C114 64 106 62 102 58" stroke="#facc15" strokeWidth="4" strokeLinecap="round" fill="none"/>
+
+              <defs>
+                <radialGradient id="appleGrad" cx="35%" cy="30%">
+                  <stop offset="0%" stopColor="white" stopOpacity="0.5"/>
+                  <stop offset="100%" stopColor="white" stopOpacity="0"/>
+                </radialGradient>
+                <radialGradient id="carrotGrad" cx="30%" cy="25%">
+                  <stop offset="0%" stopColor="white" stopOpacity="0.5"/>
+                  <stop offset="100%" stopColor="white" stopOpacity="0"/>
+                </radialGradient>
+              </defs>
+            </svg>
+
+            {/* ── Floating sparkle (star) ── */}
+            <motion.svg
+              width="18" height="18" viewBox="0 0 18 18" fill="none"
+              className="absolute"
+              style={{ top: 10, right: 22 }}
+              animate={{ y: [0, -6, 0], rotate: [0, 15, 0], opacity: [0.75, 1, 0.75] }}
+              transition={{ repeat: Infinity, duration: 2.8, ease: "easeInOut" }}
+            >
+              <path d="M9 1 L10.5 6.5 L16 6.5 L11.5 9.8 L13 15.5 L9 12 L5 15.5 L6.5 9.8 L2 6.5 L7.5 6.5 Z" fill="white" fillOpacity="0.85"/>
+            </motion.svg>
+
+            {/* ── Floating dot 1 (top-right, large) ── */}
+            <motion.div
+              className="absolute rounded-full bg-white"
+              style={{ width: 6, height: 6, top: 14, right: 8, opacity: 0.55 }}
+              animate={{ y: [0, -5, 0] }}
+              transition={{ repeat: Infinity, duration: 3.2, ease: "easeInOut", delay: 0.4 }}
+            />
+
+            {/* ── Floating dot 2 (mid-right) ── */}
+            <motion.div
+              className="absolute rounded-full bg-white"
+              style={{ width: 4, height: 4, top: 34, right: 4, opacity: 0.4 }}
+              animate={{ y: [0, -7, 0] }}
+              transition={{ repeat: Infinity, duration: 2.6, ease: "easeInOut", delay: 0.9 }}
+            />
+
+            {/* ── Floating dot 3 (mid-right lower) ── */}
+            <motion.div
+              className="absolute rounded-full bg-white"
+              style={{ width: 3, height: 3, top: 52, right: 6, opacity: 0.3 }}
+              animate={{ y: [0, -4, 0] }}
+              transition={{ repeat: Infinity, duration: 3.8, ease: "easeInOut", delay: 1.5 }}
+            />
+
+            {/* ── Floating dot 4 (left side) ── */}
+            <motion.div
+              className="absolute rounded-full bg-white"
+              style={{ width: 4, height: 4, top: 58, left: 6, opacity: 0.3 }}
+              animate={{ y: [0, -6, 0] }}
+              transition={{ repeat: Infinity, duration: 3.0, ease: "easeInOut", delay: 0.7 }}
+            />
+
+            {/* ── Floating dot 5 (left side lower) ── */}
+            <motion.div
+              className="absolute rounded-full bg-white"
+              style={{ width: 3, height: 3, top: 78, left: 4, opacity: 0.25 }}
+              animate={{ y: [0, -5, 0] }}
+              transition={{ repeat: Infinity, duration: 4.2, ease: "easeInOut", delay: 2.0 }}
+            />
+          </motion.div>
         </div>
       </motion.section>
 
@@ -433,34 +608,174 @@ function FoodHome() {
   return (
     <>
       <motion.section variants={sectionVariants} className="px-3 pt-3">
-        <div className="w-full rounded-2xl overflow-hidden relative"
-          style={{ background: "linear-gradient(135deg, #c0392b 0%, #e74c3c 100%)", minHeight: "110px" }}>
-          <div className="absolute right-0 top-0 bottom-0 w-36 flex items-center justify-center">
-            <div className="w-28 h-28 rounded-full bg-white/10 flex items-center justify-center text-5xl select-none">
-              🍔
+        {/* Food banner */}
+        <div className="w-full rounded-2xl overflow-hidden relative flex"
+          style={{ background: "linear-gradient(120deg, #6b1209 0%, #b02a1c 50%, #d94030 100%)", minHeight: "130px" }}>
+
+          {/* Diagonal stripe pattern */}
+          <div className="absolute inset-0 opacity-[0.08]"
+            style={{ backgroundImage: "repeating-linear-gradient(45deg, #fff 0px, #fff 1px, transparent 1px, transparent 14px)" }} />
+
+          {/* Warm glow behind illustration */}
+          <div className="absolute right-0 top-0 bottom-0 w-48 pointer-events-none"
+            style={{ background: "radial-gradient(ellipse at 80% 50%, rgba(255,180,80,0.18) 0%, transparent 65%)" }} />
+
+          {/* Left: text content */}
+          <div className="relative z-10 flex-1 px-4 py-4 flex flex-col justify-between">
+            <div>
+              <motion.div
+                initial={{ opacity: 0, y: -6 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.08 }}
+                className="inline-flex items-center gap-1 mb-2"
+              >
+                <span className="bg-orange-400 text-orange-900 text-[8px] font-black uppercase px-2 py-0.5 rounded-full tracking-wider leading-none">🔥 Hot &amp; fresh</span>
+              </motion.div>
+              <motion.h1
+                initial={{ opacity: 0, y: 6 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.14 }}
+                className="text-[19px] font-black text-white leading-[1.18] tracking-tight"
+              >
+                Order from<br />local favorites
+              </motion.h1>
+              <motion.p
+                initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.24 }}
+                className="text-[9.5px] text-white/70 mt-1 font-semibold"
+              >
+                Restaurants · Quick bites · Desserts
+              </motion.p>
             </div>
-          </div>
-          <div className="absolute -right-8 -top-8 w-40 h-40 rounded-full bg-white/5" />
-          <div className="relative z-10 px-4 py-4 max-w-[220px]">
             <motion.div
-              initial={{ opacity: 0, y: -6 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1 }}
-              className="inline-flex items-center gap-1 bg-white/20 text-white text-[8px] font-black uppercase px-2 py-0.5 rounded-full tracking-wider mb-2"
+              initial={{ opacity: 0, y: 4 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.32 }}
+              className="mt-3 self-start inline-flex items-center gap-1 bg-white text-[#b02a1c] text-[9px] font-black px-3 py-1.5 rounded-full shadow-md"
             >
-              🔥 Hot & fresh
+              Order now <ChevronRight size={10} strokeWidth={3} />
             </motion.div>
-            <motion.h1
-              initial={{ opacity: 0, y: 6 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.18 }}
-              className="text-[18px] font-black text-white leading-[1.15]"
-            >
-              Order from<br />local favorites
-            </motion.h1>
-            <motion.p
-              initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.3 }}
-              className="text-[10px] text-white/80 mt-1.5 font-semibold"
-            >
-              Restaurants, quick bites & desserts
-            </motion.p>
           </div>
+
+          {/* Right: inline SVG food illustration — full-height scene */}
+          <motion.div
+            initial={{ opacity: 0, x: 24 }} animate={{ opacity: 1, x: 0 }}
+            transition={{ delay: 0.12, type: "spring", stiffness: 200, damping: 22 }}
+            className="relative w-[160px] flex-shrink-0 self-stretch flex items-center justify-center select-none overflow-hidden"
+          >
+            <svg width="160" height="130" viewBox="0 0 160 130" fill="none" xmlns="http://www.w3.org/2000/svg">
+              {/* ── Shadow ── */}
+              <ellipse cx="80" cy="124" rx="55" ry="5" fill="black" fillOpacity="0.12"/>
+
+              {/* ── Bowl ── */}
+              <path d="M22 72 Q22 108 80 108 Q138 108 138 72 Z" fill="white" fillOpacity="0.18"/>
+              <path d="M22 72 Q22 108 80 108 Q138 108 138 72 Z" stroke="white" strokeOpacity="0.4" strokeWidth="1.5" fill="none"/>
+              {/* Bowl rim */}
+              <ellipse cx="80" cy="72" rx="58" ry="11" fill="white" fillOpacity="0.22"/>
+              <ellipse cx="80" cy="72" rx="58" ry="11" stroke="white" strokeOpacity="0.5" strokeWidth="1.5" fill="none"/>
+              {/* Bowl shine */}
+              <ellipse cx="50" cy="68" rx="10" ry="4" fill="white" fillOpacity="0.18" transform="rotate(-15 50 68)"/>
+
+              {/* ── Noodles in bowl ── */}
+              <path d="M34 72 Q44 58 56 68 Q68 78 80 64 Q92 50 104 62 Q116 74 126 68" stroke="#fbbf24" strokeWidth="4" strokeLinecap="round" fill="none"/>
+              <path d="M30 76 Q42 62 54 72 Q66 82 78 68 Q90 54 102 66 Q114 78 128 72" stroke="#fde68a" strokeWidth="3" strokeLinecap="round" fill="none" strokeOpacity="0.75"/>
+              <path d="M38 80 Q50 68 62 76 Q74 84 86 72 Q98 60 110 70" stroke="#f59e0b" strokeWidth="2.5" strokeLinecap="round" fill="none" strokeOpacity="0.6"/>
+
+              {/* ── Burger (left, floating above bowl) ── */}
+              {/* Bun top */}
+              <ellipse cx="42" cy="44" rx="24" ry="15" fill="#d97706" fillOpacity="0.95"/>
+              <ellipse cx="42" cy="44" rx="24" ry="15" fill="url(#bunTopGrad)" fillOpacity="0.5"/>
+              {/* Sesame seeds */}
+              <ellipse cx="35" cy="37" rx="3" ry="1.4" fill="white" fillOpacity="0.75" transform="rotate(-20 35 37)"/>
+              <ellipse cx="46" cy="34" rx="3" ry="1.4" fill="white" fillOpacity="0.75" transform="rotate(10 46 34)"/>
+              <ellipse cx="54" cy="40" rx="2.5" ry="1.2" fill="white" fillOpacity="0.65" transform="rotate(-10 54 40)"/>
+              {/* Cheese slice */}
+              <ellipse cx="42" cy="56" rx="25" ry="5" fill="#fbbf24" fillOpacity="0.9"/>
+              {/* Lettuce */}
+              <path d="M18 54 Q26 48 34 52 Q42 48 50 52 Q58 48 66 54" stroke="#4ade80" strokeWidth="4" strokeLinecap="round" fill="none"/>
+              {/* Patty */}
+              <ellipse cx="42" cy="60" rx="23" ry="5.5" fill="#92400e" fillOpacity="0.95"/>
+              {/* Bun bottom */}
+              <ellipse cx="42" cy="65" rx="23" ry="7" fill="#f59e0b" fillOpacity="0.9"/>
+
+              {/* ── Pizza slice (right, floating) ── */}
+              <path d="M100 12 L128 60 L72 60 Z" fill="#ef4444" fillOpacity="0.9"/>
+              <path d="M100 12 L128 60 L72 60 Z" stroke="white" strokeOpacity="0.2" strokeWidth="1" fill="none"/>
+              {/* Crust */}
+              <path d="M72 60 Q100 70 128 60" stroke="#d97706" strokeWidth="7" strokeLinecap="round" fill="none"/>
+              <path d="M72 60 Q100 70 128 60" stroke="#f59e0b" strokeWidth="4" strokeLinecap="round" fill="none"/>
+              {/* Cheese layer */}
+              <path d="M78 58 Q100 66 122 58" stroke="#fbbf24" strokeWidth="2" strokeLinecap="round" fill="none" strokeOpacity="0.7"/>
+              {/* Cheese drips */}
+              <path d="M86 60 Q85 67 87 71" stroke="#fbbf24" strokeWidth="3" strokeLinecap="round" fill="none"/>
+              <path d="M100 62 Q100 70 98 74" stroke="#fbbf24" strokeWidth="3" strokeLinecap="round" fill="none"/>
+              <path d="M114 60 Q115 67 113 70" stroke="#fbbf24" strokeWidth="3" strokeLinecap="round" fill="none"/>
+              {/* Toppings */}
+              <circle cx="90" cy="42" r="4" fill="#dc2626" fillOpacity="0.95"/>
+              <circle cx="104" cy="36" r="3.5" fill="#dc2626" fillOpacity="0.95"/>
+              <circle cx="114" cy="46" r="3" fill="#dc2626" fillOpacity="0.95"/>
+              <circle cx="96" cy="52" r="3" fill="#16a34a" fillOpacity="0.9"/>
+              <circle cx="110" cy="52" r="2.5" fill="#16a34a" fillOpacity="0.9"/>
+              {/* Pizza shine */}
+              <ellipse cx="88" cy="28" rx="6" ry="3" fill="white" fillOpacity="0.18" transform="rotate(-30 88 28)"/>
+
+              {/* ── Steam lines ── */}
+              <path d="M68 68 Q65 58 68 48" stroke="white" strokeOpacity="0.35" strokeWidth="2" strokeLinecap="round" fill="none"/>
+              <path d="M80 66 Q83 56 80 46" stroke="white" strokeOpacity="0.25" strokeWidth="2" strokeLinecap="round" fill="none"/>
+              <path d="M92 68 Q95 58 92 48" stroke="white" strokeOpacity="0.3" strokeWidth="2" strokeLinecap="round" fill="none"/>
+
+              <defs>
+                <radialGradient id="bunTopGrad" cx="35%" cy="28%">
+                  <stop offset="0%" stopColor="white" stopOpacity="0.55"/>
+                  <stop offset="100%" stopColor="white" stopOpacity="0"/>
+                </radialGradient>
+              </defs>
+            </svg>
+
+            {/* ── Floating sparkle (star) ── */}
+            <motion.svg
+              width="18" height="18" viewBox="0 0 18 18" fill="none"
+              className="absolute"
+              style={{ top: 8, right: 6 }}
+              animate={{ y: [0, -7, 0], rotate: [0, 18, 0], opacity: [0.7, 1, 0.7] }}
+              transition={{ repeat: Infinity, duration: 3.0, ease: "easeInOut" }}
+            >
+              <path d="M9 1 L10.5 6.5 L16 6.5 L11.5 9.8 L13 15.5 L9 12 L5 15.5 L6.5 9.8 L2 6.5 L7.5 6.5 Z" fill="white" fillOpacity="0.8"/>
+            </motion.svg>
+
+            {/* ── Floating dot 1 (top-right large) ── */}
+            <motion.div
+              className="absolute rounded-full bg-white"
+              style={{ width: 6, height: 6, top: 12, right: 2, opacity: 0.55 }}
+              animate={{ y: [0, -6, 0] }}
+              transition={{ repeat: Infinity, duration: 3.4, ease: "easeInOut", delay: 0.5 }}
+            />
+
+            {/* ── Floating dot 2 ── */}
+            <motion.div
+              className="absolute rounded-full bg-white"
+              style={{ width: 4, height: 4, top: 30, right: 8, opacity: 0.4 }}
+              animate={{ y: [0, -8, 0] }}
+              transition={{ repeat: Infinity, duration: 2.8, ease: "easeInOut", delay: 1.1 }}
+            />
+
+            {/* ── Floating dot 3 ── */}
+            <motion.div
+              className="absolute rounded-full bg-white"
+              style={{ width: 3, height: 3, top: 50, right: 4, opacity: 0.3 }}
+              animate={{ y: [0, -5, 0] }}
+              transition={{ repeat: Infinity, duration: 4.0, ease: "easeInOut", delay: 1.8 }}
+            />
+
+            {/* ── Floating dot 4 (left side) ── */}
+            <motion.div
+              className="absolute rounded-full bg-white"
+              style={{ width: 4, height: 4, top: 46, left: 6, opacity: 0.3 }}
+              animate={{ y: [0, -6, 0] }}
+              transition={{ repeat: Infinity, duration: 3.2, ease: "easeInOut", delay: 0.8 }}
+            />
+
+            {/* ── Floating dot 5 (left side lower) ── */}
+            <motion.div
+              className="absolute rounded-full bg-white"
+              style={{ width: 3, height: 3, top: 68, left: 4, opacity: 0.25 }}
+              animate={{ y: [0, -4, 0] }}
+              transition={{ repeat: Infinity, duration: 4.4, ease: "easeInOut", delay: 2.2 }}
+            />
+          </motion.div>
         </div>
       </motion.section>
 

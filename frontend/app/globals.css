@@ -1,9 +1,9 @@
 @import "tailwindcss";
 
 @theme {
-  --color-brand-primary: #5f259f;
-  --color-brand-primary-light: #7c3abf;
-  --color-brand-primary-dark: #4a1a80;
+  --color-brand-primary: #6941c6;
+  --color-brand-primary-light: #8b5cf6;
+  --color-brand-primary-dark: #4f2da0;
   --color-brand-navy: #061F41;
   --color-brand-navy-light: #0d3166;
   --color-brand-orange: #E96710;
@@ -21,7 +21,7 @@
   --radius-3xl: 24px;
   --shadow-soft: 0 4px 20px -2px rgba(6, 31, 65, 0.08);
   --shadow-medium: 0 10px 25px -5px rgba(6, 31, 65, 0.14);
-  --shadow-purple: 0 8px 24px -4px rgba(95, 37, 159, 0.28);
+  --shadow-purple: 0 8px 24px -4px rgba(105, 65, 198, 0.22);
   --shadow-card: 0 2px 12px rgba(6, 31, 65, 0.07);
 }
 
@@ -32,11 +32,13 @@ body {
   background: var(--background);
   color: var(--foreground);
   -webkit-tap-highlight-color: transparent;
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
   margin: 0;
   overscroll-behavior-y: contain;
   font-size: 12px;
   letter-spacing: 0;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }
 
 .app-container {
@@ -54,7 +56,7 @@ button, input { font: inherit; }
 .app-container .font-black    { font-weight: 700; }
 .app-container .font-extrabold{ font-weight: 700; }
 .app-container .font-bold     { font-weight: 600; }
-.app-container .font-semibold { font-weight: 600; }
+.app-container .font-semibold { font-weight: 500; }
 .app-container .uppercase     { text-transform: none; }
 .app-container h1,.app-container h2,.app-container h3 { letter-spacing: 0; }
 .app-container [class*="tracking-"] { letter-spacing: 0; }
@@ -62,20 +64,20 @@ button, input { font: inherit; }
 .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
 
 /* ─── Gradients ─────────────────────────────────────────────────────────── */
-.savega-gradient      { background: linear-gradient(135deg, #5f259f 0%, #4a1a80 100%); }
-.savega-gradient-warm { background: linear-gradient(135deg, #7c3abf 0%, #E96710 100%); }
+.savega-gradient      { background: linear-gradient(135deg, #6941c6 0%, #4f2da0 100%); }
+.savega-gradient-warm { background: linear-gradient(135deg, #8b5cf6 0%, #E96710 100%); }
 .savega-gradient-navy { background: linear-gradient(135deg, #061F41 0%, #0d3166 100%); }
-.hero-gradient        { background: linear-gradient(135deg, #5f259f 0%, #3d1570 60%, #061F41 100%); }
+.hero-gradient        { background: linear-gradient(135deg, #6941c6 0%, #4f2da0 60%, #061F41 100%); }
 
 /* ─── Badge gradients ───────────────────────────────────────────────────── */
 .badge-fresh { background: linear-gradient(135deg, #00b761, #00d472); }
 .badge-hot   { background: linear-gradient(135deg, #E96710, #f5832e); }
-.badge-new   { background: linear-gradient(135deg, #5f259f, #7c3abf); }
+.badge-new   { background: linear-gradient(135deg, #6941c6, #8b5cf6); }
 .badge-sale  { background: linear-gradient(135deg, #e11d48, #f43f5e); }
 .badge-best  { background: linear-gradient(135deg, #d97706, #f59e0b); }
 
 /* ─── Glow ──────────────────────────────────────────────────────────────── */
-.glow-purple { box-shadow: 0 0 20px rgba(95,37,159,0.45); }
+.glow-purple { box-shadow: 0 0 16px rgba(105,65,198,0.3); }
 .glow-green  { box-shadow: 0 0 20px rgba(0,183,97,0.45); }
 .glow-orange { box-shadow: 0 0 20px rgba(233,103,16,0.45); }
 
@@ -85,7 +87,7 @@ button, input { font: inherit; }
   100% { background-position:  200% 0; }
 }
 .shimmer {
-  background: linear-gradient(90deg, #f0ebf8 25%, #e4daf2 50%, #f0ebf8 75%);
+  background: linear-gradient(90deg, #f0edf8 25%, #e6e0f4 50%, #f0edf8 75%);
   background-size: 200% 100%;
   animation: shimmer 1.4s infinite;
 }
@@ -122,7 +124,7 @@ button, input { font: inherit; }
 
 /* ─── Gradient text ─────────────────────────────────────────────────────── */
 .gradient-text {
-  background: linear-gradient(135deg, #5f259f, #E96710);
+  background: linear-gradient(135deg, #6941c6, #E96710);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
@@ -135,8 +137,8 @@ button, input { font: inherit; }
   transition: border-color 0.2s, box-shadow 0.2s;
 }
 .search-bar:focus-within {
-  border-color: rgba(95,37,159,0.4);
-  box-shadow: 0 0 0 3px rgba(95,37,159,0.08);
+  border-color: rgba(105,65,198,0.35);
+  box-shadow: 0 0 0 3px rgba(105,65,198,0.07);
   background: #fff;
 }
 
