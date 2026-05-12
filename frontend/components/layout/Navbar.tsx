@@ -120,7 +120,7 @@ export default function Navbar() {
             <div className="relative">
               <div className="absolute inset-y-0 left-3 flex items-center pointer-events-none z-10">
                 <motion.div
-                  animate={{ color: query ? "#5f259f" : "#8fa0b8" }}
+                  animate={{ color: query ? "#6941c6" : "#8fa0b8" }}
                   transition={{ duration: 0.2 }}
                 >
                   <Search size={15} strokeWidth={2.5} />
@@ -146,7 +146,7 @@ export default function Navbar() {
               <div className="absolute right-3 inset-y-0 flex items-center z-10 gap-1">
                 <AnimatePresence mode="wait">
                   {query ? (
-                    <motion.button key="clear" type="button" onClick={() => setQuery("")}
+                    <motion.button key="clear" type="button" onClick={() => reset()}
                       initial={{ scale: 0, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} exit={{ scale: 0, opacity: 0 }}
                       className="w-5 h-5 rounded-full bg-brand-primary/20 flex items-center justify-center text-brand-primary"
                       aria-label="Clear search">

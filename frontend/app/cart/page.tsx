@@ -2,8 +2,8 @@
 
 import { AnimatePresence, motion } from "framer-motion";
 import {
-  ArrowLeft, Bike, ChevronRight, Clock, Heart,
-  Minus, Package, Plus, ShieldCheck, Tag, Zap,
+  ArrowLeft, Bike, Check, ChevronRight, Clock, CreditCard,
+  Heart, Minus, Package, Plus, ShieldCheck, Smartphone, Tag, Wallet, X, Zap,
 } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
@@ -35,6 +35,9 @@ export default function CartPage() {
   const [couponError, setCouponError]     = useState("");
   const [tip, setTip]                     = useState(0);
   const [paymentMethod, setPaymentMethod] = useState<"online" | "cod">("online");
+  const [showPaymentModal, setShowPaymentModal] = useState(false);
+  const [selectedUpi, setSelectedUpi]     = useState<string | null>(null);
+  const [processingPayment, setProcessingPayment] = useState(false);
 
   const subtotal    = items.reduce((s, i) => s + i.price * i.quantity, 0);
   const totalItems  = items.reduce((s, i) => s + i.quantity, 0);
@@ -70,12 +73,29 @@ export default function CartPage() {
   };
 
   const handleCheckout = () => {
+    if (paymentMethod === "online") {
+      setShowPaymentModal(true);
+    } else {
+      placeAndNavigate();
+    }
+  };
+
+  const placeAndNavigate = () => {
     const order = placeOrder(
       items.map((i) => ({ id: i.id, name: i.name, price: i.price, quantity: i.quantity })),
       grandTotal
     );
     clearCart();
     router.push(`/order-success?orderId=${order.id}`);
+  };
+
+  const handlePayNow = () => {
+    setProcessingPayment(true);
+    setTimeout(() => {
+      setProcessingPayment(false);
+      setShowPaymentModal(false);
+      placeAndNavigate();
+    }, 1800);
   };
 
   /* ── Empty state ── */
@@ -97,6 +117,7 @@ export default function CartPage() {
   }
 
   return (
+    <>
     <PageWrapper>
       {/* ── Header ── */}
       <div className="sticky top-0 z-10 bg-white border-b border-gray-100 px-4 py-3 flex items-center gap-3">
@@ -390,5 +411,122 @@ export default function CartPage() {
         </div>
       </div>
     </PageWrapper>
+
+      {/* ── Payment modal ── */}
+      <AnimatePresence>
+        {showPaymentModal && (
+          <>
+            <motion.div key="pay-bd" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
+              className="fixed inset-0 bg-black/60 z-[59]" onClick={() => !processingPayment && setShowPaymentModal(false)} />
+            <motion.div key="pay-modal"
+              initial={{ y: "100%" }} animate={{ y: 0 }} exit={{ y: "100%" }}
+              transition={{ type: "spring", stiffness: 380, damping: 38 }}
+              className="fixed bottom-0 left-0 right-0 z-[60] flex justify-center pointer-events-none">
+              <div className="w-full max-w-[420px] bg-white rounded-t-3xl pointer-events-auto overflow-hidden">
+
+                {/* Header */}
+                <div className="hero-gradient px-5 pt-5 pb-4">
+                  <div className="w-10 h-1 rounded-full bg-white/30 mx-auto mb-4" />
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <p className="text-[10px] font-black text-white/70 uppercase tracking-wider">Secure Payment</p>
+                      <p className="text-[20px] font-black text-white">Rs.{Math.round(grandTotal)}</p>
+                    </div>
+                    <button onClick={() => setShowPaymentModal(false)}
+                      className="w-8 h-8 rounded-full bg-white/20 flex items-center justify-center text-white">
+                      <X size={16} strokeWidth={2.5} />
+                    </button>
+                  </div>
+                </div>
+
+                <div className="px-4 py-4 space-y-3 pb-8">
+                  {/* UPI */}
+                  <div>
+                    <p className="text-[10px] font-black text-brand-text-muted uppercase tracking-wider mb-2">UPI</p>
+                    <div className="space-y-2">
+                      {[
+                        { id: "gpay", label: "Google Pay", icon: Smartphone, color: "text-blue-500" },
+                        { id: "phonepe", label: "PhonePe", icon: Smartphone, color: "text-purple-600" },
+                        { id: "paytm", label: "Paytm", icon: Wallet, color: "text-blue-400" },
+                        { id: "upi", label: "Other UPI ID", icon: Smartphone, color: "text-brand-primary" },
+                      ].map((opt) => (
+                        <button key={opt.id} onClick={() => setSelectedUpi(opt.id)}
+                          className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-xl border transition-all ${
+                            selectedUpi === opt.id
+                              ? "border-brand-primary bg-brand-primary/5 shadow-sm"
+                              : "border-gray-100 bg-gray-50"
+                          }`}>
+                          <div className={`w-8 h-8 rounded-lg bg-white border border-gray-100 flex items-center justify-center ${opt.color}`}>
+                            <opt.icon size={16} strokeWidth={2} />
+                          </div>
+                          <span className="text-[12px] font-black text-brand-text flex-1 text-left">{opt.label}</span>
+                          <div className={`w-4 h-4 rounded-full border-2 flex items-center justify-center ${
+                            selectedUpi === opt.id ? "border-brand-primary" : "border-gray-300"
+                          }`}>
+                            {selectedUpi === opt.id && <div className="w-2 h-2 rounded-full bg-brand-primary" />}
+                          </div>
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+
+                  {/* Card */}
+                  <div>
+                    <p className="text-[10px] font-black text-brand-text-muted uppercase tracking-wider mb-2">Card</p>
+                    <button onClick={() => setSelectedUpi("card")}
+                      className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-xl border transition-all ${
+                        selectedUpi === "card" ? "border-brand-primary bg-brand-primary/5" : "border-gray-100 bg-gray-50"
+                      }`}>
+                      <div className="w-8 h-8 rounded-lg bg-white border border-gray-100 flex items-center justify-center text-brand-orange">
+                        <CreditCard size={16} strokeWidth={2} />
+                      </div>
+                      <span className="text-[12px] font-black text-brand-text flex-1 text-left">Credit / Debit Card</span>
+                      <div className={`w-4 h-4 rounded-full border-2 flex items-center justify-center ${
+                        selectedUpi === "card" ? "border-brand-primary" : "border-gray-300"
+                      }`}>
+                        {selectedUpi === "card" && <div className="w-2 h-2 rounded-full bg-brand-primary" />}
+                      </div>
+                    </button>
+                  </div>
+
+                  {/* Pay button */}
+                  <motion.button
+                    whileTap={{ scale: 0.98 }}
+                    onClick={handlePayNow}
+                    disabled={!selectedUpi || processingPayment}
+                    className={`w-full h-13 rounded-xl py-3.5 flex items-center justify-center gap-2 text-[13px] font-black text-white transition-all ${
+                      selectedUpi && !processingPayment
+                        ? "savega-gradient shadow-[0_4px_16px_rgba(95,37,159,0.35)]"
+                        : "bg-gray-200 text-gray-400"
+                    }`}
+                  >
+                    {processingPayment ? (
+                      <>
+                        <motion.div
+                          animate={{ rotate: 360 }}
+                          transition={{ repeat: Infinity, duration: 0.8, ease: "linear" }}
+                          className="w-4 h-4 rounded-full border-2 border-white border-t-transparent"
+                        />
+                        Processing…
+                      </>
+                    ) : (
+                      <>
+                        <Check size={16} strokeWidth={3} />
+                        Pay Rs.{Math.round(grandTotal)}
+                      </>
+                    )}
+                  </motion.button>
+
+                  <div className="flex items-center justify-center gap-1.5">
+                    <ShieldCheck size={12} className="text-brand-accent" strokeWidth={2} />
+                    <p className="text-[10px] text-brand-text-muted">256-bit SSL encrypted · Powered by Razorpay</p>
+                  </div>
+                </div>
+              </div>
+            </motion.div>
+          </>
+        )}
+      </AnimatePresence>
+    </>
   );
 }
