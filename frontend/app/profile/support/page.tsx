@@ -28,7 +28,7 @@ export default function SupportPage() {
 
   return (
     <PageWrapper>
-      <div className="p-3">
+      <div className="p-3 pb-28">
         <div className="flex items-center gap-3 mb-5">
           <Link href="/profile">
             <div className="w-9 h-9 rounded-full bg-gray-100 flex items-center justify-center text-brand-text">
@@ -120,3 +120,4 @@ export default function SupportPage() {
     </PageWrapper>
   );
 }
+

@@ -10,58 +10,49 @@ interface CategoryCardProps {
   onClick?: () => void;
 }
 
-export default function CategoryCard({
-  name,
-  image,
-  color,
-  isActive = false,
-  onClick,
-}: CategoryCardProps) {
+export default function CategoryCard({ name, image, color, isActive = false, onClick }: CategoryCardProps) {
   return (
     <motion.button
       type="button"
       onClick={onClick}
-      whileTap={{ scale: 0.92 }}
+      whileTap={{ scale: 0.9 }}
       transition={{ type: "spring", stiffness: 600, damping: 15 }}
-      className="w-[72px] flex flex-col items-center flex-shrink-0 cursor-pointer group select-none bg-transparent p-0"
+      className="w-[72px] flex flex-col items-center flex-shrink-0 cursor-pointer select-none bg-transparent p-0"
     >
-      <div className="relative p-[3px]">
-        <motion.div
-          animate={{
-            scale: isActive ? 1.04 : 1,
-            y: isActive ? -1 : 0,
-          }}
-          transition={{ type: "spring", stiffness: 400, damping: 22 }}
-          className={`w-[64px] h-[64px] ${color} rounded-[20px] flex items-center justify-center shadow-[0_6px_14px_-6px_rgba(95,37,159,0.25)] ring-1 ring-black/5 relative overflow-hidden`}
-        >
-          <div className="absolute inset-0 bg-gradient-to-b from-white/50 via-transparent to-transparent pointer-events-none" />
-          <div className="absolute -top-2 -left-2 w-10 h-10 rounded-full bg-white/50 blur-md pointer-events-none" />
-          {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img
-            src={image}
-            alt={name}
-            width={52}
-            height={52}
-            className="w-[52px] h-[52px] object-contain drop-shadow-[0_3px_4px_rgba(0,0,0,0.18)] relative z-10"
-            loading="lazy"
-          />
-        </motion.div>
+      <motion.div
+        animate={{ scale: isActive ? 1.04 : 1, y: isActive ? -2 : 0 }}
+        transition={{ type: "spring", stiffness: 400, damping: 22 }}
+        className={`w-[64px] h-[64px] ${color} rounded-[20px] flex items-center justify-center relative overflow-hidden`}
+        style={{
+          boxShadow: isActive
+            ? "0 0 0 2px #6941c6, 0 4px 14px rgba(105,65,198,0.22)"
+            : "0 4px 12px rgba(6,31,65,0.12)",
+        }}
+      >
+        {/* Gloss overlay */}
+        <div className="absolute inset-0 bg-gradient-to-b from-white/40 via-transparent to-black/5 pointer-events-none" />
+        {/* Shine spot */}
+        <div className="absolute -top-3 -left-3 w-12 h-12 rounded-full bg-white/30 blur-lg pointer-events-none" />
 
-        {isActive && (
-          <motion.div
-            layoutId="category-active-ring"
-            className="absolute inset-0 border-2 border-brand-primary rounded-[22px] pointer-events-none"
-            transition={{ type: "spring", stiffness: 400, damping: 25 }}
-          />
-        )}
-      </div>
+        {/* eslint-disable-next-line @next/next/no-img-element */}
+        <img
+          src={image}
+          alt={name}
+          width={54}
+          height={54}
+          className="w-[54px] h-[54px] object-contain relative z-10"
+          style={{ filter: "drop-shadow(0 3px 6px rgba(0,0,0,0.18))" }}
+          loading="lazy"
+        />
+      </motion.div>
 
       <motion.span
         animate={{
-          color: isActive ? "var(--color-brand-primary)" : "var(--color-brand-text)",
-          fontWeight: isActive ? 800 : 700,
+          color: isActive ? "#6941c6" : "#4a5568",
+          fontWeight: isActive ? 600 : 400,
         }}
-        className="block w-full truncate text-[10px] mt-1.5 text-center leading-tight transition-all"
+        transition={{ duration: 0.15 }}
+        className="block w-full truncate text-[9px] mt-1.5 text-center leading-tight"
         title={name}
       >
         {name}

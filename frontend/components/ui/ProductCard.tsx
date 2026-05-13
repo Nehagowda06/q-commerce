@@ -1,7 +1,7 @@
 "use client";
 
 import { AnimatePresence, motion } from "framer-motion";
-import { Bookmark, Check, Minus, Package, Plus, X } from "lucide-react";
+import { Bookmark, Check, Minus, Package, Plus, X, Zap } from "lucide-react";
 import { useState } from "react";
 import { useCartStore } from "@/store/cartStore";
 import { useListStore } from "@/store/listStore";
@@ -22,19 +22,15 @@ interface ProductCardProps {
   nutrition?: { label: string; value: string }[];
 }
 
+const TAG_STYLES: Record<string, string> = {
+  Fresh:        "badge-fresh text-white",
+  "Best Seller":"badge-best text-white",
+  New:          "badge-new text-white",
+};
+
 export default function ProductCard({
-  id,
-  name,
-  image,
-  price,
-  originalPrice,
-  weight,
-  tag,
-  brand,
-  category,
-  description,
-  details,
-  nutrition,
+  id, name, image, price, originalPrice, weight, tag,
+  brand, category, description, details, nutrition,
 }: ProductCardProps) {
   const itemId = id || name;
   const { items, addItem, updateQuantity } = useCartStore();
@@ -58,117 +54,116 @@ export default function ProductCard({
   return (
     <>
       <motion.div
-        whileTap={{ scale: 0.98 }}
+        whileTap={{ scale: 0.97 }}
         onClick={() => setShowDetail(true)}
-        className="group bg-white rounded-xl p-2 shadow-soft border border-gray-100 flex flex-col h-full transition-shadow hover:shadow-medium relative overflow-visible cursor-pointer"
+        className="group bg-white rounded-2xl flex flex-col h-full relative overflow-visible cursor-pointer"
+        style={{ boxShadow: "0 2px 12px rgba(6,31,65,0.08)" }}
       >
+        {/* Tag badge */}
         {tag && (
-          <div className="absolute top-1.5 right-1.5 z-20">
-            <div className="px-1.5 py-0.5 rounded text-[7px] font-bold uppercase shadow-sm bg-emerald-500 text-white">
-              {tag}
-            </div>
-          </div>
+          <motion.div
+            initial={{ scale: 0, y: -4 }}
+            animate={{ scale: 1, y: 0 }}
+            transition={{ type: "spring", stiffness: 500, damping: 18 }}
+            className={`absolute top-2 right-2 z-20 px-1.5 py-0.5 rounded-md text-[8px] font-black uppercase ${TAG_STYLES[tag] ?? "badge-fresh text-white"}`}
+          >
+            {tag}
+          </motion.div>
         )}
 
-        {/* Bookmark button */}
+        {/* Bookmark */}
         <button
           type="button"
           onClick={(e) => { e.stopPropagation(); setShowListPicker(true); }}
-          className="absolute top-1.5 left-1.5 z-20 w-6 h-6 rounded-lg bg-white/80 backdrop-blur-sm flex items-center justify-center text-brand-primary shadow-soft border border-white/60"
+          className="absolute top-2 left-2 z-20 w-6 h-6 rounded-lg bg-white/90 backdrop-blur-sm flex items-center justify-center text-brand-primary shadow-sm border border-white/60"
           aria-label="Add to list"
         >
-          <Bookmark size={12} strokeWidth={2.5} />
+          <Bookmark size={11} strokeWidth={2.5} />
         </button>
 
-        <div className="relative w-full aspect-square rounded-lg overflow-hidden mb-2 bg-gray-100 shadow-inner">
-          <div
-            className={`w-full h-full flex items-center justify-center bg-gradient-to-br ${
-              image.includes("from-") ? image : "from-gray-100 to-gray-200"
-            }`}
-          >
-            {!image.includes("from-") ? (
-              // eslint-disable-next-line @next/next/no-img-element
-              <img src={image} alt={name} className="w-full h-full object-cover shadow-soft" />
-            ) : (
-              <div className="w-12 h-12 rounded-xl bg-white/75 border border-white/80 shadow-soft flex items-center justify-center text-brand-primary">
-                <Package size={24} strokeWidth={1.8} />
+        {/* Image area */}
+        <div className={`relative w-full aspect-square rounded-t-2xl overflow-hidden bg-gradient-to-br ${
+          image.includes("from-") ? image : "from-gray-100 to-gray-200"
+        }`}>
+          {!image.includes("from-") ? (
+            // eslint-disable-next-line @next/next/no-img-element
+            <img src={image} alt={name} className="w-full h-full object-cover" />
+          ) : (
+            <div className="w-full h-full flex items-center justify-center">
+              <div className="w-12 h-12 rounded-xl bg-white/60 flex items-center justify-center text-brand-primary/60">
+                <Package size={24} strokeWidth={1.5} />
               </div>
-            )}
-          </div>
-
-          <div className="absolute inset-0 pointer-events-none bg-gradient-to-tr from-transparent via-white/10 to-white/25" />
-
-          {discount > 0 && (
-            <div className="absolute bottom-1.5 left-1.5 bg-brand-accent text-white text-[8px] font-bold px-1.5 py-0.5 rounded shadow-sm">
-              {discount}% OFF
             </div>
+          )}
+
+          {/* Discount badge — bold pill with lightning icon + pop animation */}
+          {discount > 0 && (
+            <motion.div
+              initial={{ scale: 0, rotate: -12 }}
+              animate={{ scale: 1, rotate: 0 }}
+              transition={{ type: "spring", stiffness: 500, damping: 18, delay: 0.1 }}
+              className="absolute bottom-2 left-2 badge-sale text-white text-[9px] font-black px-1.5 py-0.5 rounded-lg flex items-center gap-0.5 shadow-sm"
+            >
+              <Zap size={8} fill="white" strokeWidth={0} />
+              {discount}% OFF
+            </motion.div>
           )}
         </div>
 
-        <div className="flex-1 px-0.5">
-          <h3 className="text-[11.5px] font-bold text-brand-text leading-tight line-clamp-2 min-h-[28px]">
-            {name}
-          </h3>
+        {/* Info */}
+        <div className="flex-1 px-2.5 pt-2 pb-1">
+          <p className="text-[11.5px] font-black text-brand-text leading-tight line-clamp-2 min-h-[28px]">{name}</p>
           {weight && <p className="text-[9px] text-brand-text-muted mt-0.5 font-semibold">{weight}</p>}
         </div>
 
-        <div className="mt-2.5 px-0.5">
-          <div className="flex min-w-0 items-baseline gap-1.5">
-            <span className="text-[12px] font-extrabold text-brand-text">Rs.{price}</span>
+        {/* Price + Add */}
+        <div className="px-2.5 pb-2.5">
+          <div className="flex items-baseline gap-1.5 mb-1.5">
+            <span className="text-[13px] font-black text-brand-text">Rs.{price}</span>
             {originalPrice && (
               <span className="text-[9px] text-brand-text-muted line-through">Rs.{originalPrice}</span>
             )}
           </div>
 
-          {/* Stop propagation so tapping Add/+/- doesn't open the detail sheet */}
-          <div className="relative mt-1.5 h-7 w-full" onClick={(e) => e.stopPropagation()}>
+          <div className="relative h-7 w-full" onClick={(e) => e.stopPropagation()}>
             <AnimatePresence mode="wait">
               {quantity === 0 ? (
                 <motion.button
                   key="add-btn"
-                  layoutId={`btn-${itemId}`}
-                  initial={{ opacity: 0 }}
-                  animate={{ opacity: 1 }}
-                  exit={{ opacity: 0 }}
+                  initial={{ opacity: 0, scale: 0.9 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  exit={{ opacity: 0, scale: 0.9 }}
                   whileTap={{ scale: 0.92 }}
-                  transition={{ type: "spring", stiffness: 600, damping: 15 }}
                   onClick={(e) => { e.stopPropagation(); addItem({ id: itemId, name, price }); }}
-                  className="absolute inset-0 bg-brand-primary text-white text-[10px] font-bold rounded-lg shadow-soft flex items-center justify-center"
+                  className="absolute inset-0 savega-gradient text-white text-[10px] font-black rounded-lg shadow-sm flex items-center justify-center gap-1"
                 >
+                  <Plus size={11} strokeWidth={3} />
                   Add
                 </motion.button>
               ) : (
                 <motion.div
                   key="qty-selector"
-                  layoutId={`btn-${itemId}`}
-                  initial={{ opacity: 0 }}
-                  animate={{ opacity: 1 }}
-                  exit={{ opacity: 0 }}
-                  className="absolute inset-0 bg-brand-primary text-white rounded-lg flex items-center justify-between px-1 shadow-soft"
+                  initial={{ opacity: 0, scale: 0.9 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  exit={{ opacity: 0, scale: 0.9 }}
+                  className="absolute inset-0 savega-gradient text-white rounded-lg flex items-center justify-between px-1 shadow-sm"
                 >
-                  <motion.button
-                    whileTap={{ scale: 0.8 }}
+                  <motion.button whileTap={{ scale: 0.8 }}
                     onClick={(e) => { e.stopPropagation(); updateQuantity(itemId, quantity - 1); }}
-                    className="w-6 h-6 flex items-center justify-center rounded-md hover:bg-white/10"
-                    aria-label={`Remove ${name}`}
-                  >
+                    className="w-6 h-6 flex items-center justify-center rounded-md hover:bg-white/20"
+                    aria-label={`Remove ${name}`}>
                     <Minus size={12} strokeWidth={3} />
                   </motion.button>
-                  <motion.span
-                    key={quantity}
-                    initial={{ scale: 0.7, opacity: 0 }}
-                    animate={{ scale: 1, opacity: 1 }}
+                  <motion.span key={quantity}
+                    initial={{ scale: 0.7, opacity: 0 }} animate={{ scale: 1, opacity: 1 }}
                     transition={{ type: "spring", stiffness: 600, damping: 12 }}
-                    className="text-[11px] font-bold w-4 text-center"
-                  >
+                    className="text-[11px] font-black w-4 text-center">
                     {quantity}
                   </motion.span>
-                  <motion.button
-                    whileTap={{ scale: 0.8 }}
+                  <motion.button whileTap={{ scale: 0.8 }}
                     onClick={(e) => { e.stopPropagation(); updateQuantity(itemId, quantity + 1); }}
-                    className="w-6 h-6 flex items-center justify-center rounded-md hover:bg-white/10"
-                    aria-label={`Add ${name}`}
-                  >
+                    className="w-6 h-6 flex items-center justify-center rounded-md hover:bg-white/20"
+                    aria-label={`Add ${name}`}>
                     <Plus size={12} strokeWidth={3} />
                   </motion.button>
                 </motion.div>
@@ -178,14 +173,12 @@ export default function ProductCard({
         </div>
       </motion.div>
 
-      {/* Product detail sheet */}
+      {/* Detail sheet */}
       <AnimatePresence>
-        {showDetail && (
-          <ProductDetailSheet product={product} onClose={() => setShowDetail(false)} />
-        )}
+        {showDetail && <ProductDetailSheet product={product} onClose={() => setShowDetail(false)} />}
       </AnimatePresence>
 
-      {/* List picker modal */}
+      {/* List picker */}
       <AnimatePresence>
         {showListPicker && (
           <>
@@ -206,18 +199,14 @@ export default function ProductCard({
                   </button>
                 </div>
                 {lists.length === 0 ? (
-                  <p className="text-[11px] text-brand-text-muted text-center py-4">
-                    No lists yet. Create one in the Lists tab.
-                  </p>
+                  <p className="text-[11px] text-brand-text-muted text-center py-4">No lists yet. Create one in the Lists tab.</p>
                 ) : (
                   <div className="space-y-2">
                     {lists.map((list) => {
                       const added = addedToListId === list.id;
                       return (
                         <button key={list.id} onClick={() => handleAddToList(list.id)}
-                          className={`w-full flex items-center gap-3 p-2.5 rounded-xl border transition-colors ${
-                            added ? "bg-brand-primary/10 border-brand-primary" : "bg-gray-50 border-gray-100 hover:border-brand-primary/40"
-                          }`}>
+                          className={`w-full flex items-center gap-3 p-2.5 rounded-xl border transition-colors ${added ? "bg-brand-primary/10 border-brand-primary" : "bg-gray-50 border-gray-100"}`}>
                           <span className="text-lg">{list.emoji}</span>
                           <div className="flex-1 text-left min-w-0">
                             <p className="text-xs font-black text-brand-text truncate">{list.name}</p>
