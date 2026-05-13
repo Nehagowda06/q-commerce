@@ -1,0 +1,346 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// ============================================
+// USER & AUTH
+// ============================================
+
+enum UserRole {
+  CUSTOMER
+  ADMIN
+}
+
+model User {
+  id                String    @id @default(uuid())
+  email             String?   @unique
+  phone             String?   @unique
+  name              String?
+  avatarUrl         String?
+  role              UserRole  @default(CUSTOMER)
+  supabaseAuthId    String?   @unique  // Links to Supabase Auth
+  
+  // Relations
+  addresses         Address[]
+  cartItems         CartItem[]
+  orders            Order[]
+  groceryLists      GroceryList[]
+  
+  createdAt         DateTime  @default(now())
+  updatedAt         DateTime  @updatedAt
+
+  @@map("users")
+}
+
+model Address {
+  id          String   @id @default(uuid())
+  userId      String
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  label       String   // "Home", "Work", "Other"
+  fullName    String
+  phone       String
+  addressLine1 String
+  addressLine2 String?
+  landmark    String?
+  city        String
+  state       String
+  pincode     String
+  isDefault   Boolean  @default(false)
+  
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@map("addresses")
+}
+
+// ============================================
+// PRODUCTS & CATEGORIES (Grocery)
+// ============================================
+
+model Category {
+  id            String        @id @default(uuid())
+  name          String        @unique  // "Fresh", "Dairy", "Staples", etc.
+  icon          String        // Lucide icon name
+  image         String        // CDN URL for category image
+  color         String        // Tailwind gradient classes
+  ring          String?       // Ring color class
+  sortOrder     Int           @default(0)
+  
+  subcategories Subcategory[]
+  products      Product[]
+  
+  createdAt     DateTime      @default(now())
+  updatedAt     DateTime      @updatedAt
+
+  @@map("categories")
+}
+
+model Subcategory {
+  id          String    @id @default(uuid())
+  categoryId  String
+  category    Category  @relation(fields: [categoryId], references: [id], onDelete: Cascade)
+  
+  name        String    // "Vegetables", "Fruits", etc.
+  image       String    // CDN URL
+  sortOrder   Int       @default(0)
+  
+  products    Product[]
+  
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  @@unique([categoryId, name])
+  @@map("subcategories")
+}
+
+model Product {
+  id              String       @id @default(uuid())
+  name            String
+  description     String?
+  weight          String       // "1 kg", "500 ml", etc.
+  price           Float
+  originalPrice   Float?       // For showing discounts
+  imageColor      String       // Tailwind gradient for placeholder
+  imageUrl        String?      // Actual product image URL
+  tag             String?      // "Fresh", "Best Seller", etc.
+  brand           String?
+  inStock         Boolean      @default(true)
+  stockQuantity   Int          @default(100)
+  
+  // Relations
+  categoryId      String
+  category        Category     @relation(fields: [categoryId], references: [id])
+  subcategoryId   String?
+  subcategory     Subcategory? @relation(fields: [subcategoryId], references: [id])
+  
+  // Product details (stored as JSON)
+  details         String[]     @default([])  // ["Country of Origin: India", ...]
+  nutrition       Json?        // [{label: "Energy", value: "18 kcal"}, ...]
+  
+  cartItems       CartItem[]
+  orderItems      OrderItem[]
+  listItems       ListItem[]
+  
+  createdAt       DateTime     @default(now())
+  updatedAt       DateTime     @updatedAt
+
+  @@map("products")
+}
+
+// ============================================
+// RESTAURANTS & FOOD
+// ============================================
+
+model FoodCategory {
+  id          String   @id @default(uuid())
+  name        String   @unique  // "Biryani", "Pizza", etc.
+  image       String   // Tailwind gradient classes
+  sortOrder   Int      @default(0)
+  
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@map("food_categories")
+}
+
+model Restaurant {
+  id          String     @id @default(uuid())
+  name        String
+  cuisine     String     // "Hyderabadi Biryani", "Burgers, Fast Food"
+  rating      Float      @default(4.0)
+  eta         String     // "25 mins"
+  distance    String     // "1.8 km"
+  image       String     // Tailwind gradient classes
+  offer       String?    // "50% off up to Rs.100"
+  popular     String[]   @default([])  // ["Chicken Dum Biryani", "Egg Biryani"]
+  isActive    Boolean    @default(true)
+  
+  menuItems   MenuItem[]
+  
+  createdAt   DateTime   @default(now())
+  updatedAt   DateTime   @updatedAt
+
+  @@map("restaurants")
+}
+
+model MenuItem {
+  id            String     @id @default(uuid())
+  restaurantId  String
+  restaurant    Restaurant @relation(fields: [restaurantId], references: [id], onDelete: Cascade)
+  
+  name          String
+  description   String?
+  price         Float
+  imageUrl      String?
+  isVeg         Boolean    @default(true)
+  inStock       Boolean    @default(true)
+  category      String?    // "Starters", "Main Course", etc.
+  
+  createdAt     DateTime   @default(now())
+  updatedAt     DateTime   @updatedAt
+
+  @@map("menu_items")
+}
+
+// ============================================
+// CART
+// ============================================
+
+model CartItem {
+  id          String   @id @default(uuid())
+  userId      String
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  productId   String
+  product     Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
+  
+  quantity    Int      @default(1)
+  
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@unique([userId, productId])
+  @@map("cart_items")
+}
+
+// ============================================
+// ORDERS
+// ============================================
+
+enum OrderStatus {
+  PENDING
+  CONFIRMED
+  PREPARING
+  OUT_FOR_DELIVERY
+  DELIVERED
+  CANCELLED
+}
+
+enum PaymentStatus {
+  PENDING
+  PAID
+  FAILED
+  REFUNDED
+}
+
+enum PaymentMethod {
+  UPI
+  CARD
+  NETBANKING
+  WALLET
+  COD
+}
+
+model Order {
+  id                  String        @id @default(uuid())
+  orderNumber         String        @unique  // "SV-82941"
+  userId              String
+  user                User          @relation(fields: [userId], references: [id])
+  
+  status              OrderStatus   @default(PENDING)
+  
+  // Amounts
+  itemTotal           Float
+  deliveryFee         Float         @default(0)
+  discount            Float         @default(0)
+  grandTotal          Float
+  
+  // Delivery
+  deliveryAddress     Json          // Snapshot of address at order time
+  estimatedDelivery   String?       // "12 mins"
+  deliveredAt         DateTime?
+  
+  // Payment
+  paymentStatus       PaymentStatus @default(PENDING)
+  paymentMethod       PaymentMethod?
+  razorpayOrderId     String?
+  razorpayPaymentId   String?
+  razorpaySignature   String?
+  
+  // Items
+  items               OrderItem[]
+  
+  createdAt           DateTime      @default(now())
+  updatedAt           DateTime      @updatedAt
+
+  @@map("orders")
+}
+
+model OrderItem {
+  id          String   @id @default(uuid())
+  orderId     String
+  order       Order    @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  productId   String
+  product     Product  @relation(fields: [productId], references: [id])
+  
+  name        String   // Snapshot of product name
+  price       Float    // Snapshot of price at order time
+  quantity    Int
+  
+  createdAt   DateTime @default(now())
+
+  @@map("order_items")
+}
+
+// ============================================
+// GROCERY LISTS
+// ============================================
+
+model GroceryList {
+  id          String     @id @default(uuid())
+  userId      String
+  user        User       @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  name        String     // "Weekly Groceries"
+  emoji       String     @default("🛒")
+  
+  items       ListItem[]
+  
+  createdAt   DateTime   @default(now())
+  updatedAt   DateTime   @updatedAt
+
+  @@map("grocery_lists")
+}
+
+model ListItem {
+  id          String      @id @default(uuid())
+  listId      String
+  list        GroceryList @relation(fields: [listId], references: [id], onDelete: Cascade)
+  
+  text        String      // "Tomatoes 1kg"
+  checked     Boolean     @default(false)
+  
+  // Optional link to product
+  productId   String?
+  product     Product?    @relation(fields: [productId], references: [id], onDelete: SetNull)
+  price       Float?
+  
+  createdAt   DateTime    @default(now())
+  updatedAt   DateTime    @updatedAt
+
+  @@map("list_items")
+}
+
+// ============================================
+// NOTIFICATIONS (for future use)
+// ============================================
+
+model Notification {
+  id          String   @id @default(uuid())
+  userId      String
+  
+  title       String
+  message     String
+  type        String   // "order", "promo", "system"
+  isRead      Boolean  @default(false)
+  data        Json?    // Additional data like orderId
+  
+  createdAt   DateTime @default(now())
+
+  @@map("notifications")
+}
