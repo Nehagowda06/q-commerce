@@ -1,8 +1,8 @@
 "use client";
 
 import { AnimatePresence, motion } from "framer-motion";
-import { Bookmark, Check, Minus, Package, Plus, X, Zap } from "lucide-react";
-import { useState } from "react";
+import { Bookmark, BookmarkCheck, Check, Minus, Package, Plus, X, Zap } from "lucide-react";
+import { useEffect, useRef, useState } from "react";
 import { useCartStore } from "@/store/cartStore";
 import { useListStore } from "@/store/listStore";
 import ProductDetailSheet from "@/components/ui/ProductDetailSheet";
@@ -34,7 +34,7 @@ export default function ProductCard({
 }: ProductCardProps) {
   const itemId = id || name;
   const { items, addItem, updateQuantity } = useCartStore();
-  const { lists, addItem: addToList } = useListStore();
+  const { lists, addItem: addToList, deleteItem } = useListStore();
   const cartItem = items.find((item) => item.id === itemId);
   const quantity = cartItem?.quantity || 0;
   const discount = originalPrice ? Math.round(((originalPrice - price) / originalPrice) * 100) : 0;
@@ -42,11 +42,55 @@ export default function ProductCard({
   const [showListPicker, setShowListPicker] = useState(false);
   const [addedToListId, setAddedToListId] = useState<number | null>(null);
   const [showDetail, setShowDetail] = useState(false);
+  const [saveFlash, setSaveFlash] = useState<"saved" | "unsaved" | null>(null);
+  const [toastPos, setToastPos] = useState<{ x: number; y: number } | null>(null);
+  const bookmarkRef = useRef<HTMLButtonElement>(null);
+
+  // Check if this product is saved in any list
+  const isSaved = lists.some((list) =>
+    list.items.some((item) => item.productId === itemId)
+  );
+
+  const captureToastPos = () => {
+    if (bookmarkRef.current) {
+      const r = bookmarkRef.current.getBoundingClientRect();
+      setToastPos({ x: r.left + r.width / 2, y: r.top });
+    }
+  };
+
+  const handleBookmarkClick = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    if (isSaved) {
+      // Remove from every list it appears in
+      lists.forEach((list) => {
+        list.items.forEach((item) => {
+          if (item.productId === itemId) {
+            deleteItem(list.id, item.id);
+          }
+        });
+      });
+      captureToastPos();
+      setSaveFlash("unsaved");
+      setTimeout(() => { setSaveFlash(null); setToastPos(null); }, 1400);
+    } else {
+      setShowListPicker(true);
+    }
+  };
 
   const handleAddToList = (listId: number) => {
     addToList(listId, { text: `${name}${weight ? ` (${weight})` : ""}`, checked: false, productId: itemId, price });
     setAddedToListId(listId);
-    setTimeout(() => { setAddedToListId(null); setShowListPicker(false); }, 1200);
+    // Close modal first, then show toast after exit animation finishes
+    setTimeout(() => {
+      setAddedToListId(null);
+      setShowListPicker(false);
+      // Small extra delay so the modal is fully gone before toast appears
+      setTimeout(() => {
+        captureToastPos();
+        setSaveFlash("saved");
+        setTimeout(() => { setSaveFlash(null); setToastPos(null); }, 1400);
+      }, 320);
+    }, 600);
   };
 
   const product = { id: itemId, name, image, price, originalPrice, weight, tag, brand, category, description, details, nutrition };
@@ -71,15 +115,59 @@ export default function ProductCard({
           </motion.div>
         )}
 
-        {/* Bookmark */}
-        <button
-          type="button"
-          onClick={(e) => { e.stopPropagation(); setShowListPicker(true); }}
-          className="absolute top-2 left-2 z-20 w-6 h-6 rounded-lg bg-white/90 backdrop-blur-sm flex items-center justify-center text-brand-primary shadow-sm border border-white/60"
-          aria-label="Add to list"
-        >
-          <Bookmark size={11} strokeWidth={2.5} />
-        </button>
+        {/* Bookmark button */}
+        <div className="absolute top-2 left-2 z-20">
+          {/* Pulse ring on save */}
+          <AnimatePresence>
+            {saveFlash === "saved" && (
+              <motion.span
+                key="pulse"
+                className="absolute inset-0 rounded-lg bg-brand-primary pointer-events-none"
+                initial={{ opacity: 0.55, scale: 1 }}
+                animate={{ opacity: 0, scale: 2.4 }}
+                exit={{ opacity: 0 }}
+                transition={{ duration: 0.5, ease: "easeOut" }}
+              />
+            )}
+          </AnimatePresence>
+
+          <motion.button
+            ref={bookmarkRef}
+            type="button"
+            onClick={handleBookmarkClick}
+            whileTap={{ scale: 0.82 }}
+            className={`relative w-6 h-6 rounded-lg backdrop-blur-sm flex items-center justify-center shadow-sm border transition-colors ${
+              isSaved
+                ? "bg-brand-primary text-white border-brand-primary"
+                : "bg-white/90 text-brand-primary border-white/60"
+            }`}
+            aria-label={isSaved ? "Remove from list" : "Add to list"}
+          >
+            <AnimatePresence mode="wait">
+              {isSaved ? (
+                <motion.span
+                  key="saved-icon"
+                  initial={{ scale: 0, rotate: -15 }}
+                  animate={{ scale: 1, rotate: 0 }}
+                  exit={{ scale: 0, rotate: 15 }}
+                  transition={{ type: "spring", stiffness: 600, damping: 14 }}
+                >
+                  <BookmarkCheck size={11} strokeWidth={2.5} />
+                </motion.span>
+              ) : (
+                <motion.span
+                  key="unsaved-icon"
+                  initial={{ scale: 0, rotate: 15 }}
+                  animate={{ scale: 1, rotate: 0 }}
+                  exit={{ scale: 0, rotate: -15 }}
+                  transition={{ type: "spring", stiffness: 600, damping: 14 }}
+                >
+                  <Bookmark size={11} strokeWidth={2.5} />
+                </motion.span>
+              )}
+            </AnimatePresence>
+          </motion.button>
+        </div>
 
         {/* Image area */}
         <div className={`relative w-full aspect-square rounded-t-2xl overflow-hidden bg-gradient-to-br ${
@@ -96,7 +184,7 @@ export default function ProductCard({
             </div>
           )}
 
-          {/* Discount badge — bold pill with lightning icon + pop animation */}
+          {/* Discount badge */}
           {discount > 0 && (
             <motion.div
               initial={{ scale: 0, rotate: -12 }}
@@ -190,7 +278,7 @@ export default function ProductCard({
               <div className="w-full max-w-[300px] bg-white rounded-3xl p-4 pointer-events-auto shadow-2xl">
                 <div className="flex items-center justify-between mb-3">
                   <div>
-                    <h3 className="text-sm font-black text-brand-text">Add to List</h3>
+                    <h3 className="text-sm font-black text-brand-text">Save to List</h3>
                     <p className="text-[10px] text-brand-text-muted truncate max-w-[180px]">{name}</p>
                   </div>
                   <button onClick={() => setShowListPicker(false)}
@@ -212,7 +300,14 @@ export default function ProductCard({
                             <p className="text-xs font-black text-brand-text truncate">{list.name}</p>
                             <p className="text-[9px] text-brand-text-muted">{list.items.length} items</p>
                           </div>
-                          {added && <Check size={14} strokeWidth={3} className="text-brand-primary flex-shrink-0" />}
+                          {added && (
+                            <motion.span
+                              initial={{ scale: 0 }} animate={{ scale: 1 }}
+                              transition={{ type: "spring", stiffness: 600, damping: 14 }}
+                            >
+                              <Check size={14} strokeWidth={3} className="text-brand-primary flex-shrink-0" />
+                            </motion.span>
+                          )}
                         </button>
                       );
                     })}
@@ -221,6 +316,30 @@ export default function ProductCard({
               </div>
             </motion.div>
           </>
+        )}
+      </AnimatePresence>
+      {/* Fixed toast — renders above all overflow/clip contexts */}
+      <AnimatePresence>
+        {saveFlash !== null && toastPos !== null && (
+          <motion.div
+            key="save-toast"
+            initial={{ opacity: 0, y: 6, scale: 0.8 }}
+            animate={{ opacity: 1, y: 0, scale: 1 }}
+            exit={{ opacity: 0, y: -4, scale: 0.85 }}
+            transition={{ type: "spring", stiffness: 520, damping: 26 }}
+            className={`fixed z-[999] -translate-x-1/2 whitespace-nowrap px-2.5 py-1 rounded-lg text-[10px] font-black shadow-xl pointer-events-none ${
+              saveFlash === "saved" ? "bg-brand-primary text-white" : "bg-gray-700 text-white"
+            }`}
+            style={{ left: toastPos.x, top: toastPos.y - 36 }}
+          >
+            {saveFlash === "saved" ? "✓ Saved!" : "✕ Removed"}
+            {/* Arrow pointing down */}
+            <span
+              className={`absolute left-1/2 -translate-x-1/2 top-full w-0 h-0 border-l-[5px] border-r-[5px] border-t-[5px] border-l-transparent border-r-transparent ${
+                saveFlash === "saved" ? "border-t-brand-primary" : "border-t-gray-700"
+              }`}
+            />
+          </motion.div>
         )}
       </AnimatePresence>
     </>

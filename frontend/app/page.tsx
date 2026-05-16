@@ -421,12 +421,15 @@ function GroceryHome({
                 Fruits · Dairy · Snacks · Essentials
               </motion.p>
             </div>
-            <motion.div
+            <motion.button
+              type="button"
+              onClick={() => document.getElementById("grocery-aisles")?.scrollIntoView({ behavior: "smooth", block: "start" })}
               initial={{ opacity: 0, y: 4 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.32 }}
-              className="mt-3 self-start inline-flex items-center gap-1 bg-white text-[#0a5c42] text-[9px] font-black px-3 py-1.5 rounded-full shadow-md"
+              whileTap={{ scale: 0.94 }}
+              className="mt-3 self-start inline-flex items-center gap-1 bg-white text-[#0a5c42] text-[9px] font-black px-3 py-1.5 rounded-full shadow-md cursor-pointer"
             >
               Shop now <ChevronRight size={10} strokeWidth={3} />
-            </motion.div>
+            </motion.button>
           </div>
 
           {/* Right: inline SVG grocery illustration — full-height scene */}
@@ -554,7 +557,7 @@ function GroceryHome({
         </div>
       </motion.section>
 
-      <motion.section variants={sectionVariants} className="mt-4">
+      <motion.section variants={sectionVariants} className="mt-4" id="grocery-aisles">
         <div className="px-3 flex items-center justify-between mb-2.5">
           <h2 className="text-[14px] font-black text-brand-text">Shop by Aisle</h2>
           <Link href="/categories" className="text-[10px] font-black text-brand-primary bg-gray-100 px-2.5 py-1 rounded-full flex items-center gap-0.5">
@@ -640,12 +643,15 @@ function FoodHome() {
                 Restaurants · Quick bites · Desserts
               </motion.p>
             </div>
-            <motion.div
+            <motion.button
+              type="button"
+              onClick={() => document.getElementById("food-restaurants")?.scrollIntoView({ behavior: "smooth", block: "start" })}
               initial={{ opacity: 0, y: 4 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.32 }}
-              className="mt-3 self-start inline-flex items-center gap-1 bg-white text-[#b02a1c] text-[9px] font-black px-3 py-1.5 rounded-full shadow-md"
+              whileTap={{ scale: 0.94 }}
+              className="mt-3 self-start inline-flex items-center gap-1 bg-white text-[#b02a1c] text-[9px] font-black px-3 py-1.5 rounded-full shadow-md cursor-pointer"
             >
               Order now <ChevronRight size={10} strokeWidth={3} />
-            </motion.div>
+            </motion.button>
           </div>
 
           {/* Right: inline SVG food illustration — full-height scene */}
@@ -655,72 +661,125 @@ function FoodHome() {
             className="relative w-[160px] flex-shrink-0 self-stretch flex items-center justify-center select-none overflow-hidden"
           >
             <svg width="160" height="130" viewBox="0 0 160 130" fill="none" xmlns="http://www.w3.org/2000/svg">
-              {/* ── Shadow ── */}
-              <ellipse cx="80" cy="124" rx="55" ry="5" fill="black" fillOpacity="0.12"/>
-
-              {/* ── Bowl ── */}
-              <path d="M22 72 Q22 108 80 108 Q138 108 138 72 Z" fill="white" fillOpacity="0.18"/>
-              <path d="M22 72 Q22 108 80 108 Q138 108 138 72 Z" stroke="white" strokeOpacity="0.4" strokeWidth="1.5" fill="none"/>
-              {/* Bowl rim */}
-              <ellipse cx="80" cy="72" rx="58" ry="11" fill="white" fillOpacity="0.22"/>
-              <ellipse cx="80" cy="72" rx="58" ry="11" stroke="white" strokeOpacity="0.5" strokeWidth="1.5" fill="none"/>
-              {/* Bowl shine */}
-              <ellipse cx="50" cy="68" rx="10" ry="4" fill="white" fillOpacity="0.18" transform="rotate(-15 50 68)"/>
-
-              {/* ── Noodles in bowl ── */}
-              <path d="M34 72 Q44 58 56 68 Q68 78 80 64 Q92 50 104 62 Q116 74 126 68" stroke="#fbbf24" strokeWidth="4" strokeLinecap="round" fill="none"/>
-              <path d="M30 76 Q42 62 54 72 Q66 82 78 68 Q90 54 102 66 Q114 78 128 72" stroke="#fde68a" strokeWidth="3" strokeLinecap="round" fill="none" strokeOpacity="0.75"/>
-              <path d="M38 80 Q50 68 62 76 Q74 84 86 72 Q98 60 110 70" stroke="#f59e0b" strokeWidth="2.5" strokeLinecap="round" fill="none" strokeOpacity="0.6"/>
-
-              {/* ── Burger (left, floating above bowl) ── */}
-              {/* Bun top */}
-              <ellipse cx="42" cy="44" rx="24" ry="15" fill="#d97706" fillOpacity="0.95"/>
-              <ellipse cx="42" cy="44" rx="24" ry="15" fill="url(#bunTopGrad)" fillOpacity="0.5"/>
-              {/* Sesame seeds */}
-              <ellipse cx="35" cy="37" rx="3" ry="1.4" fill="white" fillOpacity="0.75" transform="rotate(-20 35 37)"/>
-              <ellipse cx="46" cy="34" rx="3" ry="1.4" fill="white" fillOpacity="0.75" transform="rotate(10 46 34)"/>
-              <ellipse cx="54" cy="40" rx="2.5" ry="1.2" fill="white" fillOpacity="0.65" transform="rotate(-10 54 40)"/>
-              {/* Cheese slice */}
-              <ellipse cx="42" cy="56" rx="25" ry="5" fill="#fbbf24" fillOpacity="0.9"/>
-              {/* Lettuce */}
-              <path d="M18 54 Q26 48 34 52 Q42 48 50 52 Q58 48 66 54" stroke="#4ade80" strokeWidth="4" strokeLinecap="round" fill="none"/>
-              {/* Patty */}
-              <ellipse cx="42" cy="60" rx="23" ry="5.5" fill="#92400e" fillOpacity="0.95"/>
-              {/* Bun bottom */}
-              <ellipse cx="42" cy="65" rx="23" ry="7" fill="#f59e0b" fillOpacity="0.9"/>
-
-              {/* ── Pizza slice (right, floating) ── */}
-              <path d="M100 12 L128 60 L72 60 Z" fill="#ef4444" fillOpacity="0.9"/>
-              <path d="M100 12 L128 60 L72 60 Z" stroke="white" strokeOpacity="0.2" strokeWidth="1" fill="none"/>
-              {/* Crust */}
-              <path d="M72 60 Q100 70 128 60" stroke="#d97706" strokeWidth="7" strokeLinecap="round" fill="none"/>
-              <path d="M72 60 Q100 70 128 60" stroke="#f59e0b" strokeWidth="4" strokeLinecap="round" fill="none"/>
-              {/* Cheese layer */}
-              <path d="M78 58 Q100 66 122 58" stroke="#fbbf24" strokeWidth="2" strokeLinecap="round" fill="none" strokeOpacity="0.7"/>
-              {/* Cheese drips */}
-              <path d="M86 60 Q85 67 87 71" stroke="#fbbf24" strokeWidth="3" strokeLinecap="round" fill="none"/>
-              <path d="M100 62 Q100 70 98 74" stroke="#fbbf24" strokeWidth="3" strokeLinecap="round" fill="none"/>
-              <path d="M114 60 Q115 67 113 70" stroke="#fbbf24" strokeWidth="3" strokeLinecap="round" fill="none"/>
-              {/* Toppings */}
-              <circle cx="90" cy="42" r="4" fill="#dc2626" fillOpacity="0.95"/>
-              <circle cx="104" cy="36" r="3.5" fill="#dc2626" fillOpacity="0.95"/>
-              <circle cx="114" cy="46" r="3" fill="#dc2626" fillOpacity="0.95"/>
-              <circle cx="96" cy="52" r="3" fill="#16a34a" fillOpacity="0.9"/>
-              <circle cx="110" cy="52" r="2.5" fill="#16a34a" fillOpacity="0.9"/>
-              {/* Pizza shine */}
-              <ellipse cx="88" cy="28" rx="6" ry="3" fill="white" fillOpacity="0.18" transform="rotate(-30 88 28)"/>
-
-              {/* ── Steam lines ── */}
-              <path d="M68 68 Q65 58 68 48" stroke="white" strokeOpacity="0.35" strokeWidth="2" strokeLinecap="round" fill="none"/>
-              <path d="M80 66 Q83 56 80 46" stroke="white" strokeOpacity="0.25" strokeWidth="2" strokeLinecap="round" fill="none"/>
-              <path d="M92 68 Q95 58 92 48" stroke="white" strokeOpacity="0.3" strokeWidth="2" strokeLinecap="round" fill="none"/>
-
               <defs>
-                <radialGradient id="bunTopGrad" cx="35%" cy="28%">
-                  <stop offset="0%" stopColor="white" stopOpacity="0.55"/>
-                  <stop offset="100%" stopColor="white" stopOpacity="0"/>
-                </radialGradient>
+                {/* Handi body gradient — warm amber */}
+                <linearGradient id="handiBody" x1="55" y1="52" x2="115" y2="115" gradientUnits="userSpaceOnUse">
+                  <stop offset="0%" stopColor="#fbbf24"/>
+                  <stop offset="100%" stopColor="#d97706"/>
+                </linearGradient>
+                {/* Handi lid gradient */}
+                <linearGradient id="handiLid" x1="55" y1="44" x2="115" y2="60" gradientUnits="userSpaceOnUse">
+                  <stop offset="0%" stopColor="#fde68a"/>
+                  <stop offset="100%" stopColor="#f59e0b"/>
+                </linearGradient>
+                {/* Rice surface gradient */}
+                <linearGradient id="riceSurface" x1="60" y1="50" x2="110" y2="58" gradientUnits="userSpaceOnUse">
+                  <stop offset="0%" stopColor="#fffbeb"/>
+                  <stop offset="100%" stopColor="#fef3c7"/>
+                </linearGradient>
+                {/* Samosa gradient */}
+                <linearGradient id="samosaBody" x1="18" y1="18" x2="62" y2="72" gradientUnits="userSpaceOnUse">
+                  <stop offset="0%" stopColor="#fcd34d"/>
+                  <stop offset="100%" stopColor="#b45309"/>
+                </linearGradient>
+                {/* Samosa shadow face */}
+                <linearGradient id="samosaShadow" x1="18" y1="40" x2="62" y2="72" gradientUnits="userSpaceOnUse">
+                  <stop offset="0%" stopColor="#92400e" stopOpacity="0"/>
+                  <stop offset="100%" stopColor="#92400e" stopOpacity="0.35"/>
+                </linearGradient>
               </defs>
+
+              {/* ── Ground shadow ── */}
+              <ellipse cx="83" cy="123" rx="52" ry="5" fill="black" fillOpacity="0.15"/>
+
+              {/* ══════════════════════════════════
+                  BIRYANI HANDI (centre-right hero)
+                  ══════════════════════════════════ */}
+
+              {/* Handi base / body — rounded pot shape */}
+              <path d="M56 115 Q54 80 58 68 Q62 58 85 54 Q108 50 112 58 Q118 68 118 80 Q118 100 116 115 Z"
+                fill="url(#handiBody)"/>
+              {/* Body right-side shadow */}
+              <path d="M112 58 Q118 68 118 80 Q118 100 116 115 L100 115 Q106 95 104 75 Q102 62 96 56 Z"
+                fill="#b45309" fillOpacity="0.25"/>
+              {/* Body left highlight */}
+              <path d="M58 68 Q60 60 70 56 Q66 70 64 90 Q62 105 62 115 L56 115 Z"
+                fill="white" fillOpacity="0.12"/>
+
+              {/* Handi neck ring */}
+              <rect x="57" y="62" width="58" height="8" rx="4" fill="#d97706"/>
+              <rect x="57" y="62" width="58" height="4" rx="2" fill="#fbbf24" fillOpacity="0.6"/>
+
+              {/* Handi handles */}
+              <path d="M57 70 C46 70 42 78 46 82 C50 86 57 82 57 78" fill="#d97706" stroke="#b45309" strokeWidth="1"/>
+              <path d="M115 70 C126 70 130 78 126 82 C122 86 115 82 115 78" fill="#d97706" stroke="#b45309" strokeWidth="1"/>
+
+              {/* Rice / biryani surface inside handi */}
+              <ellipse cx="86" cy="62" rx="28" ry="9" fill="url(#riceSurface)"/>
+              {/* Saffron streaks on rice */}
+              <path d="M64 60 Q72 56 80 60 Q88 64 96 59 Q104 54 108 60"
+                stroke="#f97316" strokeWidth="2" strokeLinecap="round" fill="none" strokeOpacity="0.7"/>
+              {/* Rice grain clusters */}
+              <ellipse cx="72" cy="59" rx="3.5" ry="1.2" fill="white" fillOpacity="0.9" transform="rotate(-20 72 59)"/>
+              <ellipse cx="80" cy="56" rx="3.5" ry="1.2" fill="white" fillOpacity="0.9" transform="rotate(5 80 56)"/>
+              <ellipse cx="89" cy="57" rx="3.5" ry="1.2" fill="white" fillOpacity="0.9" transform="rotate(15 89 57)"/>
+              <ellipse cx="98" cy="59" rx="3" ry="1.1" fill="white" fillOpacity="0.85" transform="rotate(-10 98 59)"/>
+              <ellipse cx="76" cy="63" rx="3" ry="1.1" fill="white" fillOpacity="0.8" transform="rotate(10 76 63)"/>
+              <ellipse cx="93" cy="63" rx="3" ry="1.1" fill="white" fillOpacity="0.8" transform="rotate(-15 93 63)"/>
+              {/* Spice / whole spice dots */}
+              <circle cx="84" cy="61" r="2" fill="#92400e" fillOpacity="0.7"/>
+              <circle cx="94" cy="57" r="1.5" fill="#92400e" fillOpacity="0.6"/>
+              {/* Mint garnish */}
+              <path d="M100 52 C97 46 92 47 93 52" fill="#4ade80" fillOpacity="0.95"/>
+              <path d="M103 50 C103 44 108 45 107 50" fill="#22c55e" fillOpacity="0.9"/>
+              <line x1="100" y1="52" x2="100" y2="58" stroke="#15803d" strokeWidth="1.2" strokeLinecap="round"/>
+
+              {/* Lid */}
+              <ellipse cx="86" cy="52" rx="30" ry="9" fill="url(#handiLid)"/>
+              <ellipse cx="86" cy="52" rx="30" ry="9" stroke="#d97706" strokeWidth="1.5" fill="none"/>
+              {/* Lid highlight */}
+              <ellipse cx="74" cy="49" rx="10" ry="3" fill="white" fillOpacity="0.22" transform="rotate(-10 74 49)"/>
+              {/* Lid knob */}
+              <ellipse cx="86" cy="44" rx="6" ry="3.5" fill="#f59e0b"/>
+              <ellipse cx="86" cy="44" rx="6" ry="3.5" stroke="#d97706" strokeWidth="1" fill="none"/>
+              <ellipse cx="84" cy="43" rx="2" ry="1.2" fill="white" fillOpacity="0.3"/>
+
+              {/* Steam wisps above lid */}
+              <path d="M76 43 Q73 36 76 29 Q79 22 76 15"
+                stroke="white" strokeOpacity="0.45" strokeWidth="2.5" strokeLinecap="round" fill="none"/>
+              <path d="M86 41 Q89 34 86 27 Q83 20 86 13"
+                stroke="white" strokeOpacity="0.35" strokeWidth="2" strokeLinecap="round" fill="none"/>
+              <path d="M96 43 Q99 36 96 29 Q93 22 96 16"
+                stroke="white" strokeOpacity="0.4" strokeWidth="2" strokeLinecap="round" fill="none"/>
+
+              {/* ══════════════════════════════════
+                  SAMOSA (front-left, tilted)
+                  ══════════════════════════════════ */}
+              <g transform="rotate(-12 40 80)">
+                {/* Samosa body */}
+                <path d="M40 28 L14 76 L66 76 Z" fill="url(#samosaBody)"/>
+                {/* Shadow layer */}
+                <path d="M40 28 L14 76 L66 76 Z" fill="url(#samosaShadow)"/>
+                {/* Left edge crimp — dashed seam */}
+                <path d="M40 28 L14 76"
+                  stroke="#92400e" strokeWidth="1.5" strokeLinecap="round"
+                  strokeDasharray="3 4" strokeOpacity="0.55" fill="none"/>
+                {/* Right edge crimp */}
+                <path d="M40 28 L66 76"
+                  stroke="#92400e" strokeWidth="1.5" strokeLinecap="round"
+                  strokeDasharray="3 4" strokeOpacity="0.55" fill="none"/>
+                {/* Bottom edge */}
+                <path d="M14 76 L66 76"
+                  stroke="#92400e" strokeWidth="1.5" strokeLinecap="round" strokeOpacity="0.4" fill="none"/>
+                {/* Surface highlight — top-left face */}
+                <path d="M40 28 L14 76 L40 76 Z" fill="white" fillOpacity="0.07"/>
+                {/* Specular highlight */}
+                <ellipse cx="32" cy="48" rx="7" ry="4" fill="white" fillOpacity="0.18" transform="rotate(-35 32 48)"/>
+              </g>
+
+              {/* Chutney pool under samosa */}
+              <ellipse cx="36" cy="88" rx="14" ry="4" fill="#15803d" fillOpacity="0.55"/>
+              <ellipse cx="36" cy="88" rx="10" ry="2.5" fill="#16a34a" fillOpacity="0.7"/>
             </svg>
 
             {/* ── Floating sparkle (star) ── */}
@@ -795,7 +854,7 @@ function FoodHome() {
         )}
       </motion.section>
 
-      <motion.section variants={sectionVariants} className="mt-6 px-3.5">
+      <motion.section variants={sectionVariants} className="mt-6 px-3.5" id="food-restaurants">
         <div className="flex items-center justify-between mb-2.5">
           <div>
             <h2 className="text-[13px] font-extrabold text-brand-text">Most Ordered Restaurants</h2>
