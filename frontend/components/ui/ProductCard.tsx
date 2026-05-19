@@ -2,6 +2,7 @@
 
 import { AnimatePresence, motion } from "framer-motion";
 import { Bookmark, BookmarkCheck, Check, Minus, Package, Plus, X, Zap } from "lucide-react";
+import { createPortal } from "react-dom";
 import { useEffect, useRef, useState } from "react";
 import { useCartStore } from "@/store/cartStore";
 import { useListStore } from "@/store/listStore";
@@ -94,6 +95,15 @@ export default function ProductCard({
 
   // Particle burst on add to cart
   const [particles, setParticles] = useState<{ id: number; x: number; y: number; tx: number; ty: number; color: string }[]>([]);
+  const particleTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  // Clear particles on unmount so they don't bleed into other pages
+  useEffect(() => {
+    return () => {
+      if (particleTimerRef.current) clearTimeout(particleTimerRef.current);
+      setParticles([]);
+    };
+  }, []);
 
   const triggerParticles = (e: React.MouseEvent) => {
     const rect = (e.currentTarget as HTMLElement).getBoundingClientRect();
@@ -102,7 +112,7 @@ export default function ProductCard({
     const colors = ["#6941c6", "#00b761", "#ff9500", "#f43f5e", "#3b82f6"];
     const newParticles = Array.from({ length: 8 }, (_, i) => {
       const angle = (i / 8) * 2 * Math.PI;
-      const dist = 28 + Math.random() * 18;
+      const dist = 30 + Math.random() * 20;
       return {
         id: Date.now() + i,
         x: cx,
@@ -113,7 +123,8 @@ export default function ProductCard({
       };
     });
     setParticles(newParticles);
-    setTimeout(() => setParticles([]), 700);
+    if (particleTimerRef.current) clearTimeout(particleTimerRef.current);
+    particleTimerRef.current = setTimeout(() => setParticles([]), 650);
   };
 
   const product = { id: itemId, name, image, price, originalPrice, weight, tag, brand, category, description, details, nutrition };
@@ -366,17 +377,22 @@ export default function ProductCard({
         )}
       </AnimatePresence>
 
-      {/* Particle burst — fixed portal so it escapes card overflow */}
-      {particles.map((p) => (
-        <motion.span
-          key={p.id}
-          className="fixed z-[998] pointer-events-none rounded-full"
-          style={{ left: p.x, top: p.y, width: 6, height: 6, backgroundColor: p.color, translateX: "-50%", translateY: "-50%" }}
-          initial={{ opacity: 1, x: 0, y: 0, scale: 1 }}
-          animate={{ opacity: 0, x: p.tx, y: p.ty, scale: 0 }}
-          transition={{ duration: 0.55, ease: "easeOut" }}
-        />
-      ))}
+      {/* Particle burst — rendered into document.body via portal */}
+      {typeof document !== "undefined" && particles.length > 0 && createPortal(
+        <>
+          {particles.map((p) => (
+            <motion.span
+              key={p.id}
+              className="fixed z-[9999] pointer-events-none rounded-full"
+              style={{ left: p.x, top: p.y, width: 7, height: 7, backgroundColor: p.color, translateX: "-50%", translateY: "-50%" }}
+              initial={{ opacity: 1, x: 0, y: 0, scale: 1 }}
+              animate={{ opacity: 0, x: p.tx, y: p.ty, scale: 0 }}
+              transition={{ duration: 0.55, ease: "easeOut" }}
+            />
+          ))}
+        </>,
+        document.body
+      )}
     </>
   );
 }
