@@ -1,8 +1,8 @@
 "use client";
 
 import { AnimatePresence, motion } from "framer-motion";
-import { Bookmark, Check, Minus, Package, Plus, Share2, X } from "lucide-react";
-import { useState } from "react";
+import { Bookmark, BookmarkCheck, Check, Minus, Package, Plus, Share2, X } from "lucide-react";
+import { useRef, useState } from "react";
 import { useCartStore } from "@/store/cartStore";
 import { useListStore } from "@/store/listStore";
 
@@ -28,7 +28,7 @@ interface Props {
 
 export default function ProductDetailSheet({ product, onClose }: Props) {
   const { items, addItem, updateQuantity } = useCartStore();
-  const { lists, addItem: addToList } = useListStore();
+  const { lists, addItem: addToList, deleteItem } = useListStore();
 
   const cartItem = items.find((i) => i.id === product.id);
   const quantity = cartItem?.quantity ?? 0;
@@ -40,6 +40,35 @@ export default function ProductDetailSheet({ product, onClose }: Props) {
   const [showListPicker, setShowListPicker] = useState(false);
   const [addedToListId, setAddedToListId] = useState<number | null>(null);
   const [shared, setShared] = useState(false);
+  const [saveFlash, setSaveFlash] = useState<"saved" | "unsaved" | null>(null);
+  const [toastPos, setToastPos] = useState<{ x: number; y: number } | null>(null);
+  const bookmarkRef = useRef<HTMLButtonElement>(null);
+
+  const isSaved = lists.some((list) =>
+    list.items.some((item) => item.productId === product.id)
+  );
+
+  const captureToastPos = () => {
+    if (bookmarkRef.current) {
+      const r = bookmarkRef.current.getBoundingClientRect();
+      setToastPos({ x: r.left + r.width / 2, y: r.top });
+    }
+  };
+
+  const handleBookmarkClick = () => {
+    if (isSaved) {
+      lists.forEach((list) => {
+        list.items.forEach((item) => {
+          if (item.productId === product.id) deleteItem(list.id, item.id);
+        });
+      });
+      captureToastPos();
+      setSaveFlash("unsaved");
+      setTimeout(() => { setSaveFlash(null); setToastPos(null); }, 1400);
+    } else {
+      setShowListPicker(true);
+    }
+  };
 
   const handleAddToList = (listId: number) => {
     addToList(listId, {
@@ -49,7 +78,15 @@ export default function ProductDetailSheet({ product, onClose }: Props) {
       price: product.price,
     });
     setAddedToListId(listId);
-    setTimeout(() => { setAddedToListId(null); setShowListPicker(false); }, 1200);
+    setTimeout(() => {
+      setAddedToListId(null);
+      setShowListPicker(false);
+      setTimeout(() => {
+        captureToastPos();
+        setSaveFlash("saved");
+        setTimeout(() => { setSaveFlash(null); setToastPos(null); }, 1400);
+      }, 320);
+    }, 600);
   };
 
   const handleShare = async () => {
@@ -151,10 +188,45 @@ export default function ProductDetailSheet({ product, onClose }: Props) {
                     className="w-8 h-8 rounded-xl bg-gray-100 flex items-center justify-center text-gray-500">
                     {shared ? <Check size={14} strokeWidth={3} className="text-brand-accent" /> : <Share2 size={14} strokeWidth={2.5} />}
                   </button>
-                  <button onClick={() => setShowListPicker(true)}
-                    className="w-8 h-8 rounded-xl bg-brand-primary/10 flex items-center justify-center text-brand-primary">
-                    <Bookmark size={14} strokeWidth={2.5} />
-                  </button>
+                  {/* Animated bookmark button */}
+                  <div className="relative">
+                    <AnimatePresence>
+                      {saveFlash === "saved" && (
+                        <motion.span key="pulse-sheet"
+                          className="absolute inset-0 rounded-xl bg-brand-primary pointer-events-none"
+                          initial={{ opacity: 0.5, scale: 1 }}
+                          animate={{ opacity: 0, scale: 2 }}
+                          exit={{ opacity: 0 }}
+                          transition={{ duration: 0.45, ease: "easeOut" }}
+                        />
+                      )}
+                    </AnimatePresence>
+                    <motion.button
+                      ref={bookmarkRef}
+                      onClick={handleBookmarkClick}
+                      whileTap={{ scale: 0.82 }}
+                      className={`relative w-8 h-8 rounded-xl flex items-center justify-center transition-colors ${
+                        isSaved ? "bg-brand-primary text-white" : "bg-brand-primary/10 text-brand-primary"
+                      }`}
+                      aria-label={isSaved ? "Remove from list" : "Save to list"}
+                    >
+                      <AnimatePresence mode="wait">
+                        {isSaved ? (
+                          <motion.span key="saved-sheet"
+                            initial={{ scale: 0, rotate: -15 }} animate={{ scale: 1, rotate: 0 }} exit={{ scale: 0 }}
+                            transition={{ type: "spring", stiffness: 600, damping: 14 }}>
+                            <BookmarkCheck size={14} strokeWidth={2.5} />
+                          </motion.span>
+                        ) : (
+                          <motion.span key="unsaved-sheet"
+                            initial={{ scale: 0, rotate: 15 }} animate={{ scale: 1, rotate: 0 }} exit={{ scale: 0 }}
+                            transition={{ type: "spring", stiffness: 600, damping: 14 }}>
+                            <Bookmark size={14} strokeWidth={2.5} />
+                          </motion.span>
+                        )}
+                      </AnimatePresence>
+                    </motion.button>
+                  </div>
                 </div>
               </div>
 
@@ -320,6 +392,27 @@ export default function ProductDetailSheet({ product, onClose }: Props) {
               </div>
             </motion.div>
           </>
+        )}
+      </AnimatePresence>
+      {/* Fixed toast */}
+      <AnimatePresence>
+        {saveFlash !== null && toastPos !== null && (
+          <motion.div
+            key="sheet-toast"
+            initial={{ opacity: 0, y: 6, scale: 0.8 }}
+            animate={{ opacity: 1, y: 0, scale: 1 }}
+            exit={{ opacity: 0, y: -4, scale: 0.85 }}
+            transition={{ type: "spring", stiffness: 520, damping: 26 }}
+            className={`fixed z-[999] -translate-x-1/2 whitespace-nowrap px-2.5 py-1 rounded-lg text-[10px] font-black shadow-xl pointer-events-none ${
+              saveFlash === "saved" ? "bg-brand-primary text-white" : "bg-gray-700 text-white"
+            }`}
+            style={{ left: toastPos.x, top: toastPos.y - 36 }}
+          >
+            {saveFlash === "saved" ? "✓ Saved!" : "✕ Removed"}
+            <span className={`absolute left-1/2 -translate-x-1/2 top-full w-0 h-0 border-l-[5px] border-r-[5px] border-t-[5px] border-l-transparent border-r-transparent ${
+              saveFlash === "saved" ? "border-t-brand-primary" : "border-t-gray-700"
+            }`} />
+          </motion.div>
         )}
       </AnimatePresence>
     </>

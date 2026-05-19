@@ -12,10 +12,34 @@ import PageWrapper from "@/components/layout/PageWrapper";
 import { useCartStore } from "@/store/cartStore";
 import { useOrderStore } from "@/store/orderStore";
 import { allProducts } from "@/data/mockData";
+import ProductCard from "@/components/ui/ProductCard";
 
 const productMap = Object.fromEntries(
   Object.values(allProducts).flat().map((p) => [p.id, p])
 );
+
+type GroceryProduct = (typeof allProducts.vegetables)[number];
+
+const allGroceryProducts = (() => {
+  const seen = new Set<string>();
+  const result: GroceryProduct[] = [];
+  const keys: (keyof typeof allProducts)[] = [
+    "vegetables", "fruits", "herbs", "cutAndPeeled",
+    "milk", "curd", "paneer", "butterAndCheese",
+    "atta", "rice", "dal", "oilAndGhee",
+    "chips", "namkeen", "biscuits", "chocolates",
+    "teaAndCoffee", "juices", "softDrinks", "energyDrinks",
+    "detergents", "cleaners", "tissues", "repellents",
+    "bath", "hair", "skin", "oralCare",
+    "diapers", "babyFood", "petFood", "petTreats",
+  ];
+  for (const key of keys) {
+    for (const p of allProducts[key] as GroceryProduct[]) {
+      if (!seen.has(p.id)) { seen.add(p.id); result.push(p); }
+    }
+  }
+  return result;
+})();
 
 const COUPONS: Record<string, { label: string; discount: number; min: number; type: "pct" | "flat" }> = {
   SAVE10:   { label: "10% off (max Rs.80)",        discount: 0.10, min: 100, type: "pct"  },
@@ -218,6 +242,42 @@ export default function CartPage() {
             </div>
           )}
         </div>
+
+        {/* ── You might also want ── */}
+        {items.length > 0 && (() => {
+          // Pick products not already in cart, from same categories as cart items
+          const cartIds = new Set(items.map((i) => i.id));
+          const cartCategories = new Set(
+            items.map((i) => productMap[i.id] && "category" in productMap[i.id]
+              ? (productMap[i.id] as { category?: string }).category ?? ""
+              : "")
+          );
+          const suggestions = allGroceryProducts
+            .filter((p) => !cartIds.has(p.id) && cartCategories.has(p.category ?? ""))
+            .slice(0, 8);
+          if (suggestions.length === 0) return null;
+          return (
+            <div className="bg-white mt-2 pb-3">
+              <div className="px-4 pt-3 pb-2 flex items-center gap-2">
+                <Zap size={13} className="text-brand-orange" strokeWidth={2.5} />
+                <p className="text-[12px] font-black text-brand-text">You might also want</p>
+              </div>
+              <div className="flex overflow-x-auto gap-2.5 px-4 no-scrollbar">
+                {suggestions.map((product) => (
+                  <div key={product.id} className="w-[120px] flex-shrink-0">
+                    <ProductCard
+                      id={product.id} name={product.name} image={product.imageColor}
+                      price={product.price} originalPrice={product.originalPrice}
+                      weight={product.weight} tag={product.tag}
+                      brand={product.brand} category={product.category}
+                      description={product.description} details={product.details} nutrition={product.nutrition}
+                    />
+                  </div>
+                ))}
+              </div>
+            </div>
+          );
+        })()}
 
         {/* ── Coupon ── */}
         <div className="bg-white mt-2 px-4 py-3">

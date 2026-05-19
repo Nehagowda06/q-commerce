@@ -1,8 +1,9 @@
 "use client";
 
-import { motion } from "framer-motion";
+import { motion, AnimatePresence } from "framer-motion";
 import { Home, LayoutGrid, ListChecks, ShoppingCart } from "lucide-react";
 import { usePathname, useRouter } from "next/navigation";
+import { useEffect, useRef } from "react";
 import { useSearchStore } from "@/store/searchStore";
 import { useCartStore } from "@/store/cartStore";
 
@@ -18,7 +19,22 @@ export default function BottomNav() {
   const router    = useRouter();
   const reset     = useSearchStore((s) => s.reset);
   const cartItems = useCartStore((s) => s.items);
+  const lastAdded = useCartStore((s) => s.lastAdded);
+  const clearLastAdded = useCartStore((s) => s.clearLastAdded);
   const cartCount = cartItems.reduce((sum, i) => sum + i.quantity, 0);
+  const prevCount = useRef(cartCount);
+  const bouncing  = useRef(false);
+
+  // Trigger bounce when lastAdded fires
+  useEffect(() => {
+    if (lastAdded) {
+      bouncing.current = true;
+      const t = setTimeout(() => { bouncing.current = false; clearLastAdded(); }, 600);
+      return () => clearTimeout(t);
+    }
+  }, [lastAdded, clearLastAdded]);
+
+  useEffect(() => { prevCount.current = cartCount; }, [cartCount]);
 
   const handleNav = (href: string) => {
     if (href === "/") reset();
@@ -56,21 +72,30 @@ export default function BottomNav() {
 
               {/* Icon */}
               <div className="relative mt-1">
-                <Icon
-                  size={20}
-                  strokeWidth={isActive ? 2.2 : 1.6}
-                  className={`transition-colors duration-150 ${isActive ? "text-brand-primary" : "text-gray-400"}`}
-                />
-                {showBadge && (
-                  <motion.div
-                    initial={{ scale: 0 }}
-                    animate={{ scale: 1 }}
-                    transition={{ type: "spring", stiffness: 500, damping: 20 }}
-                    className="absolute -top-1 -right-1.5 min-w-[13px] h-[13px] bg-red-500 text-white text-[7px] font-bold rounded-full flex items-center justify-center px-0.5 leading-none"
-                  >
-                    {cartCount > 9 ? "9+" : cartCount}
-                  </motion.div>
-                )}
+                <motion.div
+                  animate={item.id === "cart" && lastAdded ? { scale: [1, 1.35, 0.9, 1.1, 1] } : { scale: 1 }}
+                  transition={{ duration: 0.45, ease: "easeOut" }}
+                >
+                  <Icon
+                    size={20}
+                    strokeWidth={isActive ? 2.2 : 1.6}
+                    className={`transition-colors duration-150 ${isActive ? "text-brand-primary" : "text-gray-400"}`}
+                  />
+                </motion.div>
+                <AnimatePresence>
+                  {showBadge && (
+                    <motion.div
+                      key={cartCount}
+                      initial={{ scale: 0 }}
+                      animate={{ scale: 1 }}
+                      exit={{ scale: 0 }}
+                      transition={{ type: "spring", stiffness: 600, damping: 18 }}
+                      className="absolute -top-1 -right-1.5 min-w-[13px] h-[13px] bg-red-500 text-white text-[7px] font-bold rounded-full flex items-center justify-center px-0.5 leading-none"
+                    >
+                      {cartCount > 9 ? "9+" : cartCount}
+                    </motion.div>
+                  )}
+                </AnimatePresence>
               </div>
 
               {/* Label */}

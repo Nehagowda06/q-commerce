@@ -61,7 +61,6 @@ export default function ProductCard({
   const handleBookmarkClick = (e: React.MouseEvent) => {
     e.stopPropagation();
     if (isSaved) {
-      // Remove from every list it appears in
       lists.forEach((list) => {
         list.items.forEach((item) => {
           if (item.productId === itemId) {
@@ -91,6 +90,25 @@ export default function ProductCard({
         setTimeout(() => { setSaveFlash(null); setToastPos(null); }, 1400);
       }, 320);
     }, 600);
+  };
+
+  // Particle burst on add to cart
+  const [particles, setParticles] = useState<{ id: number; x: number; y: number; color: string }[]>([]);
+  const addBtnRef = useRef<HTMLButtonElement>(null);
+
+  const triggerParticles = (e: React.MouseEvent) => {
+    const rect = (e.currentTarget as HTMLElement).getBoundingClientRect();
+    const cx = rect.left + rect.width / 2;
+    const cy = rect.top + rect.height / 2;
+    const colors = ["#6941c6", "#00b761", "#ff9500", "#f43f5e", "#3b82f6"];
+    const newParticles = Array.from({ length: 8 }, (_, i) => ({
+      id: Date.now() + i,
+      x: cx,
+      y: cy,
+      color: colors[i % colors.length],
+    }));
+    setParticles(newParticles);
+    setTimeout(() => setParticles([]), 700);
   };
 
   const product = { id: itemId, name, image, price, originalPrice, weight, tag, brand, category, description, details, nutrition };
@@ -222,7 +240,7 @@ export default function ProductCard({
                   animate={{ opacity: 1, scale: 1 }}
                   exit={{ opacity: 0, scale: 0.9 }}
                   whileTap={{ scale: 0.92 }}
-                  onClick={(e) => { e.stopPropagation(); addItem({ id: itemId, name, price }); }}
+                  onClick={(e) => { e.stopPropagation(); triggerParticles(e); addItem({ id: itemId, name, price }); }}
                   className="absolute inset-0 savega-gradient text-white text-[10px] font-black rounded-lg shadow-sm flex items-center justify-center gap-1"
                 >
                   <Plus size={11} strokeWidth={3} />
@@ -342,6 +360,24 @@ export default function ProductCard({
           </motion.div>
         )}
       </AnimatePresence>
+
+      {/* Particle burst — fixed portal so it escapes card overflow */}
+      {particles.map((p, i) => {
+        const angle = (i / particles.length) * 2 * Math.PI;
+        const dist = 28 + Math.random() * 18;
+        const tx = Math.cos(angle) * dist;
+        const ty = Math.sin(angle) * dist;
+        return (
+          <motion.span
+            key={p.id}
+            className="fixed z-[998] pointer-events-none rounded-full"
+            style={{ left: p.x, top: p.y, width: 6, height: 6, backgroundColor: p.color, translateX: "-50%", translateY: "-50%" }}
+            initial={{ opacity: 1, x: 0, y: 0, scale: 1 }}
+            animate={{ opacity: 0, x: tx, y: ty, scale: 0 }}
+            transition={{ duration: 0.55, ease: "easeOut" }}
+          />
+        );
+      })}
     </>
   );
 }
