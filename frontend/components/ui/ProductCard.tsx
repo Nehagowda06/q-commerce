@@ -93,20 +93,25 @@ export default function ProductCard({
   };
 
   // Particle burst on add to cart
-  const [particles, setParticles] = useState<{ id: number; x: number; y: number; color: string }[]>([]);
-  const addBtnRef = useRef<HTMLButtonElement>(null);
+  const [particles, setParticles] = useState<{ id: number; x: number; y: number; tx: number; ty: number; color: string }[]>([]);
 
   const triggerParticles = (e: React.MouseEvent) => {
     const rect = (e.currentTarget as HTMLElement).getBoundingClientRect();
     const cx = rect.left + rect.width / 2;
     const cy = rect.top + rect.height / 2;
     const colors = ["#6941c6", "#00b761", "#ff9500", "#f43f5e", "#3b82f6"];
-    const newParticles = Array.from({ length: 8 }, (_, i) => ({
-      id: Date.now() + i,
-      x: cx,
-      y: cy,
-      color: colors[i % colors.length],
-    }));
+    const newParticles = Array.from({ length: 8 }, (_, i) => {
+      const angle = (i / 8) * 2 * Math.PI;
+      const dist = 28 + Math.random() * 18;
+      return {
+        id: Date.now() + i,
+        x: cx,
+        y: cy,
+        tx: Math.cos(angle) * dist,
+        ty: Math.sin(angle) * dist,
+        color: colors[i % colors.length],
+      };
+    });
     setParticles(newParticles);
     setTimeout(() => setParticles([]), 700);
   };
@@ -362,22 +367,16 @@ export default function ProductCard({
       </AnimatePresence>
 
       {/* Particle burst — fixed portal so it escapes card overflow */}
-      {particles.map((p, i) => {
-        const angle = (i / particles.length) * 2 * Math.PI;
-        const dist = 28 + Math.random() * 18;
-        const tx = Math.cos(angle) * dist;
-        const ty = Math.sin(angle) * dist;
-        return (
-          <motion.span
-            key={p.id}
-            className="fixed z-[998] pointer-events-none rounded-full"
-            style={{ left: p.x, top: p.y, width: 6, height: 6, backgroundColor: p.color, translateX: "-50%", translateY: "-50%" }}
-            initial={{ opacity: 1, x: 0, y: 0, scale: 1 }}
-            animate={{ opacity: 0, x: tx, y: ty, scale: 0 }}
-            transition={{ duration: 0.55, ease: "easeOut" }}
-          />
-        );
-      })}
+      {particles.map((p) => (
+        <motion.span
+          key={p.id}
+          className="fixed z-[998] pointer-events-none rounded-full"
+          style={{ left: p.x, top: p.y, width: 6, height: 6, backgroundColor: p.color, translateX: "-50%", translateY: "-50%" }}
+          initial={{ opacity: 1, x: 0, y: 0, scale: 1 }}
+          animate={{ opacity: 0, x: p.tx, y: p.ty, scale: 0 }}
+          transition={{ duration: 0.55, ease: "easeOut" }}
+        />
+      ))}
     </>
   );
 }
