@@ -1,11 +1,13 @@
 "use client";
 
 import { motion, AnimatePresence } from "framer-motion";
-import { ArrowLeft, Check, ChevronRight, ClipboardList, Truck } from "lucide-react";
+import { ArrowLeft, Check, ChevronRight, ClipboardList, RotateCcw, Truck } from "lucide-react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { useState } from "react";
 import PageWrapper from "@/components/layout/PageWrapper";
 import { useOrderStore, type Order, type OrderStatus } from "@/store/orderStore";
+import { useCartStore } from "@/store/cartStore";
 
 const STATUS_STEPS: { key: OrderStatus; label: string }[] = [
   { key: "confirmed", label: "Confirmed" },
@@ -59,6 +61,19 @@ function OrderCard({ order, onExpand }: { order: Order; onExpand: () => void }) 
   const date = new Date(order.placedAt);
   const timeStr = date.toLocaleTimeString("en-IN", { hour: "2-digit", minute: "2-digit" });
   const dateStr = date.toLocaleDateString("en-IN", { day: "numeric", month: "short" });
+  const addItem = useCartStore((s) => s.addItem);
+  const router = useRouter();
+  const [reordering, setReordering] = useState(false);
+
+  const handleReorder = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    setReordering(true);
+    order.items.forEach((item) => addItem({ id: item.id, name: item.name, price: item.price }));
+    setTimeout(() => {
+      setReordering(false);
+      router.push("/cart");
+    }, 700);
+  };
 
   return (
     <motion.div
@@ -86,12 +101,27 @@ function OrderCard({ order, onExpand }: { order: Order; onExpand: () => void }) 
 
       <div className="flex items-center justify-between mt-2.5 pt-2.5 border-t border-gray-50">
         <span className="text-xs font-black text-brand-text">Rs.{order.total}</span>
-        <button
-          onClick={onExpand}
-          className="flex items-center gap-1 text-[10px] font-black text-brand-primary"
-        >
-          Details <ChevronRight size={12} strokeWidth={3} />
-        </button>
+        <div className="flex items-center gap-2">
+          <motion.button
+            whileTap={{ scale: 0.92 }}
+            onClick={handleReorder}
+            disabled={reordering}
+            className={`flex items-center gap-1 text-[10px] font-black px-2.5 py-1.5 rounded-lg transition-colors ${
+              reordering ? "bg-brand-accent text-white" : "bg-brand-primary/10 text-brand-primary"
+            }`}
+          >
+            <motion.span animate={reordering ? { rotate: 360 } : { rotate: 0 }} transition={{ duration: 0.6 }}>
+              <RotateCcw size={10} strokeWidth={2.5} />
+            </motion.span>
+            {reordering ? "Adding…" : "Reorder"}
+          </motion.button>
+          <button
+            onClick={onExpand}
+            className="flex items-center gap-1 text-[10px] font-black text-brand-primary"
+          >
+            Details <ChevronRight size={12} strokeWidth={3} />
+          </button>
+        </div>
       </div>
     </motion.div>
   );

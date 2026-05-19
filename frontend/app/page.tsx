@@ -2,7 +2,7 @@
 
 import { useEffect, useMemo, useRef, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
-import { Check, ChevronDown, ChevronRight, Clock, Star, Store, Utensils, X, Zap } from "lucide-react";
+import { Check, ChevronDown, ChevronRight, Clock, RotateCcw, Star, Store, Utensils, X, Zap } from "lucide-react";
 import Link from "next/link";
 import PageWrapper from "@/components/layout/PageWrapper";
 import ProductCard from "@/components/ui/ProductCard";
@@ -10,6 +10,8 @@ import CategoryCard from "@/components/ui/CategoryCard";
 import PullToRefresh from "@/components/ui/PullToRefresh";
 import { allProducts, foodCategories, groceryAisles, restaurants, type Subcategory } from "@/data/mockData";
 import { useSearchStore, type SortOption, type FilterOption } from "@/store/searchStore";
+import { useOrderStore } from "@/store/orderStore";
+import { useCartStore } from "@/store/cartStore";
 
 const containerVariants = {
   hidden: { opacity: 0 },
@@ -384,6 +386,32 @@ function GroceryHome({
   setActiveAisle: (name: string) => void;
   activeSubcategories: Subcategory[];
 }) {
+  const orders = useOrderStore((s) => s.orders);
+  const cartItems = useCartStore((s) => s.items);
+
+  // "Buy Again" — products from past orders, deduped
+  const buyAgainProducts = useMemo(() => {
+    const seen = new Set<string>();
+    const result: GroceryProduct[] = [];
+    for (const order of orders) {
+      for (const item of order.items) {
+        if (!seen.has(item.id)) {
+          seen.add(item.id);
+          const p = allGroceryProducts.find((gp) => gp.id === item.id);
+          if (p) result.push(p);
+        }
+      }
+    }
+    return result.slice(0, 10);
+  }, [orders]);
+
+  // "Recently Viewed" — products currently in cart (proxy for viewed, since we have no view tracking yet)
+  const recentlyViewed = useMemo(() => {
+    return cartItems
+      .map((ci) => allGroceryProducts.find((p) => p.id === ci.id))
+      .filter(Boolean)
+      .slice(0, 8) as GroceryProduct[];
+  }, [cartItems]);
   return (
     <>
       <motion.section variants={sectionVariants} className="px-3 pt-3">
@@ -595,6 +623,9 @@ function GroceryHome({
       </motion.section>
 
       <ProductRow title="Fresh Picks" subtitle="Morning essentials" products={[...allProducts.vegetables, ...allProducts.fruits]} />
+      {buyAgainProducts.length > 0 && (
+        <BuyAgainRow products={buyAgainProducts} />
+      )}
       <ProductRow title="Savega Staples" subtitle="Popular pantry deals" products={allProducts.staples} />
       <ProductGrid title="Super Savings" products={[...allProducts.dairy, ...allProducts.snacks]} />
       <WatermarkFooter />
@@ -887,8 +918,45 @@ function WatermarkFooter() {
   );
 }
 
-function ProductRow({ title, subtitle, products }: { title: string; subtitle: string; products: GroceryProduct[] }) {
+function BuyAgainRow({ products }: { products: GroceryProduct[] }) {
+  const { addItem } = useCartStore();
   return (
+    <motion.section variants={sectionVariants} className="mt-5">
+      <div className="px-3 flex items-center justify-between mb-2.5">
+        <div className="flex items-center gap-2">
+          <div className="w-6 h-6 rounded-lg bg-brand-primary/10 flex items-center justify-center">
+            <RotateCcw size={12} className="text-brand-primary" strokeWidth={2.5} />
+          </div>
+          <div>
+            <h2 className="text-[14px] font-black text-brand-text">Buy Again</h2>
+            <p className="text-[9px] text-brand-text-muted font-bold uppercase tracking-wide">From your past orders</p>
+          </div>
+        </div>
+      </div>
+      <div className="flex overflow-x-auto gap-2.5 px-3 pb-3 no-scrollbar">
+        {products.map((product, i) => (
+          <motion.div
+            key={product.id}
+            className="w-[130px] flex-shrink-0"
+            initial={{ opacity: 0, y: 16 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: Math.min(i * 0.04, 0.2), type: "spring", stiffness: 300, damping: 24 }}
+          >
+            <ProductCard
+              id={product.id} name={product.name} image={product.imageColor}
+              price={product.price} originalPrice={product.originalPrice}
+              weight={product.weight} tag={product.tag}
+              brand={product.brand} category={product.category}
+              description={product.description} details={product.details} nutrition={product.nutrition}
+            />
+          </motion.div>
+        ))}
+      </div>
+    </motion.section>
+  );
+}
+
+function ProductRow({ title, subtitle, products }: { title: string; subtitle: string; products: GroceryProduct[] }) {  return (
     <motion.section variants={sectionVariants} className="mt-5">
       <div className="px-3 flex items-center justify-between mb-2.5">
         <div>

@@ -1,11 +1,11 @@
 "use client";
 
 import { AnimatePresence, motion } from "framer-motion";
-import { Briefcase, Check, ChevronDown, Home, MapPin, Navigation, Plus, Search, User, X } from "lucide-react";
+import { Briefcase, Check, ChevronDown, Clock, Home, MapPin, Navigation, Plus, Search, User, X } from "lucide-react";
 import Link from "next/link";
 import dynamic from "next/dynamic";
 import { usePathname } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useSearchStore } from "@/store/searchStore";
 import { MANDYA_CENTER } from "@/components/ui/LeafletMap";
 
@@ -21,6 +21,14 @@ const placeholders = [
   'Search "detergent"',
 ];
 
+// Quick autocomplete suggestions derived from product names
+const SUGGESTIONS = [
+  "tomatoes", "onion", "potato", "milk", "curd", "paneer", "butter",
+  "atta", "rice", "dal", "ghee", "chips", "biscuits", "chocolate",
+  "tea", "coffee", "juice", "soap", "shampoo", "detergent",
+  "banana", "mango", "apple", "broccoli", "carrot",
+];
+
 const routesWithSearch = new Set(["/", "/categories"]);
 
 const SAVED_ADDRESSES = [
@@ -31,8 +39,32 @@ const SAVED_ADDRESSES = [
 export default function Navbar() {
   const pathname = usePathname();
   const [placeholderIdx, setPlaceholderIdx] = useState(0);
-  const { query, setQuery, reset } = useSearchStore();
+  const { query, setQuery, reset, recentSearches, addRecentSearch, clearRecentSearches } = useSearchStore();
   const showSearch = routesWithSearch.has(pathname);
+  const [searchFocused, setSearchFocused] = useState(false);
+  const inputRef = useRef<HTMLInputElement>(null);
+
+  // Autocomplete suggestions filtered by current query
+  const suggestions = query.trim().length > 0
+    ? SUGGESTIONS.filter((s) => s.includes(query.toLowerCase())).slice(0, 5)
+    : [];
+
+  const showDropdown = searchFocused && (suggestions.length > 0 || recentSearches.length > 0) && !query.trim().length || (searchFocused && suggestions.length > 0);
+
+  const handleSelectSuggestion = (s: string) => {
+    setQuery(s);
+    addRecentSearch(s);
+    setSearchFocused(false);
+    inputRef.current?.blur();
+  };
+
+  const handleSearchSubmit = () => {
+    if (query.trim()) {
+      addRecentSearch(query.trim());
+      setSearchFocused(false);
+      inputRef.current?.blur();
+    }
+  };
 
   const [showAddressPicker, setShowAddressPicker] = useState(false);
   const [activeAddressId, setActiveAddressId] = useState("home");
@@ -127,7 +159,14 @@ export default function Navbar() {
                 </motion.div>
               </div>
               <div className="search-bar relative w-full h-10 rounded-xl flex items-center overflow-hidden">
-                <input type="text" value={query} onChange={(e) => setQuery(e.target.value)}
+                <input
+                  ref={inputRef}
+                  type="text"
+                  value={query}
+                  onChange={(e) => setQuery(e.target.value)}
+                  onFocus={() => setSearchFocused(true)}
+                  onBlur={() => setTimeout(() => setSearchFocused(false), 150)}
+                  onKeyDown={(e) => e.key === "Enter" && handleSearchSubmit()}
                   className="w-full h-full pl-9 pr-16 bg-transparent text-[12px] font-medium focus:outline-none z-10 text-brand-text"
                   aria-label="Search Savega" placeholder="" />
                 {!query && (
@@ -160,6 +199,53 @@ export default function Navbar() {
                   )}
                 </AnimatePresence>
               </div>
+
+              {/* Autocomplete / recent searches dropdown */}
+              <AnimatePresence>
+                {showDropdown && (
+                  <motion.div
+                    initial={{ opacity: 0, y: -4, scale: 0.98 }}
+                    animate={{ opacity: 1, y: 0, scale: 1 }}
+                    exit={{ opacity: 0, y: -4, scale: 0.98 }}
+                    transition={{ type: "spring", stiffness: 500, damping: 32 }}
+                    className="absolute top-[calc(100%+6px)] left-0 right-0 bg-white rounded-2xl shadow-xl border border-gray-100 overflow-hidden z-[55]"
+                  >
+                    {/* Suggestions */}
+                    {suggestions.length > 0 && (
+                      <div>
+                        {suggestions.map((s) => (
+                          <button key={s} onMouseDown={() => handleSelectSuggestion(s)}
+                            className="w-full flex items-center gap-2.5 px-3 py-2.5 hover:bg-gray-50 text-left">
+                            <Search size={11} className="text-brand-text-muted flex-shrink-0" strokeWidth={2} />
+                            <span className="text-[12px] text-brand-text">
+                              {s.slice(0, query.length) === query.toLowerCase()
+                                ? <><span className="font-black text-brand-primary">{s.slice(0, query.length)}</span>{s.slice(query.length)}</>
+                                : s}
+                            </span>
+                          </button>
+                        ))}
+                      </div>
+                    )}
+
+                    {/* Recent searches — only when no query */}
+                    {!query.trim() && recentSearches.length > 0 && (
+                      <div>
+                        <div className="flex items-center justify-between px-3 pt-2.5 pb-1">
+                          <span className="text-[9px] font-black text-brand-text-muted uppercase tracking-wider">Recent</span>
+                          <button onMouseDown={clearRecentSearches} className="text-[9px] font-black text-brand-primary">Clear</button>
+                        </div>
+                        {recentSearches.map((r) => (
+                          <button key={r} onMouseDown={() => handleSelectSuggestion(r)}
+                            className="w-full flex items-center gap-2.5 px-3 py-2 hover:bg-gray-50 text-left">
+                            <Clock size={11} className="text-brand-text-muted flex-shrink-0" strokeWidth={2} />
+                            <span className="text-[12px] text-brand-text">{r}</span>
+                          </button>
+                        ))}
+                      </div>
+                    )}
+                  </motion.div>
+                )}
+              </AnimatePresence>
             </div>
           )}
         </div>

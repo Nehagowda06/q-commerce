@@ -20,13 +20,14 @@ const STATUS_STEPS: { key: OrderStatus; label: string; desc: string }[] = [
   { key: "delivered", label: "Delivered", desc: "Enjoy your order!" },
 ];
 
-const confettiPieces = Array.from({ length: 18 }, (_, i) => ({
+const confettiPieces = Array.from({ length: 20 }, (_, i) => ({
   id: i,
-  x: `${(i * 37) % 100}%`,
-  y: `${(i * 61) % 100}%`,
-  duration: 2 + (i % 4) * 0.35,
-  delay: (i % 6) * 0.45,
-  color: ["bg-brand-primary", "bg-brand-accent", "bg-yellow-400", "bg-blue-400"][i % 4],
+  left: `${5 + (i * 37) % 90}%`,
+  duration: `${2 + (i % 4) * 0.4}s`,
+  delay: `${(i % 7) * 0.3}s`,
+  color: ["#6941c6", "#00b761", "#facc15", "#3b82f6", "#f43f5e"][i % 5],
+  size: 6 + (i % 3) * 3,
+  rotate: i % 2 === 0 ? "360deg" : "-360deg",
 }));
 
 function OrderTracker({ order }: { order: Order }) {
@@ -143,14 +144,34 @@ function OrderSuccessContent() {
   return (
     <PageWrapper>
       <div className="relative flex flex-col items-center px-4 py-6 pb-32 overflow-hidden">
-        {/* Confetti */}
+        {/* Confetti — pure CSS fall animation, no Framer Motion transform issues */}
         <div className="absolute inset-0 pointer-events-none overflow-hidden">
+          <style>{`
+            @keyframes confetti-fall {
+              0%   { transform: translateY(-20px) rotate(0deg); opacity: 1; }
+              80%  { opacity: 1; }
+              100% { transform: translateY(100vh) rotate(var(--r)); opacity: 0; }
+            }
+          `}</style>
           {confettiPieces.map((p) => (
-            <motion.div key={p.id}
-              initial={{ x: "50%", y: "50%", scale: 0, rotate: 0 }}
-              animate={{ x: p.x, y: p.y, scale: [0, 1, 0.5], rotate: 360 }}
-              transition={{ duration: p.duration, ease: "easeOut", repeat: Infinity, repeatDelay: p.delay }}
-              className={`absolute w-2.5 h-2.5 rounded-sm ${p.color}`}
+            <div
+              key={p.id}
+              style={{
+                position: "absolute",
+                left: p.left,
+                top: 0,
+                width: p.size,
+                height: p.size,
+                backgroundColor: p.color,
+                borderRadius: p.id % 3 === 0 ? "50%" : "2px",
+                animationName: "confetti-fall",
+                animationDuration: p.duration,
+                animationDelay: p.delay,
+                animationTimingFunction: "linear",
+                animationIterationCount: "infinite",
+                animationFillMode: "both",
+                ["--r" as string]: p.rotate,
+              }}
             />
           ))}
         </div>

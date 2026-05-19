@@ -2,6 +2,7 @@
 
 import { AnimatePresence, motion } from "framer-motion";
 import { Bookmark, BookmarkCheck, Check, Minus, Package, Plus, X, Zap } from "lucide-react";
+import { createPortal } from "react-dom";
 import { useEffect, useRef, useState } from "react";
 import { useCartStore } from "@/store/cartStore";
 import { useListStore } from "@/store/listStore";
@@ -61,7 +62,6 @@ export default function ProductCard({
   const handleBookmarkClick = (e: React.MouseEvent) => {
     e.stopPropagation();
     if (isSaved) {
-      // Remove from every list it appears in
       lists.forEach((list) => {
         list.items.forEach((item) => {
           if (item.productId === itemId) {
@@ -91,6 +91,40 @@ export default function ProductCard({
         setTimeout(() => { setSaveFlash(null); setToastPos(null); }, 1400);
       }, 320);
     }, 600);
+  };
+
+  // Particle burst on add to cart
+  const [particles, setParticles] = useState<{ id: number; x: number; y: number; tx: number; ty: number; color: string }[]>([]);
+  const particleTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  // Clear particles on unmount so they don't bleed into other pages
+  useEffect(() => {
+    return () => {
+      if (particleTimerRef.current) clearTimeout(particleTimerRef.current);
+      setParticles([]);
+    };
+  }, []);
+
+  const triggerParticles = (e: React.MouseEvent) => {
+    const rect = (e.currentTarget as HTMLElement).getBoundingClientRect();
+    const cx = rect.left + rect.width / 2;
+    const cy = rect.top + rect.height / 2;
+    const colors = ["#6941c6", "#00b761", "#ff9500", "#f43f5e", "#3b82f6"];
+    const newParticles = Array.from({ length: 8 }, (_, i) => {
+      const angle = (i / 8) * 2 * Math.PI;
+      const dist = 30 + Math.random() * 20;
+      return {
+        id: Date.now() + i,
+        x: cx,
+        y: cy,
+        tx: Math.cos(angle) * dist,
+        ty: Math.sin(angle) * dist,
+        color: colors[i % colors.length],
+      };
+    });
+    setParticles(newParticles);
+    if (particleTimerRef.current) clearTimeout(particleTimerRef.current);
+    particleTimerRef.current = setTimeout(() => setParticles([]), 650);
   };
 
   const product = { id: itemId, name, image, price, originalPrice, weight, tag, brand, category, description, details, nutrition };
@@ -222,7 +256,7 @@ export default function ProductCard({
                   animate={{ opacity: 1, scale: 1 }}
                   exit={{ opacity: 0, scale: 0.9 }}
                   whileTap={{ scale: 0.92 }}
-                  onClick={(e) => { e.stopPropagation(); addItem({ id: itemId, name, price }); }}
+                  onClick={(e) => { e.stopPropagation(); triggerParticles(e); addItem({ id: itemId, name, price }); }}
                   className="absolute inset-0 savega-gradient text-white text-[10px] font-black rounded-lg shadow-sm flex items-center justify-center gap-1"
                 >
                   <Plus size={11} strokeWidth={3} />
@@ -342,6 +376,23 @@ export default function ProductCard({
           </motion.div>
         )}
       </AnimatePresence>
+
+      {/* Particle burst — rendered into document.body via portal */}
+      {typeof document !== "undefined" && particles.length > 0 && createPortal(
+        <>
+          {particles.map((p) => (
+            <motion.span
+              key={p.id}
+              className="fixed z-[9999] pointer-events-none rounded-full"
+              style={{ left: p.x, top: p.y, width: 7, height: 7, backgroundColor: p.color, translateX: "-50%", translateY: "-50%" }}
+              initial={{ opacity: 1, x: 0, y: 0, scale: 1 }}
+              animate={{ opacity: 0, x: p.tx, y: p.ty, scale: 0 }}
+              transition={{ duration: 0.55, ease: "easeOut" }}
+            />
+          ))}
+        </>,
+        document.body
+      )}
     </>
   );
 }
