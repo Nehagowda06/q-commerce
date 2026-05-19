@@ -22,8 +22,9 @@ const STATUS_STEPS: { key: OrderStatus; label: string; desc: string }[] = [
 
 const confettiPieces = Array.from({ length: 18 }, (_, i) => ({
   id: i,
-  x: `${(i * 37) % 100}%`,
-  y: `${(i * 61) % 100}%`,
+  // Spread pieces across the full width, avoid the 0,0 corner
+  x: `${5 + (i * 37) % 90}%`,
+  y: `${5 + (i * 61) % 85}%`,
   duration: 2 + (i % 4) * 0.35,
   delay: (i % 6) * 0.45,
   color: ["bg-brand-primary", "bg-brand-accent", "bg-yellow-400", "bg-blue-400"][i % 4],
@@ -147,9 +148,9 @@ function OrderSuccessContent() {
         <div className="absolute inset-0 pointer-events-none overflow-hidden">
           {confettiPieces.map((p) => (
             <motion.div key={p.id}
-              initial={{ x: "50%", y: "50%", scale: 0, rotate: 0 }}
-              animate={{ x: p.x, y: p.y, scale: [0, 1, 0.5], rotate: 360 }}
-              transition={{ duration: p.duration, ease: "easeOut", repeat: Infinity, repeatDelay: p.delay }}
+              initial={{ x: p.x, y: "-10%", scale: 0, rotate: 0, opacity: 1 }}
+              animate={{ x: p.x, y: "110%", scale: [0, 1, 1, 0.5], rotate: 360, opacity: [0, 1, 1, 0] }}
+              transition={{ duration: p.duration, ease: "easeIn", repeat: Infinity, repeatDelay: p.delay, delay: p.delay }}
               className={`absolute w-2.5 h-2.5 rounded-sm ${p.color}`}
             />
           ))}
