@@ -154,5 +154,45 @@ button, input { font: inherit; }
     max-width: 100%;
     box-shadow: none;
   }
+
+  /* ── Banner: taller on desktop ── */
+  [style*="0a5c42"],
+  [style*="6b1209"] {
+    min-height: 200px !important;
+  }
+
+  /* ── Shop by Aisle section: bigger icons + more spacing ── */
+  #grocery-aisles .flex.overflow-x-auto {
+    gap: 20px !important;
+    padding-left: 20px !important;
+    padding-right: 20px !important;
+  }
+  /* Scale up each CategoryCard */
+  #grocery-aisles .flex.overflow-x-auto > button {
+    width: 96px !important;
+    transform: scale(1.2);
+    transform-origin: top center;
+    margin-bottom: 12px;
+  }
+
+  /* ── Subcategory grid: 4 columns on desktop ── */
+  #grocery-aisles .grid {
+    grid-template-columns: repeat(4, minmax(0, 1fr)) !important;
+    gap: 12px !important;
+    padding-left: 20px !important;
+    padding-right: 20px !important;
+  }
+
+  /* ── Shop by Aisle heading row padding ── */
+  #grocery-aisles > div:first-child {
+    padding-left: 20px !important;
+    padding-right: 20px !important;
+  }
+
+  /* ── Super Savings: 4 columns so cards are smaller ── */
+  .super-savings-grid {
+    grid-template-columns: repeat(4, minmax(0, 1fr)) !important;
+    gap: 12px !important;
+  }
 }
 

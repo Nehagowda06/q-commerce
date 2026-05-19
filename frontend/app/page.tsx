@@ -999,7 +999,7 @@ function ProductGrid({ title, products }: { title: string; products: GroceryProd
           <Zap size={10} fill="white" strokeWidth={0} /> Limited time
         </div>
       </div>
-      <div className="grid grid-cols-2 gap-2.5">
+      <div className="grid grid-cols-2 gap-2.5 super-savings-grid">
         {products.slice(0, 4).map((product) => (
           <ProductCard
             key={product.id} id={product.id} name={product.name} image={product.imageColor}
